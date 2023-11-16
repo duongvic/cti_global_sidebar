@@ -79,3 +79,50 @@ html {
   align-items: center;
   margin: 0;
 }
+.call-action{
+  padding-top: 10rem;
+}
+.btn-call{
+  /* display: inline-flex;
+  place-content: center;
+  align-items: center;
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 0px;
+  cursor: inherit;
+  letter-spacing: 0px;
+  outline: 0px;
+  border-radius: 4px;
+  --fw-icon-color: currentColor; */
+  display: inline-flex;
+  height: 6rem;
+  color: aliceblue;
+  background-color: green;
+  border: aliceblue;
+  width: 100%;
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  place-content: center;
+  align-items: center;
+  font-weight: 600;
+  /* border-radius: 6ch; */
+  border-bottom-right-radius: 2ch;
+  border-bottom-left-radius: 2ch;
+}
+
+.lb-phone {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #262626;
+}
