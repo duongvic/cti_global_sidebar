@@ -31,6 +31,37 @@ function showNotify(type, message) {
 }
 
 /**
+ * To get the logged in user in Freshdesk
+ */
+function getLoggedInUser() {
+  client.data.get("loggedInUser").then(
+    function (data) {
+      console.info("Successfully got loggedInUser data");
+      showNotify("info", `User's name: ${data.loggedInUser.contact.name}`);
+    },
+    function (error) {
+      console.error("Error: Failed to get the loggedInUser information");
+      console.error(error);
+    }
+  );
+}
+
+/**
+ * To open the CTI app
+ */
+function openApp() {
+  client.interface
+    .trigger("show", { id: "softphone" })
+    .then(function () {
+      console.log(`Success: Opened the app`);
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to open the app");
+      console.error(error);
+    });
+}
+
+/**
  * To close the CTI app
  */
 function closeApp() {
@@ -38,12 +69,26 @@ function closeApp() {
     .trigger("hide", { id: "softphone" })
     .then(function () {
       console.info("successfully closed the CTI app");
-      // showNotify("success", "Successfully closed the CTI app.");
+      showNotify("success", "Successfully closed the CTI app.");
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
       console.error(error);
     });
+}
+
+/**
+ * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
+ */
+function clickToCall() {
+  let textElement = document.getElementById("appText");
+
+  client.events.on("cti.triggerDialer", function (event) {
+    openApp();
+    var data = event.helper.getData();
+    console.log("data", data);
+    textElement.innerText = `Clicked phone number: ${data.number}`;
+  });
 }
 
 /**
@@ -60,20 +105,20 @@ async function init() {
   client.events.on("app.activated", onAppActiveHandler);
   client.events.on("app.deactivated", onAppDeactiveHandler);
 
-  client.events.on("app.activated", getContactData);
+  // client.events.on("app.activated", getContactData);
 }
 
-async function getContactData() {
-  try {
-    const data = await client.data.get("contact");
-    // Success output
-    // data: {contact: {"active": true, ...}}
-    console.log(data);
-  } catch (error) {
-    // Failure operation
-    console.log(error);
-  }
-}
+// async function getContactData() {
+//   try {
+//     const data = await client.data.get("contact");
+//     // Success output
+//     // data: {contact: {"active": true, ...}}
+//     console.log(data);
+//   } catch (error) {
+//     // Failure operation
+//     console.log(error);
+//   }
+// }
 
 // async function getContacts() {
 //   const iparamData = await client.iparams.get("creatorDomain");
@@ -99,18 +144,23 @@ function onAppActiveHandler() {
 
   /* Adding event handlers for all the buttons in the UI of the app */
   document.getElementById("btnClose").addEventListener("fwClick", closeApp);
-  document.getElementById("btnClose1").addEventListener("click", () => {
-    client.interface
-      .trigger("hide", { id: "softphone" })
-      .then(function () {
-        console.info("successfully closed the CTI app");
-        // showNotify("success", "Successfully closed the CTI app.");
-      })
-      .catch(function (error) {
-        console.error("Error: Failed to close the CTI app");
-        console.error(error);
-      });
-  });
+
+  // document.getElementById("btnClose1").addEventListener("click", () => {
+  //   client.interface
+  //     .trigger("hide", { id: "softphone" })
+  //     .then(function () {
+  //       console.info("successfully closed the CTI app");
+  //       // showNotify("success", "Successfully closed the CTI app.");
+  //     })
+  //     .catch(function (error) {
+  //       console.error("Error: Failed to close the CTI app");
+  //       console.error(error);
+  //     });
+  // });
+
+  /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
+  clickToCall();
+
   console.info("App is activated");
 }
 function onAppDeactiveHandler() {

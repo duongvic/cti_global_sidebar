@@ -32,10 +32,6 @@
 </head>
 
 <body>
-  <div class="main">
-    <!-- <p>Utilize this template code to build your App</p>
-    <p id="apptext"></p> -->
-  </div>
   <div class="fw-widget-wrapper" style="background: #12344D;">
     <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
     <fw-button class="action-buttons flr" id="btnClose" size="small" color="primary">__
@@ -84,11 +80,17 @@
       </div>
     </div>
   </div>
+
+  <p id="appText"></p>
+
   <div class="txt-phone">
     <fw-input icon-right="delete" placeholder="" minlength="10" size="12" class="secure-field"
       data-bind="product.api_key">
       <i class="ri-delete-back-fill"></i>
     </fw-input>
+
+
+
     <!-- 
     <fw-select label="Select a Transformation" class="select-alien">
       <div slot="dropdown-options">
