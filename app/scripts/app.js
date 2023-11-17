@@ -160,7 +160,7 @@ function clickToCall() {
     let call = webphone.calls[0];
     if (!call) {
       // click without an active call -> start a video call to number 23
-      webphone.makeCall("0353293254", {
+      webphone.makeCall(phoneNumberReceiver, {
         autoOriginate: "doNotPrompt",
         audio: true,
         video: false,
@@ -261,7 +261,37 @@ function onAppActivate() {
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
       document.getElementById("mainOutbound").style.display = "none";
 
-      document.getElementById("toggle").addEventListener("click", () => {
+      /**Call tu man hinh dialpad **/
+      document.getElementById("callEnter").addEventListener("click", () => {
+        openApp();
+        let textElementDialpad = document.getElementById("output").value;
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("mainOutbound").style.display = "block";
+        phoneNumberReceiver = textElementDialpad;
+
+        /**click to call as7*/
+        let call = webphone.calls[0];
+        if (!call) {
+          // click without an active call -> start a video call to number 23
+          webphone.makeCall(phoneNumberReceiver, {
+            autoOriginate: "doNotPrompt",
+            audio: true,
+            video: false,
+            subjectOfCall: "PredictiveCall",
+          });
+        } else if (call.localConnectionInfo == "alerting") {
+          // click while we have an alerting call -> accept it
+          call.answerCall({ audio: true, video: true });
+        } else {
+          // otherwise we release the call
+          call.clearConnection();
+        }
+        /**end click to call as7*/
+      });
+      /**Call tu man hinh dialpad **/
+
+      /**End Call **/
+      document.getElementById("toggleEndCall").addEventListener("click", () => {
         client.interface
           .trigger("hide", { id: "softphone" })
           .then(function () {
@@ -278,19 +308,7 @@ function onAppActivate() {
             console.error(error);
           });
       });
-
-      // document.getElementById("btnClose1").addEventListener("click", () => {
-      //   client.interface
-      //     .trigger("hide", { id: "softphone" })
-      //     .then(function () {
-      //       console.info("successfully closed the CTI app");
-      //       // showNotify("success", "Successfully closed the CTI app.");
-      //     })
-      //     .catch(function (error) {
-      //       console.error("Error: Failed to close the CTI app");
-      //       console.error(error);
-      //     });
-      // });
+      /**End Call **/
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
       clickToCall();

@@ -15,14 +15,14 @@ html {
   align-items: center;
 }
 
-.flr{
+.flr {
   float: right;
 }
 
 .fw-divider-solid {
   border-bottom: 1px #0e2b61 solid;
 }
-.menu-app{
+.menu-app {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -70,7 +70,7 @@ html {
   padding: 16px 8px;
 }
 
-.enter-phone{
+.enter-phone {
   padding-top: 48px;
   padding-left: 8px;
   padding-right: 8px;
@@ -79,28 +79,10 @@ html {
   align-items: center;
   margin: 0;
 }
-.call-action{
+.call-action {
   padding-top: 3.4rem;
 }
-.btn-call{
-  /* display: inline-flex;
-  place-content: center;
-  align-items: center;
-  width: 100%;
-  border-style: solid;
-  border-width: 1px;
-  font-weight: 600;
-  font-family: inherit;
-  text-decoration: none;
-  user-select: none;
-  white-space: nowrap;
-  vertical-align: middle;
-  padding: 0px;
-  cursor: inherit;
-  letter-spacing: 0px;
-  outline: 0px;
-  border-radius: 4px;
-  --fw-icon-color: currentColor; */
+.btn-call {
   display: inline-flex;
   height: 6rem;
   color: aliceblue;
@@ -125,4 +107,7 @@ html {
   letter-spacing: 0em;
   text-align: center;
   color: #262626;
+}
+.icon__call {
+  width: 24px;
 }

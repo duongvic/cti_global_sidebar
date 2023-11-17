@@ -32,7 +32,6 @@
     </fw-button><br><br> -->
     <div class="fw-divider-solid"></div>
 
-
     <div id="mainContent">
       <div class="row menu-app" style="background: #12344D;">
         <div class="col-sm-3 muted">
@@ -72,14 +71,8 @@
           </span>
         </div>
       </div>
-      <!-- <p id="appText"></p> -->
-
       <div class="txt-phone" id="dialpad">
-        <!-- <fw-input clear-input placeholder="" minlength="10" size="12" id="output" class="secure-field" data-bind="">
-    </fw-input> -->
         <fw-input clear-input minlength="10" size="12" id="output">
-
-
           <!-- 
     <fw-select label="Select a Transformation" class="select-alien">
       <div slot="dropdown-options">
@@ -162,13 +155,13 @@
         </div>
       </div>
 
-      <!-- call as7 -->
-      <!-- <button onclick="toggleCall()">toggle call</button> -->
-      <!-- call as7 -->
       <div class="call-action">
-        <button class="btn-call" id="btnCall">Call</button>
+        <button class="btn-call" id="callEnter" onclick="toggleCall()" type=" button"><span
+            style="margin-right: 9px;"><img class="icon__call" src="./images/call.png" /></span><span
+            style="font-size: large;">Call</span></button>
       </div>
     </div>
+
     <div id="mainOutbound">
       <button id="call" onclick="toggleCall()" hidden type="button"><span id="status"></span><i id="hook"
           class="material-icons">Call</i></button>
@@ -187,7 +180,7 @@
             <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
           </div>
         </div>
-        <button id="toggle" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
+        <button id="toggleEndCall" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
               src="./images/endcall.png" /></span> End call</button>
 
       </div>
