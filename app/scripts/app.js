@@ -1,3 +1,5 @@
+let phoneNumberReceiver;
+
 /**as7 backend **/
 let agent = anCti.newAgent();
 let webphone;
@@ -36,24 +38,7 @@ agent.on("remotestream", (event) => {
 //     $("#call").toggleClass("open");
 
 // });
-document.onclick = () => {
-  let call = webphone.calls[0];
-  if (!call) {
-    // click without an active call -> start a video call to number 23
-    webphone.makeCall("0985554375", {
-      autoOriginate: "doNotPrompt",
-      audio: true,
-      video: false,
-      subjectOfCall: "PredictiveCall",
-    });
-  } else if (call.localConnectionInfo == "alerting") {
-    // click while we have an alerting call -> accept it
-    call.answerCall({ audio: true, video: true });
-  } else {
-    // otherwise we release the call
-    call.clearConnection();
-  }
-};
+
 function showTime() {
   var date = new Date();
   var h = date.getHours(); // 0 - 23
@@ -156,25 +141,26 @@ function closeApp() {
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
 function clickToCall() {
-  // let textElement = document.getElementById("appText");
+  let textElementPhone = document.getElementById("appTextPhone");
   // let textElementDialpad = document.getElementById("output").value;
 
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
     document.getElementById("mainContent").style.display = "none";
-    document.getElementById("mainOutbount").style.display = "block";
+    document.getElementById("mainOutbound").style.display = "block";
 
     var data = event.helper.getData();
     console.log("data", data);
-    // textElement.innerText = `Clicked phone number: ${data.number}`;
-    document.getElementById("output").value = data.number;
+    textElementPhone.innerText = data.number;
+    phoneNumberReceiver = data.number;
+    // document.getElementById("output").value = data.number;
     //getContact by Id
 
     /**click to call as7*/
     let call = webphone.calls[0];
     if (!call) {
       // click without an active call -> start a video call to number 23
-      webphone.makeCall("0353293254", {
+      webphone.makeCall(phoneNumberReceiver, {
         autoOriginate: "doNotPrompt",
         audio: true,
         video: false,
@@ -268,12 +254,27 @@ function onAppActivate() {
         ? data.loggedInUser.contact.mobile
         : null;
       window.userPhone = phone;
-      console.log(phone);
-      // document.getElementById('mainContent').style.display = 'block';
+      console.log("data loggedInUser", data);
+
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
-      document.getElementById("mainOutbount").style.display = "none";
+      document.getElementById("mainOutbound").style.display = "none";
+
+      document.getElementById("toggle").addEventListener("click", () => {
+        client.interface
+          .trigger("hide", { id: "softphone" })
+          .then(function () {
+            document.getElementById("mainContent").style.display = "block";
+            document.getElementById("mainOutbound").style.display = "none";
+            console.info("successfully closed the CTI app");
+          })
+          .catch(function (error) {
+            console.error("Error: Failed to close the CTI app");
+            console.error(error);
+          });
+      });
+
       // document.getElementById("btnClose1").addEventListener("click", () => {
       //   client.interface
       //     .trigger("hide", { id: "softphone" })
