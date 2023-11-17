@@ -20,17 +20,21 @@
 </head>
 
 <body>
-  <div id="mainContent">
-    <div class="fw-widget-wrapper" style="background: #12344D;">
+
+  <div class="fw-widget-wrapper">
+    <div style="background: #12344D;">
       <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
       <fw-button class="action-buttons flr" id="btnClose" size="small" color="primary">__
       </fw-button><br><br>
-      <!-- <fw-button class="action-buttons" id="btnShowMissedCalls" size="small" color="primary">
+    </div>
+    <!-- <fw-button class="action-buttons" id="btnShowMissedCalls" size="small" color="primary">
       Show missed calls
     </fw-button><br><br> -->
-      <div class="fw-divider-solid"></div>
+    <div class="fw-divider-solid"></div>
 
-      <div class="row menu-app">
+
+    <div id="mainContent">
+      <div class="row menu-app" style="background: #12344D;">
         <div class="col-sm-3 muted">
           <span id="btnDialpad">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -68,17 +72,15 @@
           </span>
         </div>
       </div>
-    </div>
+      <!-- <p id="appText"></p> -->
 
-    <!-- <p id="appText"></p> -->
-
-    <div class="txt-phone" id="dialpad">
-      <!-- <fw-input clear-input placeholder="" minlength="10" size="12" id="output" class="secure-field" data-bind="">
+      <div class="txt-phone" id="dialpad">
+        <!-- <fw-input clear-input placeholder="" minlength="10" size="12" id="output" class="secure-field" data-bind="">
     </fw-input> -->
-      <fw-input clear-input minlength="10" size="12" id="output">
+        <fw-input clear-input minlength="10" size="12" id="output">
 
 
-        <!-- 
+          <!-- 
     <fw-select label="Select a Transformation" class="select-alien">
       <div slot="dropdown-options">
         <fw-select-option id="1" value="Cannonbolt">Cannonbolt</fw-select-option>
@@ -100,170 +102,103 @@
       <fw-input required="true" type="text" icon-left="items" label="domain" size="30"
         placeholder="subdomain.freshdesk.com" class="domain" data-bind="product.domain"></fw-input>
     </section> -->
-    </div>
+      </div>
 
-    <div class="row enter-phone">
-      <div class="col-sm-3 muted" style="margin-top: -1.5rem;">
-        <p value="1" class="lb-phone">1</p>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="2" class="lb-phone">2</p>
-        <span>A</span><span>B</span><span>C</span>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="3" class="lb-phone">3</p>
-        <span>D</span><span>E</span><span>F</span>
-      </div>
-    </div>
-
-    <div class="row enter-phone">
-      <div class="col-sm-3 muted">
-        <p value="4" class="lb-phone">4</p>
-        <span>G</span><span>H</span><span>I</span>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="5" class="lb-phone">5</p>
-        <span>J</span><span>L</span><span>K</span>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="6" class="lb-phone">6</p>
-        <span>M</span><span>N</span><span>O</span>
-      </div>
-    </div>
-
-    <div class="row enter-phone">
-      <div class="col-sm-3 muted">
-        <p value="7" class="lb-phone">7</p>
-        <span>P</span><span>Q</span><span>R</span><span>S</span>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="8" class="lb-phone">8</p>
-        <span>T</span><span>U</span><span>V</span>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="9" class="lb-phone">9</p>
-        <span>W</span><span>X</span><span>Y</span><span>Z</span>
-      </div>
-    </div>
-
-    <div class="row enter-phone">
-      <div class="col-sm-3 muted">
-        <p value="*" class="lb-phone">*</p>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="0" class="lb-phone">0</p>
-        <span style="margin-left: 0.45rem;">+</span>
-      </div>
-      <div class="col-sm-3 muted">
-        <p value="#" class="lb-phone">#</p>
-        <!-- <fw-label value="#" color=""></fw-label> -->
-      </div>
-    </div>
-
-    <!-- call as7 -->
-    <!-- <button onclick="toggleCall()">toggle call</button> -->
-    <!-- call as7 -->
-    <div class="call-action">
-      <button class="btn-call" id="btnCall">Call</button>
-    </div>
-  </div>
-
-  <div id="mainOutbound">
-    <button id="call" onclick="toggleCall()" hidden type="button"><span id="status"></span><i id="hook"
-        class="material-icons">Call</i></button>
-    <div class="calling">
-      <p class="text-algin">Outbound Call...</p>
-
-      <h4>Khách hàng:</h4>
-      <p id="appTextPhone"></p>
-      <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
-      <img class="avatar" src="./styles/images/download.jpeg" />
-      <div style="padding-top: 27rem;">
-        <div class="ac__calling">
-          <div class="ct__calling">1</div>
-          <div class="ct__calling">2</div>
-          <div class="ct__calling">3</div>
-          <div class="ct__calling">4</div>
+      <div class="row enter-phone">
+        <div class="col-sm-3 muted" style="margin-top: -1.5rem;">
+          <p value="1" class="lb-phone">1</p>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="2" class="lb-phone">2</p>
+          <span>A</span><span>B</span><span>C</span>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="3" class="lb-phone">3</p>
+          <span>D</span><span>E</span><span>F</span>
         </div>
       </div>
-      <button id="toggle" class="hint" type="button">End call</button>
 
+      <div class="row enter-phone">
+        <div class="col-sm-3 muted">
+          <p value="4" class="lb-phone">4</p>
+          <span>G</span><span>H</span><span>I</span>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="5" class="lb-phone">5</p>
+          <span>J</span><span>L</span><span>K</span>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="6" class="lb-phone">6</p>
+          <span>M</span><span>N</span><span>O</span>
+        </div>
+      </div>
+
+      <div class="row enter-phone">
+        <div class="col-sm-3 muted">
+          <p value="7" class="lb-phone">7</p>
+          <span>P</span><span>Q</span><span>R</span><span>S</span>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="8" class="lb-phone">8</p>
+          <span>T</span><span>U</span><span>V</span>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="9" class="lb-phone">9</p>
+          <span>W</span><span>X</span><span>Y</span><span>Z</span>
+        </div>
+      </div>
+
+      <div class="row enter-phone">
+        <div class="col-sm-3 muted">
+          <p value="*" class="lb-phone">*</p>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="0" class="lb-phone">0</p>
+          <span style="margin-left: 0.45rem;">+</span>
+        </div>
+        <div class="col-sm-3 muted">
+          <p value="#" class="lb-phone">#</p>
+          <!-- <fw-label value="#" color=""></fw-label> -->
+        </div>
+      </div>
+
+      <!-- call as7 -->
+      <!-- <button onclick="toggleCall()">toggle call</button> -->
+      <!-- call as7 -->
+      <div class="call-action">
+        <button class="btn-call" id="btnCall">Call</button>
+      </div>
     </div>
-    <!-- <video id="view" autoplay playsInline></video> -->
-    <script>
+    <div id="mainOutbound">
+      <button id="call" onclick="toggleCall()" hidden type="button"><span id="status"></span><i id="hook"
+          class="material-icons">Call</i></button>
+      <div class="calling">
+        <p class="text-algin" style="padding-top: 3rem ; padding-bottom: 3rem;">Outbound Call...</p>
 
-      // let agent = anCti.newAgent();
-      // let webphone;
-      // let audio = new Audio();
-      // audio.autoplay = true;
+        <h4>Khách hàng:</h4>
+        <p id="appTextPhone"></p>
+        <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
+        <div style="padding: 34px 0;"><img class="avatar" src="./styles/images/download.jpeg" /></div>
+        <div style="padding-top: 10.5rem;">
+          <div class="ac__calling">
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend Transfer.svg" /></span></div>
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind Transfer.svg" /></span></div>
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div>
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
+          </div>
+        </div>
+        <button id="toggle" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
+              src="./images/endcall.png" /></span> End call</button>
 
-      // agent.startApplicationSession({
-      //   username: "phuln6@fpt.com",
-      //   password: "Phuln6!!!",
-      // })
-      // agent.on("applicationsessionstarted", (event) => {
-      //   // webphone = agent.getDevice("sip:9999@autocall.oncallcx.test.vn");
-      //   webphone = agent.getDevice("sip:1973@oncallcx.crm.vn");
-      //   console.log({ webphone });
-      //   // tell server that we want to use WebRTC (error handling omitted)
-      //   webphone.monitorStart({ rtc: true });
+      </div>
+      <!-- <video id="view" autoplay playsInline></video> -->
+      <script>
+      </script>
+    </div>
 
-      // });
-
-      // // if WebRTC creates a media-stream we bind it to the corresponding elements
-      // agent.on('localstream', (event) => {
-      //   document.getElementById('localView').srcObject = event.stream;
-      // });
-      // agent.on('applicationsessionterminated', () => {
-      //   $("#menu").removeClass("calling established");
-      //   $("#call").removeClass("open");
-      //   $("#hook").text("call");
-      //   $("#status").text("click to call an agent");
-      // });
-
-      // agent.on('remotestream', (event) => {
-      //   document.getElementById('remoteView').srcObject = event.stream;
-      //   audio.srcObject = event.stream;
-      // });
-      // //   $("#toggle").on('click',() => {
-      // //     $("#toggle").removeClass("hint");
-      // //     $("#call").toggleClass("open");
-
-      // // });
-      // document.onclick = () => {
-      //   let call = webphone.calls[0];
-      //   if (!call) {
-      //     // click without an active call -> start a video call to number 23
-      //     webphone.makeCall("0985554375", { autoOriginate: "doNotPrompt", audio: true, video: false, subjectOfCall: 'PredictiveCall' });
-      //   } else if (call.localConnectionInfo == "alerting") {
-      //     // click while we have an alerting call -> accept it
-      //     call.answerCall({ audio: true, video: true });
-      //   } else {
-      //     // otherwise we release the call
-      //     call.clearConnection();
-      //   }
-      // }
-      // function showTime() {
-      //   var date = new Date();
-      //   var h = date.getHours(); // 0 - 23
-      //   var m = date.getMinutes(); // 0 - 59
-      //   var s = date.getSeconds(); // 0 - 59
-
-
-      //   m = (m < 10) ? "0" + m : m;
-      //   s = (s < 10) ? "0" + s : s;
-
-      //   var time = m + ":" + s + " ";
-      //   document.getElementById("MyClockDisplay").innerText = time;
-      //   document.getElementById("MyClockDisplay").textContent = time;
-
-      //   setTimeout(showTime, 1000);
-
-      // }
-
-      // showTime();
-    </script>
   </div>
+
+
 </body>
 <script defer src="scripts/app.js"></script>
 <!-- <script defer src="scripts/as7.js"></script> -->

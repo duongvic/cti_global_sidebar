@@ -160,7 +160,7 @@ function clickToCall() {
     let call = webphone.calls[0];
     if (!call) {
       // click without an active call -> start a video call to number 23
-      webphone.makeCall(phoneNumberReceiver, {
+      webphone.makeCall("0353293254", {
         autoOriginate: "doNotPrompt",
         audio: true,
         video: false,
@@ -267,6 +267,10 @@ function onAppActivate() {
           .then(function () {
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("mainOutbound").style.display = "none";
+            /**as7 backend **/
+            let call = webphone.calls[0];
+            call.clearConnection();
+            /**as7 backend **/
             console.info("successfully closed the CTI app");
           })
           .catch(function (error) {
