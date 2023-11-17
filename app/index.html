@@ -81,17 +81,15 @@
     </div>
   </div>
 
-  <p id="appText"></p>
+  <!-- <p id="appText"></p> -->
 
-  <div class="txt-phone">
-    <fw-input icon-right="delete" placeholder="" minlength="10" size="12" class="secure-field"
-      data-bind="product.api_key">
-      <i class="ri-delete-back-fill"></i>
-    </fw-input>
-
+  <div class="txt-phone" id="dialpad">
+    <!-- <fw-input clear-input placeholder="" minlength="10" size="12" id="output" class="secure-field" data-bind="">
+    </fw-input> -->
+    <fw-input clear-input minlength="10" size="12" id="output">
 
 
-    <!-- 
+      <!-- 
     <fw-select label="Select a Transformation" class="select-alien">
       <div slot="dropdown-options">
         <fw-select-option id="1" value="Cannonbolt">Cannonbolt</fw-select-option>

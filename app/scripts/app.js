@@ -81,15 +81,36 @@ function closeApp() {
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
 function clickToCall() {
-  let textElement = document.getElementById("appText");
+  // let textElement = document.getElementById("appText");
+  // let textElementDialpad = document.getElementById("output").value;
 
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
     var data = event.helper.getData();
     console.log("data", data);
-    textElement.innerText = `Clicked phone number: ${data.number}`;
+    // textElement.innerText = `Clicked phone number: ${data.number}`;
+    document.getElementById("output").value = data.number;
+    //getContact by Id
   });
 }
+
+// /**
+//  * It opens the contact details page for the give contact id
+//  *
+//  * @param {number} contactId - Contact to open
+//  */
+// function goToContact(contactId) {
+//   client.interface
+//     .trigger("click", { id: "contact", value: contactId })
+//     .then(function (data) {
+//       console.log("contact", data);
+//       console.info("successfully navigated to contact");
+//     })
+//     .catch(function (error) {
+//       console.error("Error: Failed to navigate to contact");
+//       console.error(error);
+//     });
+// }
 
 /**
  * To resize the height of the CTI app
@@ -102,8 +123,8 @@ let client;
 init();
 async function init() {
   client = await app.initialized();
-  client.events.on("app.activated", onAppActiveHandler);
-  client.events.on("app.deactivated", onAppDeactiveHandler);
+  client.events.on("app.activated", onAppActivate);
+  client.events.on("app.deactivated", onAppDeactive);
 
   // client.events.on("app.activated", getContactData);
 }
@@ -139,30 +160,48 @@ async function init() {
 //   });
 // }
 
-function onAppActiveHandler() {
+function onAppActivate() {
   resizeApp();
 
-  /* Adding event handlers for all the buttons in the UI of the app */
-  document.getElementById("btnClose").addEventListener("fwClick", closeApp);
+  client.data.get("loggedInUser").then(
+    function (data) {
+      const phone = data.loggedInUser.contact.phone
+        ? data.loggedInUser.contact.phone
+        : data.loggedInUser.contact.mobile
+        ? data.loggedInUser.contact.mobile
+        : null;
+      window.userPhone = phone;
+      console.log(phone);
+      // document.getElementById('mainContent').style.display = 'block';
+      // addEventListeners();
+      /* Adding event handlers for all the buttons in the UI of the app */
+      document.getElementById("btnClose").addEventListener("fwClick", closeApp);
 
-  // document.getElementById("btnClose1").addEventListener("click", () => {
-  //   client.interface
-  //     .trigger("hide", { id: "softphone" })
-  //     .then(function () {
-  //       console.info("successfully closed the CTI app");
-  //       // showNotify("success", "Successfully closed the CTI app.");
-  //     })
-  //     .catch(function (error) {
-  //       console.error("Error: Failed to close the CTI app");
-  //       console.error(error);
-  //     });
-  // });
+      // document.getElementById("btnClose1").addEventListener("click", () => {
+      //   client.interface
+      //     .trigger("hide", { id: "softphone" })
+      //     .then(function () {
+      //       console.info("successfully closed the CTI app");
+      //       // showNotify("success", "Successfully closed the CTI app.");
+      //     })
+      //     .catch(function (error) {
+      //       console.error("Error: Failed to close the CTI app");
+      //       console.error(error);
+      //     });
+      // });
 
-  /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
-  clickToCall();
+      /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
+      clickToCall();
 
-  console.info("App is activated");
+      console.info("App is activated");
+    },
+    function (error) {
+      console.error("Failed to get logged in user data");
+      console.error(error);
+      showNotify("danger", "Failed to get user data. Try again later.");
+    }
+  );
 }
-function onAppDeactiveHandler() {
+function onAppDeactive() {
   console.info("App is deactivated");
 }
