@@ -1,4 +1,10 @@
 {
+  "contact": {
+    "display_name": "Contact Details",
+    "description": "Please enter the contact details",
+    "type": "text",
+    "required": true
+  },
   "freshdesk_domain": {
     "display_name": "Freshdesk Domain",
     "type": "text",

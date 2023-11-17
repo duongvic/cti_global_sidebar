@@ -1,3 +1,78 @@
+/**as7 backend **/
+let agent = anCti.newAgent();
+let webphone;
+let audio = new Audio();
+audio.autoplay = true;
+
+agent.startApplicationSession({
+  username: "phuln6@fpt.com",
+  password: "Phuln6!!!",
+});
+agent.on("applicationsessionstarted", () => {
+  // webphone = agent.getDevice("sip:9999@autocall.oncallcx.test.vn");
+  webphone = agent.getDevice("sip:1973@oncallcx.crm.vn");
+  console.log({ webphone });
+  // tell server that we want to use WebRTC (error handling omitted)
+  webphone.monitorStart({ rtc: true });
+});
+
+// if WebRTC creates a media-stream we bind it to the corresponding elements
+agent.on("localstream", (event) => {
+  document.getElementById("localView").srcObject = event.stream;
+});
+agent.on("applicationsessionterminated", () => {
+  $("#menu").removeClass("calling established");
+  $("#call").removeClass("open");
+  $("#hook").text("call");
+  $("#status").text("click to call an agent");
+});
+
+agent.on("remotestream", (event) => {
+  document.getElementById("remoteView").srcObject = event.stream;
+  audio.srcObject = event.stream;
+});
+//   $("#toggle").on('click',() => {
+//     $("#toggle").removeClass("hint");
+//     $("#call").toggleClass("open");
+
+// });
+document.onclick = () => {
+  let call = webphone.calls[0];
+  if (!call) {
+    // click without an active call -> start a video call to number 23
+    webphone.makeCall("0985554375", {
+      autoOriginate: "doNotPrompt",
+      audio: true,
+      video: false,
+      subjectOfCall: "PredictiveCall",
+    });
+  } else if (call.localConnectionInfo == "alerting") {
+    // click while we have an alerting call -> accept it
+    call.answerCall({ audio: true, video: true });
+  } else {
+    // otherwise we release the call
+    call.clearConnection();
+  }
+};
+function showTime() {
+  var date = new Date();
+  var h = date.getHours(); // 0 - 23
+  console.log(h);
+  var m = date.getMinutes(); // 0 - 59
+  var s = date.getSeconds(); // 0 - 59
+
+  m = m < 10 ? "0" + m : m;
+  s = s < 10 ? "0" + s : s;
+
+  var time = m + ":" + s + " ";
+  document.getElementById("MyClockDisplay").innerText = time;
+  document.getElementById("MyClockDisplay").textContent = time;
+
+  setTimeout(showTime, 1000);
+}
+showTime();
+/**as7 backend **/
+
 // var client;
 
 // init();
@@ -86,11 +161,33 @@ function clickToCall() {
 
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainOutbount").style.display = "block";
+
     var data = event.helper.getData();
     console.log("data", data);
     // textElement.innerText = `Clicked phone number: ${data.number}`;
     document.getElementById("output").value = data.number;
     //getContact by Id
+
+    /**click to call as7*/
+    let call = webphone.calls[0];
+    if (!call) {
+      // click without an active call -> start a video call to number 23
+      webphone.makeCall("0353293254", {
+        autoOriginate: "doNotPrompt",
+        audio: true,
+        video: false,
+        subjectOfCall: "PredictiveCall",
+      });
+    } else if (call.localConnectionInfo == "alerting") {
+      // click while we have an alerting call -> accept it
+      call.answerCall({ audio: true, video: true });
+    } else {
+      // otherwise we release the call
+      call.clearConnection();
+    }
+    /**end click to call as7*/
   });
 }
 
@@ -176,7 +273,7 @@ function onAppActivate() {
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
-
+      document.getElementById("mainOutbount").style.display = "none";
       // document.getElementById("btnClose1").addEventListener("click", () => {
       //   client.interface
       //     .trigger("hide", { id: "softphone" })

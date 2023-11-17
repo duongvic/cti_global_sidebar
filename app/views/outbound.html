@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Click to call</title>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://pbx-stg.oncallcx.vn/cti/ancti/ancti.js"></script>
+    <!-- https://pbx-stg.oncallcx.vn/cti/ancti/ancti.js -->
+  </head>
+  <body>
+    <!-- <button onclick="toggleCall()"><span id="status"></span><i id="hook" class="material-icons">call</i></button> -->
+
+      <button id="call" onclick="toggleCall()" type="button"><span id="status"></span><i id="hook" class="material-icons">Call</i></button>
+      <div class="calling">
+        <p class="text-algin">Outbound Call</p>
+        
+        <h4>Khách hàng Phú Lê</h4>
+        <p>0985554375</p>
+        <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
+        <img class="avatar" src="./images/download.jpeg"/>
+        <div class="ac__calling">
+          <div class="ct__calling">1</div>
+          <div class="ct__calling">2</div>
+          <div class="ct__calling">3</div>
+          <div class="ct__calling">4</div>
+       
+        </div>
+        <button id="toggle" class="hint" type="button">End call</button>
+
+      </div>
+    <video id="view" autoplay playsInline></video>
+
+
+    <!-- <div class="mobile" id="sipClient">
+      <div id="sip-dialpad" class="dropdown-menu">
+          <button type="button" class="btn btn-default digit" data-digit="1">1<span>&nbsp;</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="2">2<span>ABC</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="3">3<span>DEF</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="4">4<span>GHI</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="5">5<span>JKL</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="6">6<span>MNO</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="7">7<span>PQRS</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="8">8<span>TUV</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="9">9<span>WXYZ</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="*">*<span>&nbsp;</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="0">0<span>+</span></button>
+          <button type="button" class="btn btn-default digit" data-digit="#">#<span>&nbsp;</span></button>
+          <button class="btn btn-success btn-block btnCall" title="Send"><i class="fa fa-play"></i><span class="trn"> Call</span></button>
+        </div>
+  </div> -->
+    <script>
+
+        let agent = anCti.newAgent();
+        let webphone;
+        let audio = new Audio();
+        audio.autoplay = true;
+        
+        agent.startApplicationSession({
+            username: "phuln6@fpt.com",
+            password: "Phuln6!!!",
+        })
+        agent.on("applicationsessionstarted", (event) => {
+            // webphone = agent.getDevice("sip:9999@autocall.oncallcx.test.vn");
+            webphone = agent.getDevice("sip:1973@oncallcx.crm.vn");
+            console.log({webphone});
+            // tell server that we want to use WebRTC (error handling omitted)
+            webphone.monitorStart({ rtc:true });  
+           
+        });
+        
+        // if WebRTC creates a media-stream we bind it to the corresponding elements
+        agent.on('localstream', (event) => {
+          document.getElementById('localView').srcObject = event.stream;
+        });
+        agent.on('applicationsessionterminated',() => {
+            $("#menu").removeClass("calling established");
+            $("#call").removeClass("open");
+            $("#hook").text("call");
+            $("#status").text("click to call an agent");
+        });
+
+        agent.on('remotestream',(event) => {
+          document.getElementById('remoteView').srcObject = event.stream;
+          audio.srcObject = event.stream;
+        });
+      //   $("#toggle").on('click',() => {
+      //     $("#toggle").removeClass("hint");
+      //     $("#call").toggleClass("open");
+          
+      // });
+        document.onclick = () => {
+            let call = webphone.calls[0];
+            if (!call) {
+                // click without an active call -> start a video call to number 23
+                webphone.makeCall("", { autoOriginate: "doNotPrompt",audio : true,video : false,subjectOfCall : 'PredictiveCall'}, voice);
+            } else if (call.localConnectionInfo=="alerting") {
+                // click while we have an alerting call -> accept it
+                call.answerCall({ audio:true, video: true});
+            } else {
+                // otherwise we release the call
+                call.clearConnection();
+            }
+        }
+        function showTime(){
+            var date = new Date();
+            var h = date.getHours(); // 0 - 23
+            var m = date.getMinutes(); // 0 - 59
+            var s = date.getSeconds(); // 0 - 59
+        
+            
+            m = (m < 10) ? "0" + m : m;
+            s = (s < 10) ? "0" + s : s;
+            
+            var time = m + ":" + s + " " ;
+            document.getElementById("MyClockDisplay").innerText = time;
+            document.getElementById("MyClockDisplay").textContent = time;
+            
+            setTimeout(showTime, 1000);
+            
+        }
+
+        showTime();
+        </script>
+  </body>
+</html>
