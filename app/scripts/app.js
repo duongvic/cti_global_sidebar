@@ -1,4 +1,4 @@
-let phoneNumberReceiver;
+let phoneNumberReceiver = "";
 
 /**as7 backend **/
 let agent = anCti.newAgent();
@@ -53,6 +53,9 @@ function showTime() {
   document.getElementById("MyClockDisplay").innerText = time;
   document.getElementById("MyClockDisplay").textContent = time;
 
+  document.getElementById("MyClockDisplayCollapseClickToCall").innerText = time;
+  document.getElementById("MyClockDisplayCollapseClickToCall").textContent =
+    time;
   setTimeout(showTime, 1000);
 }
 showTime();
@@ -113,6 +116,7 @@ function openApp() {
   client.interface
     .trigger("show", { id: "softphone" })
     .then(function () {
+      resizeApp();
       console.log(`Success: Opened the app`);
     })
     .catch(function (error) {
@@ -128,8 +132,9 @@ function closeApp() {
   client.interface
     .trigger("hide", { id: "softphone" })
     .then(function () {
+      resizeApp();
       console.info("successfully closed the CTI app");
-      showNotify("success", "Successfully closed the CTI app.");
+      // showNotify("success", "Successfully closed the CTI app.");
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
@@ -141,12 +146,14 @@ function closeApp() {
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
 function clickToCall() {
+  client.instance.resize({ height: "630px" });
   let textElementPhone = document.getElementById("appTextPhone");
   // let textElementDialpad = document.getElementById("output").value;
 
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
     document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainCollapseClickToCall").style.display = "none";
     document.getElementById("mainOutbound").style.display = "block";
 
     var data = event.helper.getData();
@@ -243,6 +250,13 @@ async function init() {
 //   });
 // }
 
+function viewScreenCollapseClickToCall() {
+  client.instance.resize({ height: "48px" });
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "block";
+}
+
 function onAppActivate() {
   resizeApp();
 
@@ -260,6 +274,21 @@ function onAppActivate() {
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
       document.getElementById("mainOutbound").style.display = "none";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+      // thu gon màn hinh khi callbtnCollapseClickToCall
+      document
+        .getElementById("btnCollapseClickToCall")
+        .addEventListener("fwClick", viewScreenCollapseClickToCall);
+      // mo rong man hinh click to call
+      document
+        .getElementById("mainCollapseClickToCall")
+        .addEventListener("click", () => {
+          client.instance.resize({ height: "630px" });
+          document.getElementById("mainCollapseClickToCall").style.display =
+            "none";
+          document.getElementById("mainContent").style.display = "none";
+          document.getElementById("mainOutbound").style.display = "block";
+        });
 
       /**Call tu man hinh dialpad **/
       document.getElementById("callEnter").addEventListener("click", () => {
@@ -267,8 +296,12 @@ function onAppActivate() {
         let textElementDialpad = document.getElementById("output").value;
         document.getElementById("mainContent").style.display = "none";
         document.getElementById("mainOutbound").style.display = "block";
-        phoneNumberReceiver = textElementDialpad;
+        document.getElementById("mainCollapseClickToCall").style.display =
+          "none";
 
+        phoneNumberReceiver = textElementDialpad;
+        document.getElementById("appTextPhone").value = phoneNumberReceiver;
+        document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
         /**click to call as7*/
         let call = webphone.calls[0];
         if (!call) {
@@ -297,17 +330,53 @@ function onAppActivate() {
           .then(function () {
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("mainOutbound").style.display = "none";
+            document.getElementById("mainCollapseClickToCall").style.display =
+              "none";
+
+            phoneNumberReceiver = document.getElementById("output").value = "";
+            document.getElementById("appTextPhone").value = "";
+            document.getElementById("appTextPhone").innerText = "";
             /**as7 backend **/
             let call = webphone.calls[0];
             call.clearConnection();
             /**as7 backend **/
-            console.info("successfully closed the CTI app");
+            resizeApp();
+            // console.info("successfully closed the CTI app");
           })
           .catch(function (error) {
             console.error("Error: Failed to close the CTI app");
             console.error(error);
           });
       });
+
+      // ------ ----
+      document
+        .getElementById("toggleEndCallCollapse")
+        .addEventListener("click", () => {
+          client.interface
+            .trigger("hide", { id: "softphone" })
+            .then(function () {
+              document.getElementById("mainOutbound").style.display = "none";
+              document.getElementById("mainCollapseClickToCall").style.display =
+                "none";
+              document.getElementById("mainContent").style.display = "block";
+
+              phoneNumberReceiver = document.getElementById("output").value =
+                "";
+              document.getElementById("appTextPhone").value = "";
+              document.getElementById("appTextPhone").innerText = "";
+              /**as7 backend **/
+              let call = webphone.calls[0];
+              call.clearConnection();
+              /**as7 backend **/
+              onAppDeactive;
+              // console.info("successfully closed the CTI app");
+            })
+            .catch(function (error) {
+              console.error("Error: Failed to close the CTI app");
+              console.error(error);
+            });
+        });
       /**End Call **/
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
@@ -323,5 +392,6 @@ function onAppActivate() {
   );
 }
 function onAppDeactive() {
+  closeApp();
   console.info("App is deactivated");
 }
