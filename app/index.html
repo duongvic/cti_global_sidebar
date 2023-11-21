@@ -27,8 +27,6 @@
     <!-- <fw-button class="action-buttons" id="btnShowMissedCalls" size="small" color="primary">
       Show missed calls
     </fw-button><br><br> -->
-
-
     <div id="mainContent">
       <div style="background: #12344D;">
         <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
@@ -75,8 +73,10 @@
         </div>
       </div>
       <div class="txt-phone" id="dialpad">
-        <fw-input clear-input minlength="10" size="12" id="output">
-          <!-- 
+        <!-- <fw-input clear-input minlength="10" size="12" id="output" onblur="checkPhone()"> -->
+        <input type="text" name="output" id="output" onblur="checkPhone()">
+        <p id="appTextPhone1" style="color: red;"></p>
+        <!-- 
     <fw-select label="Select a Transformation" class="select-alien">
       <div slot="dropdown-options">
         <fw-select-option id="1" value="Cannonbolt">Cannonbolt</fw-select-option>
@@ -163,6 +163,10 @@
             style="margin-right: 9px;"><img class="icon__call" src="./images/call.png" /></span><span
             style="font-size: large;">Call</span></button>
       </div>
+
+      <script>
+
+      </script>
     </div>
 
     <div id="mainOutbound">

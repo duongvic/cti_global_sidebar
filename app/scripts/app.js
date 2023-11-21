@@ -161,7 +161,8 @@ function clickToCall() {
     textElementPhone.innerText = data.number;
     phoneNumberReceiver = data.number;
     // document.getElementById("output").value = data.number;
-    //getContact by Id
+
+    /**làm thé nào de getContact by Id?*/
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -290,39 +291,6 @@ function onAppActivate() {
           document.getElementById("mainOutbound").style.display = "block";
         });
 
-      /**Call tu man hinh dialpad **/
-      document.getElementById("callEnter").addEventListener("click", () => {
-        openApp();
-        let textElementDialpad = document.getElementById("output").value;
-        document.getElementById("mainContent").style.display = "none";
-        document.getElementById("mainOutbound").style.display = "block";
-        document.getElementById("mainCollapseClickToCall").style.display =
-          "none";
-
-        phoneNumberReceiver = textElementDialpad;
-        document.getElementById("appTextPhone").value = phoneNumberReceiver;
-        document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
-        /**click to call as7*/
-        let call = webphone.calls[0];
-        if (!call) {
-          // click without an active call -> start a video call to number 23
-          webphone.makeCall(phoneNumberReceiver, {
-            autoOriginate: "doNotPrompt",
-            audio: true,
-            video: false,
-            subjectOfCall: "PredictiveCall",
-          });
-        } else if (call.localConnectionInfo == "alerting") {
-          // click while we have an alerting call -> accept it
-          call.answerCall({ audio: true, video: true });
-        } else {
-          // otherwise we release the call
-          call.clearConnection();
-        }
-        /**end click to call as7*/
-      });
-      /**Call tu man hinh dialpad **/
-
       /**End Call **/
       document.getElementById("toggleEndCall").addEventListener("click", () => {
         client.interface
@@ -394,4 +362,55 @@ function onAppActivate() {
 function onAppDeactive() {
   closeApp();
   console.info("App is deactivated");
+}
+
+function checkPhone() {
+  var x = document.getElementById("output");
+  // var phone = /^\d{10}$/;
+  var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
+  if (x.value.match(phone)) {
+    document.getElementById("appTextPhone1").innerText = "";
+    /**Call tu man hinh dialpad **/
+    document.getElementById("callEnter").addEventListener("click", () => {
+      openApp();
+      let textElementDialpad = document.getElementById("output").value;
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("mainOutbound").style.display = "block";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+
+      phoneNumberReceiver = textElementDialpad;
+      document.getElementById("appTextPhone").value = phoneNumberReceiver;
+      document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
+      /**click to call as7*/
+      let call = webphone.calls[0];
+      if (!call) {
+        // click without an active call -> start a video call to number 23
+        webphone.makeCall(phoneNumberReceiver, {
+          autoOriginate: "doNotPrompt",
+          audio: true,
+          video: false,
+          subjectOfCall: "PredictiveCall",
+        });
+      } else if (call.localConnectionInfo == "alerting") {
+        // click while we have an alerting call -> accept it
+        call.answerCall({ audio: true, video: true });
+      } else {
+        // otherwise we release the call
+        call.clearConnection();
+      }
+      /**end click to call as7*/
+    });
+    /**Call tu man hinh dialpad **/
+
+    return true;
+  } else {
+    $("#callEnter")
+      .removeAttr("onclick")
+      .click(function () {
+        //do something
+      });
+    document.getElementById("appTextPhone1").innerText =
+      "Incorrect phone number format";
+    return false;
+  }
 }
