@@ -369,6 +369,8 @@ function checkPhone() {
   // var phone = /^\d{10}$/;
   var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
   if (x.value.match(phone)) {
+    $("#callEnter").attr("disabled", false);
+    $("#callEnter").css({ backgroundColor: "green" });
     document.getElementById("appTextPhone1").innerText = "";
     /**Call tu man hinh dialpad **/
     document.getElementById("callEnter").addEventListener("click", () => {
@@ -404,11 +406,8 @@ function checkPhone() {
 
     return true;
   } else {
-    $("#callEnter")
-      .removeAttr("onclick")
-      .click(function () {
-        //do something
-      });
+    $("#callEnter").attr("disabled", true);
+    $("#callEnter").css({ backgroundColor: "darkgray" });
     document.getElementById("appTextPhone1").innerText =
       "Incorrect phone number format";
     return false;
