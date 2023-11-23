@@ -67,7 +67,42 @@ html {
 } */
 
 .txt-phone {
-  padding: 16px 8px;
+  margin-top: 3%;
+  background-color: #f0f3f6;
+}
+
+.txt-phone::after {
+  display: block;
+  content: "";
+  clear: both;
+}
+
+.txt-phone .input {
+  width: 90%;
+  float: left;
+  padding: 3px 0px 3px 10px;
+  box-sizing: border-box;
+}
+
+.txt-phone .input input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  font-size: 20px;
+  font-weight: bolder;
+  /* font-family: "montserrat"; */
+  line-height: 28px;
+  vertical-align: middle;
+  background: transparent;
+}
+.txt-phone .reset {
+  width: 10%;
+  float: left;
+  padding: 4px;
+}
+.txt-phone .reset button {
+  width: 100%;
+  padding: 8px 8px 8px 0;
 }
 
 .enter-phone {
@@ -80,7 +115,7 @@ html {
   margin: 0;
 }
 .call-action {
-  padding-top: 3.4rem;
+  padding-top: 3.2rem;
 }
 .btn-call {
   display: inline-flex;
@@ -110,4 +145,27 @@ html {
 }
 .icon__call {
   width: 24px;
+}
+
+.digit {
+  cursor: pointer;
+}
+.digit:active,
+.dig:active {
+  background-color: #e6e6e6;
+}
+
+.btn__back {
+  border: none;
+  background: transparent;
+}
+
+.error__number__phone {
+  color: red;
+}
+.correct__number__phone {
+  color: white;
+}
+.correct__number__phone {
+  margin-top: 9px;
 }

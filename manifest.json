@@ -11,11 +11,14 @@
           "url": "views/contact_details_page/contact_sidebar.html",
           "icon": "styles/images/aeroplane.svg"
         }
+      },
+      "requests": {
+        "getContacts": {}
       }
     }
   },
   "engines": {
-    "node": "18.12.1",
+    "node": "18.13.0",
     "fdk": "9.0.5"
   }
 }

@@ -8,7 +8,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script async src="https://static.freshdev.io/fdk/2.0/assets/fresh_client.js"></script>
+  <script src="{{{appclient}}}"></script>
+  <!-- <script async src="https://static.freshdev.io/fdk/2.0/assets/fresh_client.js"></script> -->
   <link rel="stylesheet" type="text/css" href="https://static.freshdev.io/fdk/2.0/assets/freshdesk.css">
 
   <script src="https://pbx-stg.oncallcx.vn/cti/ancti/ancti.js"></script>
@@ -54,13 +55,13 @@
           </a>
         </div>
         <div class="col-sm-3 muted">
-          <span id="btnMissCall">
+          <a id="btnMissCall">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M23.7188 16.7953C23.9063 16.9843 24 17.2205 24 17.5039C24 17.7874 23.9063 18.0236 23.7188 18.2126L21.2344 20.7165C21.0469 20.9055 20.8125 21 20.5313 21C20.25 21 20.0156 20.9055 19.8281 20.7165C18.9531 19.8976 18.0625 19.2677 17.1563 18.8268C16.7813 18.6693 16.5938 18.3701 16.5938 17.9291V14.811C15.1563 14.3386 13.625 14.1024 12 14.1024C10.375 14.1024 8.84375 14.3386 7.40625 14.811V17.9291C7.40625 18.4016 7.21875 18.7165 6.84375 18.874C5.84375 19.3465 4.95313 19.9606 4.17188 20.7165C3.98438 20.9055 3.75 21 3.46875 21C3.1875 21 2.95313 20.9055 2.76563 20.7165L0.28125 18.2126C0.09375 18.0236 0 17.7874 0 17.5039C0 17.2205 0.09375 16.9843 0.28125 16.7953C3.5625 13.6457 7.46875 12.0709 12 12.0709C13.875 12.0709 15.9531 12.5433 18.2344 13.4882C20.5156 14.4016 22.3438 15.5039 23.7188 16.7953ZM6.51563 5.50394V9.04724H5.01563V3H11.0156V4.51181H7.5L12 9.04724L18 3L18.9844 3.99213L12 11.0787L6.51563 5.50394Z"
                 fill="white" fill-opacity="0.65" />
             </svg>
-          </span>
+          </a>
         </div>
         <div class="col-sm-3 muted">
           <span id="btnContactCall">
@@ -72,10 +73,18 @@
           </span>
         </div>
       </div>
-      <div class="txt-phone" id="dialpad">
-        <!-- <fw-input clear-input minlength="10" size="12" id="output" onblur="checkPhone()"> -->
-        <input type="text" name="output" id="output" onblur="checkPhone()">
-        <p id="appTextPhone1" style="color: red;"></p>
+      <div class="txt-phone">
+        <div class="input">
+          <input type="text" name="output" id="output" onblur="checkPhone()" onchange="checkPhone()">
+        </div>
+        <div class="reset">
+          <button class="btn__back" id="reset_txt_phone" onclick="ResetTxtPhone()"><span><img style="size: 24px;"
+                src="./images/reset_phone.png" /></span></button>
+        </div>
+        <!-- <fw-button class="action-buttons" id="btnShowContact" size="small" color="primary">
+          Show missed calls
+        </fw-button> -->
+
         <!-- 
     <fw-select label="Select a Transformation" class="select-alien">
       <div slot="dropdown-options">
@@ -99,74 +108,72 @@
         placeholder="subdomain.freshdesk.com" class="domain" data-bind="product.domain"></fw-input>
     </section> -->
       </div>
+      <div id="">
+        <div>
+          <p id="appTextPhone1"></p>
+        </div>
+        <div class="row enter-phone">
+          <div class="col-sm-3 muted" style="margin-top: -1.5rem;">
+            <p id="1" class="lb-phone digit">1</p>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="2" class="lb-phone digit">2</p>
+            <span>A</span><span>B</span><span>C</span>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="3" class="lb-phone digit">3</p>
+            <span>D</span><span>E</span><span>F</span>
+          </div>
+        </div>
 
-      <div class="row enter-phone">
-        <div class="col-sm-3 muted" style="margin-top: -1.5rem;">
-          <p value="1" class="lb-phone">1</p>
+        <div class="row enter-phone">
+          <div class="col-sm-3 muted">
+            <p id="4" class="lb-phone digit">4</p>
+            <span>G</span><span>H</span><span>I</span>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="5" class="lb-phone digit">5</p>
+            <span>J</span><span>L</span><span>K</span>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="6" class="lb-phone digit">6</p>
+            <span>M</span><span>N</span><span>O</span>
+          </div>
         </div>
-        <div class="col-sm-3 muted">
-          <p value="2" class="lb-phone">2</p>
-          <span>A</span><span>B</span><span>C</span>
+
+        <div class="row enter-phone">
+          <div class="col-sm-3 muted">
+            <p id="7" class="lb-phone digit">7</p>
+            <span>P</span><span>Q</span><span>R</span><span>S</span>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="8" class="lb-phone digit">8</p>
+            <span>T</span><span>U</span><span>V</span>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="9" class="lb-phone digit">9</p>
+            <span>W</span><span>X</span><span>Y</span><span>Z</span>
+          </div>
         </div>
-        <div class="col-sm-3 muted">
-          <p value="3" class="lb-phone">3</p>
-          <span>D</span><span>E</span><span>F</span>
+
+        <div class="row enter-phone">
+          <div class="col-sm-3 muted">
+            <p id="*" class="lb-phone digit">*</p>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="0" class="lb-phone digit">0</p>
+            <span style="margin-left: 0.45rem;">+</span>
+          </div>
+          <div class="col-sm-3 muted">
+            <p id="#" class="lb-phone digit">#</p>
+          </div>
         </div>
       </div>
-
-      <div class="row enter-phone">
-        <div class="col-sm-3 muted">
-          <p value="4" class="lb-phone">4</p>
-          <span>G</span><span>H</span><span>I</span>
-        </div>
-        <div class="col-sm-3 muted">
-          <p value="5" class="lb-phone">5</p>
-          <span>J</span><span>L</span><span>K</span>
-        </div>
-        <div class="col-sm-3 muted">
-          <p value="6" class="lb-phone">6</p>
-          <span>M</span><span>N</span><span>O</span>
-        </div>
-      </div>
-
-      <div class="row enter-phone">
-        <div class="col-sm-3 muted">
-          <p value="7" class="lb-phone">7</p>
-          <span>P</span><span>Q</span><span>R</span><span>S</span>
-        </div>
-        <div class="col-sm-3 muted">
-          <p value="8" class="lb-phone">8</p>
-          <span>T</span><span>U</span><span>V</span>
-        </div>
-        <div class="col-sm-3 muted">
-          <p value="9" class="lb-phone">9</p>
-          <span>W</span><span>X</span><span>Y</span><span>Z</span>
-        </div>
-      </div>
-
-      <div class="row enter-phone">
-        <div class="col-sm-3 muted">
-          <p value="*" class="lb-phone">*</p>
-        </div>
-        <div class="col-sm-3 muted">
-          <p value="0" class="lb-phone">0</p>
-          <span style="margin-left: 0.45rem;">+</span>
-        </div>
-        <div class="col-sm-3 muted">
-          <p value="#" class="lb-phone">#</p>
-          <!-- <fw-label value="#" color=""></fw-label> -->
-        </div>
-      </div>
-
       <div class="call-action">
         <button class="btn-call" id="callEnter" onclick="toggleCall()" type=" button"><span
             style="margin-right: 9px;"><img class="icon__call" src="./images/call.png" /></span><span
             style="font-size: large;">Call</span></button>
       </div>
-
-      <script>
-
-      </script>
     </div>
 
     <div id="mainOutbound">
@@ -198,8 +205,6 @@
 
 
       <!-- <video id="view" autoplay playsInline></video> -->
-      <script>
-      </script>
     </div>
 
     <div id="mainCollapseClickToCall">
@@ -213,10 +218,6 @@
           </button>
         </div>
       </div>
-      <!-- <div class="waiting__screen">
-        <button id="toggleEndCall" onclick="endCall()" class="" type="button"><span><img class="icon__calling"
-              src="./images/endcall.png" /></span></button>
-      </div> -->
     </div>
   </div>
 
@@ -226,5 +227,13 @@
 <!-- <script defer src="scripts/as7.js"></script> -->
 <script async type="module" src="https://unpkg.com/@freshworks/crayons@3/dist/crayons/crayons.esm.js"></script>
 <script async nomodule src="https://unpkg.com/@freshworks/crayons@3/dist/crayons/crayons.js"></script>
+
+<script>
+  // $('input[name="output"]').on('change', function () {
+  //   if ($(this).val().length == 0) {
+  //     alert('Input field is empty');
+  //   }
+  // });
+</script>
 
 </html>

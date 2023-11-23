@@ -1,26 +1,20 @@
 {
-  "contact": {
-    "display_name": "Contact Details",
-    "description": "Please enter the contact details",
-    "type": "text",
-    "required": true
-  },
-  "freshdesk_domain": {
-    "display_name": "Freshdesk Domain",
+  "subdomain": {
+    "display_name": "what is subdomain of host Freshworks account",
     "type": "domain",
-    "description": "Your Freshdesk domain in complete format. Eg. mycompany.freshdesk.com",
-    "required": true,
-    "data-bind": "product.domain",
+    "description": "devrel",
     "type_attributes": {
       "product": "freshdesk"
     }
   },
-  "freshdesk_api_key": {
-    "display_name": "Freshdesk API Key",
-    "type": "text",
-    "description": "Your Freshdesk API key.",
-    "required": true,
+  "apiKey": {
+    "display_name": "Freshdesk apikey",
+    "description": "freshdesk API requires app calls to include API keys in all of their requests",
     "secure": true,
-    "data-bind": "product.api_key"
+    "type": "api_key",
+    "required": true,
+    "type_attributes": {
+      "product": "freshdesk"
+    }
   }
 }

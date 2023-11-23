@@ -142,6 +142,18 @@ function closeApp() {
     });
 }
 
+async function getContactData() {
+  try {
+    const data = await client.request.invokeTemplate("getContacts", {});
+    // Success output
+    // data: {contact: {"active": true, ...}}
+    console.log("data contact:", data);
+  } catch (error) {
+    // Failure operation
+    console.log(error);
+  }
+}
+
 /**
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
@@ -270,7 +282,14 @@ function onAppActivate() {
         : null;
       window.userPhone = phone;
       console.log("data loggedInUser", data);
+      /* Outgoing call functionality */
+      // dialpadEvents();
+      checkPhone();
+      // document
+      //   .getElementById("btnShowContact")
+      //   .addEventListener("fwClick", getContactData);
 
+      // document.getElementById("ouput").innerText = $(this).data("id");
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
@@ -366,12 +385,14 @@ function onAppDeactive() {
 
 function checkPhone() {
   var x = document.getElementById("output");
-  // var phone = /^\d{10}$/;
+  // var phoneNumber = /^\d{10}$/;
   var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
   if (x.value.match(phone)) {
     $("#callEnter").attr("disabled", false);
     $("#callEnter").css({ backgroundColor: "green" });
-    document.getElementById("appTextPhone1").innerText = "";
+    document.getElementById("appTextPhone1").innerText = "Correct";
+    document.getElementById("appTextPhone1").className =
+      "correct__number__phone";
     /**Call tu man hinh dialpad **/
     document.getElementById("callEnter").addEventListener("click", () => {
       openApp();
@@ -404,12 +425,42 @@ function checkPhone() {
     });
     /**Call tu man hinh dialpad **/
 
-    return true;
+    // return true;
   } else {
     $("#callEnter").attr("disabled", true);
     $("#callEnter").css({ backgroundColor: "darkgray" });
+    if (x.value.length === 0) {
+      document.getElementById("appTextPhone1").innerText = "Correct";
+      document.getElementById("appTextPhone1").className =
+        "correct__number__phone";
+    } else
+      document.getElementById("appTextPhone1").className =
+        "error__number__phone";
     document.getElementById("appTextPhone1").innerText =
       "Incorrect phone number format";
     return false;
+  }
+}
+
+/**
+ * Adds dialer events
+ **/
+var count = 0;
+$(".digit").on("click", function () {
+  var num = $(this).clone().children().remove().end().text();
+  // $("#output1").append("<span>" + num.trim() + "</span>");
+  var prevOutput = document.getElementById("output").value;
+  document.getElementById("output").value = prevOutput + num;
+  count++;
+  if (count < 12) {
+    checkPhone();
+  }
+});
+
+function ResetTxtPhone() {
+  var x = document.getElementById("output").value;
+  document.getElementById("output").value = x.substring(0, x.length - 1);
+  if (x.length < 12) {
+    checkPhone();
   }
 }
