@@ -158,7 +158,7 @@ async function getContactData() {
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
 function clickToCall() {
-  client.instance.resize({ height: "630px" });
+  client.instance.resize({ height: "560px" });
   let textElementPhone = document.getElementById("appTextPhone");
   // let textElementDialpad = document.getElementById("output").value;
 
@@ -219,7 +219,7 @@ function clickToCall() {
  * To resize the height of the CTI app
  */
 function resizeApp() {
-  client.instance.resize({ height: "630px" });
+  client.instance.resize({ height: "560px" });
 }
 
 let client;
@@ -303,7 +303,7 @@ function onAppActivate() {
       document
         .getElementById("mainCollapseClickToCall")
         .addEventListener("click", () => {
-          client.instance.resize({ height: "630px" });
+          resizeApp();
           document.getElementById("mainCollapseClickToCall").style.display =
             "none";
           document.getElementById("mainContent").style.display = "none";
@@ -386,59 +386,42 @@ function onAppDeactive() {
 function checkPhone() {
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
-  var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
-  if (x.value.match(phone)) {
-    $("#callEnter").attr("disabled", false);
-    $("#callEnter").css({ backgroundColor: "green" });
-    document.getElementById("appTextPhone1").innerText = "Correct";
-    document.getElementById("appTextPhone1").className =
-      "correct__number__phone";
-    /**Call tu man hinh dialpad **/
-    document.getElementById("callEnter").addEventListener("click", () => {
-      openApp();
-      let textElementDialpad = document.getElementById("output").value;
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("mainOutbound").style.display = "block";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
-
-      phoneNumberReceiver = textElementDialpad;
-      document.getElementById("appTextPhone").value = phoneNumberReceiver;
-      document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
-      /**click to call as7*/
-      let call = webphone.calls[0];
-      if (!call) {
-        // click without an active call -> start a video call to number 23
-        webphone.makeCall(phoneNumberReceiver, {
-          autoOriginate: "doNotPrompt",
-          audio: true,
-          video: false,
-          subjectOfCall: "PredictiveCall",
-        });
-      } else if (call.localConnectionInfo == "alerting") {
-        // click while we have an alerting call -> accept it
-        call.answerCall({ audio: true, video: true });
-      } else {
-        // otherwise we release the call
-        call.clearConnection();
-      }
-      /**end click to call as7*/
-    });
-    /**Call tu man hinh dialpad **/
-
-    // return true;
+  if (x.value.includes("+")) {
+    var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
+    if (x.value.match(phone) && x.value.length == 12) {
+      eventHandlecallDialpad();
+    } else {
+      $("#callEnter").attr("disabled", true);
+      $("#callEnter").css({ backgroundColor: "darkgray" });
+      if (x.value.length === 0) {
+        document.getElementById("appTextPhone1").innerText = "Correct";
+        document.getElementById("appTextPhone1").className =
+          "correct__number__phone";
+      } else
+        document.getElementById("appTextPhone1").className =
+          "error__number__phone";
+      document.getElementById("appTextPhone1").innerText =
+        "Incorrect phone number format";
+      return false;
+    }
   } else {
-    $("#callEnter").attr("disabled", true);
-    $("#callEnter").css({ backgroundColor: "darkgray" });
-    if (x.value.length === 0) {
-      document.getElementById("appTextPhone1").innerText = "Correct";
-      document.getElementById("appTextPhone1").className =
-        "correct__number__phone";
-    } else
-      document.getElementById("appTextPhone1").className =
-        "error__number__phone";
-    document.getElementById("appTextPhone1").innerText =
-      "Incorrect phone number format";
-    return false;
+    var phone = /^\d{10}$/;
+    if (x.value.match(phone)) {
+      eventHandlecallDialpad();
+    } else {
+      $("#callEnter").attr("disabled", true);
+      $("#callEnter").css({ backgroundColor: "darkgray" });
+      if (x.value.length === 0) {
+        document.getElementById("appTextPhone1").innerText = "Correct";
+        document.getElementById("appTextPhone1").className =
+          "correct__number__phone";
+      } else
+        document.getElementById("appTextPhone1").className =
+          "error__number__phone";
+      document.getElementById("appTextPhone1").innerText =
+        "Incorrect phone number format";
+      return false;
+    }
   }
 }
 
@@ -452,15 +435,54 @@ $(".digit").on("click", function () {
   var prevOutput = document.getElementById("output").value;
   document.getElementById("output").value = prevOutput + num;
   count++;
-  if (count < 12) {
-    checkPhone();
-  }
+  checkPhone();
 });
 
 function ResetTxtPhone() {
   var x = document.getElementById("output").value;
   document.getElementById("output").value = x.substring(0, x.length - 1);
-  if (x.length < 12) {
-    checkPhone();
-  }
+  checkPhone();
+}
+
+/**
+ * call dialpad events
+ **/
+function eventHandlecallDialpad() {
+  $("#callEnter").attr("disabled", false);
+  $("#callEnter").css({ backgroundColor: "green" });
+  document.getElementById("appTextPhone1").innerText = "Correct";
+  document.getElementById("appTextPhone1").className = "correct__number__phone";
+  /**Call tu man hinh dialpad **/
+  document.getElementById("callEnter").addEventListener("click", () => {
+    openApp();
+    let textElementDialpad = document.getElementById("output").value;
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("mainCollapseClickToCall").style.display = "none";
+
+    phoneNumberReceiver = textElementDialpad;
+    document.getElementById("appTextPhone").value = phoneNumberReceiver;
+    document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
+    /**click to call as7*/
+    let call = webphone.calls[0];
+    if (!call) {
+      // click without an active call -> start a video call to number 23
+      webphone.makeCall(phoneNumberReceiver, {
+        autoOriginate: "doNotPrompt",
+        audio: true,
+        video: false,
+        subjectOfCall: "PredictiveCall",
+      });
+    } else if (call.localConnectionInfo == "alerting") {
+      // click while we have an alerting call -> accept it
+      call.answerCall({ audio: true, video: true });
+    } else {
+      // otherwise we release the call
+      call.clearConnection();
+    }
+    /**end click to call as7*/
+  });
+  /**Call tu man hinh dialpad **/
+
+  // return true;
 }
