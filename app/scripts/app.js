@@ -11,7 +11,6 @@ agent.startApplicationSession({
   password: "Phuln6!!!",
 });
 agent.on("applicationsessionstarted", () => {
-  // webphone = agent.getDevice("sip:9999@autocall.oncallcx.test.vn");
   webphone = agent.getDevice("sip:1973@term.115");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
@@ -21,12 +20,6 @@ agent.on("applicationsessionstarted", () => {
 // if WebRTC creates a media-stream we bind it to the corresponding elements
 agent.on("localstream", (event) => {
   document.getElementById("localView").srcObject = event.stream;
-});
-agent.on("applicationsessionterminated", () => {
-  $("#menu").removeClass("calling established");
-  $("#call").removeClass("open");
-  $("#hook").text("call");
-  $("#status").text("click to call an agent");
 });
 
 agent.on("remotestream", (event) => {
@@ -175,7 +168,7 @@ function clickToCall() {
     // document.getElementById("output").value = data.number;
 
     /**làm thé nào de getContact by Id?*/
-    goToContact(data?.id);
+    // goToContact(data?.id);
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -185,11 +178,11 @@ function clickToCall() {
         autoOriginate: "doNotPrompt",
         audio: true,
         video: false,
-        subjectOfCall: "PredictiveCall",
+        // subjectOfCall: "PredictiveCall",
       });
     } else if (call.localConnectionInfo == "alerting") {
       // click while we have an alerting call -> accept it
-      call.answerCall({ audio: true, video: true });
+      call.answerCall({ audio: true, video: false });
     } else {
       // otherwise we release the call
       call.clearConnection();
