@@ -12,7 +12,7 @@ agent.startApplicationSession({
 });
 agent.on("applicationsessionstarted", () => {
   // webphone = agent.getDevice("sip:9999@autocall.oncallcx.test.vn");
-  webphone = agent.getDevice("sip:1973@oncallcx.crm.vn");
+  webphone = agent.getDevice("sip:1973@term.115");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
   webphone.monitorStart({ rtc: true });
@@ -169,12 +169,13 @@ function clickToCall() {
     document.getElementById("mainOutbound").style.display = "block";
 
     var data = event.helper.getData();
-    console.log("data", data);
+    console.log("data event.helper :", data);
     textElementPhone.innerText = data.number;
     phoneNumberReceiver = data.number;
     // document.getElementById("output").value = data.number;
 
     /**làm thé nào de getContact by Id?*/
+    goToContact(data?.id);
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -197,23 +198,23 @@ function clickToCall() {
   });
 }
 
-// /**
-//  * It opens the contact details page for the give contact id
-//  *
-//  * @param {number} contactId - Contact to open
-//  */
-// function goToContact(contactId) {
-//   client.interface
-//     .trigger("click", { id: "contact", value: contactId })
-//     .then(function (data) {
-//       console.log("contact", data);
-//       console.info("successfully navigated to contact");
-//     })
-//     .catch(function (error) {
-//       console.error("Error: Failed to navigate to contact");
-//       console.error(error);
-//     });
-// }
+/**
+ * It opens the contact details page for the give contact id
+ *
+ * @param {number} contactId - Contact to open
+ */
+function goToContact(contactId) {
+  client.interface
+    .trigger("click", { id: "contact", value: contactId })
+    .then(function (data) {
+      console.log("goToContact:", data);
+      console.info("successfully navigated to contact");
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to navigate to contact");
+      console.error(error);
+    });
+}
 
 /**
  * To resize the height of the CTI app
