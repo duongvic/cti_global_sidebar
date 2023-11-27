@@ -14,5 +14,24 @@
       "retryDelay": 1000,
       "isOAuth": true
     }
+  },
+  "filterContacts": {
+    "schema": {
+      "method": "GET",
+      "protocol": "https",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/contacts",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      },
+      "query": {
+        "mobile": "<%= context.phone %>"
+      }
+    },
+    "options": {
+      "retryDelay": 1000,
+      "isOAuth": true
+    }
   }
 }

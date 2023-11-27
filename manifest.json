@@ -13,7 +13,8 @@
         }
       },
       "requests": {
-        "getContacts": {}
+        "getContacts": {},
+        "filterContacts": {}
       }
     }
   },

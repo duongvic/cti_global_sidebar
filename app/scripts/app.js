@@ -147,6 +147,20 @@ async function getContactData() {
   }
 }
 
+async function filterContactData(phone) {
+  console.log("phone view contact:", phone);
+  try {
+    const data = await client.request.invokeTemplate("filterContacts", {
+      context: {
+        mobile: phone,
+      },
+    });
+    console.log("view a contact:", data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 /**
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
@@ -169,6 +183,8 @@ function clickToCall() {
 
     /**làm thé nào de getContact by Id?*/
     // goToContact(data?.id);
+    var a = filterContactData(data?.number ? data?.number : undefined);
+    console.log("aaaaaa:", aaaa);
 
     /**click to call as7*/
     let call = webphone.calls[0];
