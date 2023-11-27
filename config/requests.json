@@ -2,6 +2,7 @@
   "getContacts": {
     "schema": {
       "method": "GET",
+      "protocol": "https",
       "host": "<%= iparam.subdomain %>.freshdesk.com",
       "path": "/api/v2/contacts",
       "headers": {
@@ -10,7 +11,8 @@
       }
     },
     "options": {
-      "retryDelay": 1000
+      "retryDelay": 1000,
+      "isOAuth": true
     }
   }
 }

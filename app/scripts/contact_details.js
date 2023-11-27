@@ -12,6 +12,8 @@ let client;
 async function getContacts() {
   //   let err, reply;
   let data = await to(client.request.invokeTemplate("getContacts", {}));
+  let display = document.querySelector(".auth-call");
+  display.innerHTML = `status ${data[0].status}`;
   console.log("data1 getContacts: ", data);
   //   if (err) console.error("Request failed \nReason", err);
   //   let { response } = reply;

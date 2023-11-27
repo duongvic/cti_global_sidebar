@@ -486,3 +486,7 @@ function eventHandlecallDialpad() {
 
   // return true;
 }
+
+function showContact() {
+  getContactData();
+}
