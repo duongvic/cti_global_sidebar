@@ -139,13 +139,11 @@ function closeApp() {
 async function getContactData() {
   try {
     var data = await client.request.invokeTemplate("getContacts", {});
-    if (data.status === 200) {
-      console.log("data contact:", JSON.parse(data?.response));
+    console.log("data contact:", JSON.parse(data?.response));
+    var a = data?.response ? JSON.parse(data?.response) : [];
+    if (a.length > 0) {
+      renderListContact(a);
     }
-    // var a = data?.response ? JSON.parse(data?.response) : [];
-    // if (a.length > 0) {
-    //   renderListContact(a);
-    // }
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -178,6 +176,8 @@ function clickToCall() {
     openApp();
     document.getElementById("mainContent").style.display = "none";
     document.getElementById("mainCollapseClickToCall").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+
     document.getElementById("mainOutbound").style.display = "block";
 
     var data = event.helper.getData();
@@ -247,18 +247,6 @@ async function init() {
   // client.events.on("app.activated", getContactData);
 }
 
-// async function getContactData() {
-//   try {
-//     const data = await client.data.get("contact");
-//     // Success output
-//     // data: {contact: {"active": true, ...}}
-//     console.log(data);
-//   } catch (error) {
-//     // Failure operation
-//     console.log(error);
-//   }
-// }
-
 // async function getContacts() {
 //   const iparamData = await client.iparams.get("creatorDomain");
 //   const URL = `https://${iparamData.creatorDomain}.freshdesk.com/api/v2/contacts`;
@@ -310,18 +298,19 @@ function onAppActivate() {
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
-
-      document
-        .getElementById("btnContactCall")
-        .addEventListener("click", () => {
-          showContact;
-        });
+      document.getElementById("mainListContacts").style.display = "none";
+      // document
+      //   .getElementById("btnContactCall")
+      //   .addEventListener("click", () => {
+      //     showContact;
+      //   });
 
       // thu gon màn hinh khi callbtnCollapseClickToCall
       document
         .getElementById("btnCollapseClickToCall")
         .addEventListener("fwClick", viewScreenCollapseClickToCall);
       // mo rong man hinh click to call
+
       document
         .getElementById("mainCollapseClickToCall")
         .addEventListener("click", () => {
@@ -510,13 +499,16 @@ function eventHandlecallDialpad() {
 }
 
 function showContact() {
+  document.getElementById("mainListContacts").style.display = "block";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
   getContactData();
 }
 
-// function renderListContact(listContacts) {
-//   document.getElementById("listContact").innerHTML = listContacts
-//     .map((contact) => {
-//       return `<li>${contact.name}</li>`;
-//     })
-//     .join("");
-// }
+function renderListContact(listContacts) {
+  document.getElementById("listContact").innerHTML = listContacts
+    .map((contact) => {
+      return `<li>${contact.name}</li>`;
+    })
+    .join("");
+}
