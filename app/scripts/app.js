@@ -1,4 +1,5 @@
 let phoneNumberReceiver = "";
+// let listContacts;
 
 /**as7 backend **/
 let agent = anCti.newAgent();
@@ -137,8 +138,14 @@ function closeApp() {
 
 async function getContactData() {
   try {
-    const data = await client.request.invokeTemplate("getContacts", {});
-    console.log("data contact:", JSON.parse(data?.response));
+    var data = await client.request.invokeTemplate("getContacts", {});
+    if (data.status === 200) {
+      console.log("data contact:", JSON.parse(data?.response));
+    }
+    // var a = data?.response ? JSON.parse(data?.response) : [];
+    // if (a.length > 0) {
+    //   renderListContact(a);
+    // }
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -181,8 +188,8 @@ function clickToCall() {
 
     /**làm thé nào de getContact by Id?*/
     // goToContact(data?.id);
-    var a = filterContactData(data?.number ? data?.number : undefined);
-    console.log("aaaaaa:", aaaa);
+    var aaaaaa = filterContactData(data?.number ? data?.number : undefined);
+    console.log("aaaaaa:", aaaaaa);
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -303,6 +310,13 @@ function onAppActivate() {
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
+
+      document
+        .getElementById("btnContactCall")
+        .addEventListener("click", () => {
+          showContact;
+        });
+
       // thu gon màn hinh khi callbtnCollapseClickToCall
       document
         .getElementById("btnCollapseClickToCall")
@@ -498,3 +512,11 @@ function eventHandlecallDialpad() {
 function showContact() {
   getContactData();
 }
+
+// function renderListContact(listContacts) {
+//   document.getElementById("listContact").innerHTML = listContacts
+//     .map((contact) => {
+//       return `<li>${contact.name}</li>`;
+//     })
+//     .join("");
+// }

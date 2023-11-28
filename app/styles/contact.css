@@ -1,0 +1,47 @@
+.lb__contact {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0em;
+  color: #262626;
+  margin: 0;
+  padding: 9px 9px;
+}
+.txt_search_contact {
+  margin: 6px;
+  background-color: #f0f3f6;
+  border-radius: 20ch;
+}
+.txt_search_contact::after {
+  display: block;
+  content: "";
+  clear: both;
+}
+
+.txt_search_contact .input {
+  width: 90%;
+  float: left;
+  padding: 3px 0px 3px 10px;
+  box-sizing: border-box;
+}
+
+.txt_search_contact .input input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  font-size: 16x;
+  /* font-weight: bolder; */
+  /* font-family: "montserrat"; */
+  line-height: 22px;
+  vertical-align: middle;
+  background: transparent;
+}
+.txt_search_contact .search {
+  width: 10%;
+  float: left;
+  /* padding: 6px; */
+}
+.txt_search_contact .search button {
+  width: 100%;
+  padding: 10px 10px 10px 0;
+}
