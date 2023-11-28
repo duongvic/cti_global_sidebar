@@ -138,9 +138,7 @@ function closeApp() {
 async function getContactData() {
   try {
     const data = await client.request.invokeTemplate("getContacts", {});
-    // Success output
-    // data: {contact: {"active": true, ...}}
-    console.log("data contact:", data);
+    console.log("data contact:", JSON.parse(data?.response));
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -152,7 +150,7 @@ async function filterContactData(phone) {
   try {
     const data = await client.request.invokeTemplate("filterContacts", {
       context: {
-        mobile: phone,
+        mobile: parseInt(phone),
       },
     });
     console.log("view a contact:", data);
