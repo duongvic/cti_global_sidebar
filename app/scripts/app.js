@@ -140,9 +140,22 @@ async function getContactData() {
   try {
     var data = await client.request.invokeTemplate("getContacts", {});
     console.log("data contact:", JSON.parse(data?.response));
-    var a = data?.response ? JSON.parse(data?.response) : [];
-    if (a.length > 0) {
-      renderListContact(a);
+    var arr = data?.response ? JSON.parse(data?.response) : [];
+    if (arr.length > 0) {
+      arr.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      });
+      renderListContact(arr);
     }
   } catch (error) {
     // Failure operation
