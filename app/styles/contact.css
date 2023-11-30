@@ -61,6 +61,7 @@
 .contact_character {
   font-weight: 700;
   cursor: pointer;
+  text-align: center;
 }
 .contact_character:active {
   color: #12344d;
@@ -161,13 +162,13 @@ div.relative :hover {
 }
 div.absolute {
   position: absolute;
-  top: 16px;
+  top: 6px;
   left: 6rem;
 }
 
 div.absolute-info {
   position: absolute;
-  top: 24px;
+  top: 20px;
   right: 9px;
 }
 
@@ -191,4 +192,42 @@ a :hover {
   cursor: pointer;
   color: #2196f3;
   text-decoration: underline;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.menubar {
+  /* position: fixed; */
+  /* display: flex; */
+  /* top: 0px; */
+  /* height: 15%; */
+  /* height: 61px; */
+  /* line-height: 61px; */
+  /* width: 100%; */
+  /* background-color: yellow; */
+  /* z-index: 1000; */
+  height: 89px;
+}
+
+.menuContact {
+  /* position: fixed; */
+  /* top: 89px; */
+  /* width: 100%; */
+  /* background-color: red; */
+  /* z-index: 999; */
+  height: 89px;
+}
+
+.menuContactList {
+  position: fixed;
+  top: 166px;
+  width: 100%;
+  /* background-color: red; */
+  z-index: 998;
 }

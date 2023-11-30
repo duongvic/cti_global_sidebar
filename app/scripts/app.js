@@ -1137,7 +1137,9 @@ function onAppActivate() {
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
-      document.getElementById("btnClose1").addEventListener("fwClick", closeApp);
+      document
+        .getElementById("btnClose1")
+        .addEventListener("fwClick", closeApp);
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
@@ -1237,6 +1239,7 @@ function onAppDeactive() {
 }
 
 function checkPhone() {
+  console.log("đã check");
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
   if (x.value.includes("+")) {
@@ -1301,6 +1304,7 @@ function ResetTxtPhone() {
  * call dialpad events
  **/
 function eventHandlecallDialpad() {
+  console.log("vảo eventHandlecallDialpad");
   $("#callEnter").attr("disabled", false);
   $("#callEnter").css({ backgroundColor: "green" });
   document.getElementById("appTextPhone1").innerText = "Correct";
@@ -1358,10 +1362,10 @@ function renderListContact(listContacts) {
           <p class="user-name">
             <b>${contact.name}</b>
           </p>
-          <p class="user__phone" id-user-phone= "${
+          <p class="user__phone" id-user-phone="${
             contact?.mobile ? contact?.mobile : contact?.phone
-          }" onclick="clickContactCall(this)">
-            <span class="">${
+          }" onclick="clickContactCall(this)" >
+            <span class="" id="userPhoneContact">${
               contact?.mobile ? contact?.mobile : contact?.phone
             }</span>
           </p>
@@ -1385,5 +1389,34 @@ function enableCharacterContact(elem) {
 
 function clickContactCall(elem) {
   var phone_contact = $(elem).attr("id-user-phone");
+  document.getElementById("callEnter1").addEventListener("click", () => {
+    openApp();
+    let textElementDialpad = document.getElementById("output").value;
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("mainCollapseClickToCall").style.display = "none";
+
+    phoneNumberReceiver = textElementDialpad;
+    document.getElementById("appTextPhone").value = phoneNumberReceiver;
+    document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
+    /**click to call as7*/
+    let call = webphone.calls[0];
+    if (!call) {
+      // click without an active call -> start a video call to number 23
+      webphone.makeCall(phoneNumberReceiver, {
+        autoOriginate: "doNotPrompt",
+        audio: true,
+        video: false,
+      });
+    } else if (call.localConnectionInfo == "alerting") {
+      // click while we have an alerting call -> accept it
+      call.answerCall({ audio: true, video: true });
+    } else {
+      // otherwise we release the call
+      call.clearConnection();
+    }
+    /**end click to call as7*/
+  });
+  /**Call tu man hinh dialpad **/
   console.log("vvavav", phone_contact);
 }
