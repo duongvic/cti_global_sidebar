@@ -19,6 +19,18 @@
   <link rel="stylesheet" href="styles/collapseClickToCall.css">
   <link rel="stylesheet" href="styles/contact.css" />
   <link rel="stylesheet" type="text/css" href="styles/style.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/6b20b1c14d.js" crossorigin="anonymous"></script>
+
+  <style>
+    .options fw-icon {
+      vertical-align: middle;
+    }
+  </style>
 </head>
 
 
@@ -232,7 +244,7 @@
     <div id="mainListContacts">
       <div style="background: #12344d">
         <span style="color: aliceblue; line-height: 2%">SST-CQ05 1100</span>
-        <fw-button class="action-buttons flr" id="btnClose" size="small" color="primary">__
+        <fw-button class="action-buttons flr" id="btnClose1" size="small" color="primary">__
         </fw-button><br /><br />
         <div class="fw-divider-solid"></div>
       </div>
@@ -276,28 +288,103 @@
       </div>
 
       <div>
-        <p class="lb__contact">Danh bạ</p>
-      </div>
-      <div class="txt_search_contact">
-        <div class="input">
-          <input type="text" name="output" id="search_contact" placeholder="Tìm kiếm" />
+        <div>
+          <p class="lb__contact">Danh bạ</p>
         </div>
-        <div class="search">
-          <button class="btn__back" id="search_txt_phone" onclick="">
-            <span><img style="size: 24px" src="./images/icon-search.png" /></span>
-          </button>
+        <div class="txt_search_contact">
+          <div class="input">
+            <input type="text" name="output" id="search_contact" placeholder="Tìm kiếm" />
+          </div>
+          <div class="search">
+            <button class="btn__back" id="search_txt_phone" onclick="">
+              <span><img style="size: 24px" src="./images/icon-search.png" /></span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <ol id="listContact"></ol>
+        <p class="lb__character" id="showCharacter"></p>
+        <div class="col-wrap">
+          <div class="col">
+            <ol id="listContact">
+              <!-- <li>
+                <div class="relative">
+                  <div class="avt">
+                    <img src="./images/avatar.png" class="img-circle list-user-avatar">
+                  </div>
+                  <div class="absolute user-info">
+                    <p class="user-name">
+                      <b> A Dương</b>
+                    </p>
+                    <p>
+                      <a id="customer-link-2" href="#">
+                        <span class="">0353293254</span>
+                      </a>
+                    </p>
+                  </div>
+                  <div class="absolute-info action">
+                    <img src="./images/icon-info.png">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="relative">
+                  <div class="avt">
+                    <img src="./images/avatar.png" class="img-circle list-user-avatar">
+                  </div>
+                  <div class="absolute user-info">
+                    <p class="user-name">
+                      <b> A Dương</b>
+                    </p>
+                    <p>
+                      <a id="customer-link-2" href="#">
+                        <span class="">0353293254</span>
+                      </a>
+                    </p>
+                  </div>
+                  <div class="absolute-info action">
+                    <img src="./images/icon-info.png">
+                  </div>
+                </div> -->
+            </ol>
+          </div>
+
+          <div class="col">
+            <div class="absolute-use-characters">
+              <p class="contact_character" id="A" onclick="enableCharacterContact(this)">A</p>
+              <p class="contact_character" id="B" onclick="enableCharacterContact(this)">B</p>
+              <p class="contact_character" id="C" onclick="enableCharacterContact(this)">C</p>
+              <p class="contact_character" id="D" onclick="enableCharacterContact(this)">D</p>
+              <p class="contact_character" id="E" onclick="enableCharacterContact(this)">E</p>
+              <p class="contact_character" id="F" onclick="enableCharacterContact(this)">F</p>
+              <p class="contact_character" id="G" onclick="enableCharacterContact(this)">G</p>
+              <p class="contact_character" id="H" onclick="enableCharacterContact(this)">H</p>
+              <p class="contact_character" id="I" onclick="enableCharacterContact(this)">I</p>
+              <p class="contact_character" id="J" onclick="enableCharacterContact(this)">J</p>
+              <p class="contact_character" id="K" onclick="enableCharacterContact(this)">K</p>
+              <p class="contact_character" id="L" onclick="enableCharacterContact(this)">L</p>
+              <p class="contact_character" id="M" onclick="enableCharacterContact(this)">M</p>
+              <p class="contact_character" id="N" onclick="enableCharacterContact(this)">N</p>
+              <p class="contact_character" id="O" onclick="enableCharacterContact(this)">O</p>
+              <p class="contact_character" id="P" onclick="enableCharacterContact(this)">P</p>
+              <p class="contact_character" id="Q" onclick="enableCharacterContact(this)">Q</p>
+              <p class="contact_character" id="R" onclick="enableCharacterContact(this)">R</p>
+              <p class="contact_character" id="S" onclick="enableCharacterContact(this)">S</p>
+              <p class="contact_character" id="T" onclick="enableCharacterContact(this)">T</p>
+              <p class="contact_character" id="U" onclick="enableCharacterContact(this)">U</p>
+              <p class="contact_character" id="V" onclick="enableCharacterContact(this)">V</p>
+              <p class="contact_character" id="W" onclick="enableCharacterContact(this)">W</p>
+              <p class="contact_character" id="X" onclick="enableCharacterContact(this)">X</p>
+              <p class="contact_character" id="Y" onclick="enableCharacterContact(this)">Y</p>
+              <p class="contact_character" id="Z" onclick="enableCharacterContact(this)">Z</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
   </div>
 
-
 </body>
+
 <script defer src="scripts/app.js"></script>
 <!-- <script defer src="scripts/as7.js"></script> -->
 <script async type="module" src="https://unpkg.com/@freshworks/crayons@3/dist/crayons/crayons.esm.js"></script>
@@ -309,6 +396,8 @@
   //     alert('Input field is empty');
   //   }
   // });
+
+
 </script>
 
 </html>

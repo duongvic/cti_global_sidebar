@@ -8,7 +8,7 @@
   padding: 9px 9px;
 }
 .txt_search_contact {
-  margin: 6px;
+  /* margin: 6px; */
   background-color: #f0f3f6;
   border-radius: 20ch;
 }
@@ -44,4 +44,151 @@
 .txt_search_contact .search button {
   width: 100%;
   padding: 10px 10px 10px 0;
+}
+
+.contact__content {
+  background-color: #f0f3f6;
+  height: 380px;
+  overflow: auto;
+  padding-top: 9px;
+  /* margin-top: 16px; */
+  display: flex;
+  flex-wrap: nowrap;
+  margin: 0;
+  width: 100%;
+}
+
+.contact_character {
+  font-weight: 700;
+  cursor: pointer;
+}
+.contact_character:active {
+  color: #12344d;
+  opacity: 0.8;
+}
+.lb__character {
+  font-size: 17px;
+  font-weight: 600;
+  /* line-height: 24px; */
+  letter-spacing: 0em;
+  color: #262626;
+  margin: 0;
+  padding-top: 9px;
+  padding-right: 9px;
+  /* padding-bottom: 9px; */
+  padding-left: 9px;
+
+  /* background-color: #f0f3f6; */
+}
+ul {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+ol {
+  padding-inline-start: 0px;
+  margin: 0;
+  width: 100%;
+}
+
+li {
+  display: list-item;
+  /* text-align: -webkit-match-parent; */
+}
+.list__item {
+  list-style: none;
+}
+
+.contact-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5em;
+  transition: 0.3s;
+}
+/* .contact-section:hover {
+  background-color: #48494a;
+} */
+section {
+  display: block;
+}
+
+.list-user-avatar {
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  /* margin-top: 6px; */
+}
+
+.img-circle {
+  border-radius: 50%;
+}
+
+.user-info .user-name {
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.container {
+  width: 100%;
+}
+
+.col-wrap {
+  display: table;
+  width: 100%;
+}
+
+.col {
+  display: table-cell;
+  /* padding: 1rem; */
+  width: 100%;
+}
+.col:nth-child(even) {
+  /* background-color: orange; */
+  width: 4%;
+}
+.col:nth-child(odd) {
+  /* background-color: yellow; */
+  width: 96%;
+}
+
+div.relative {
+  position: relative;
+}
+
+div.relative :hover {
+  background-color: #f0f3f6;
+}
+div.absolute {
+  position: absolute;
+  top: 16px;
+  left: 6rem;
+}
+
+div.absolute-info {
+  position: absolute;
+  top: 24px;
+  right: 9px;
+}
+
+div.absolute-use-characters {
+  position: absolute;
+  /* top: 24px; */
+  right: 0;
+}
+
+a :hover {
+  color: #2196f3 !important;
+  /* text-decoration: underline; */
+}
+
+.user-info .user__phone {
+  cursor: pointer;
+  color: #8c8c8c;
+}
+
+.user-info .user__phone :hover {
+  cursor: pointer;
+  color: #2196f3;
+  text-decoration: underline;
 }
