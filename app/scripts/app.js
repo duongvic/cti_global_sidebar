@@ -933,7 +933,7 @@ function openApp() {
   client.interface
     .trigger("show", { id: "softphone" })
     .then(function () {
-      resizeApp();
+      resizeAppDefault();
       console.log(`Success: Opened the app`);
     })
     .catch(function (error) {
@@ -949,7 +949,7 @@ function closeApp() {
   client.interface
     .trigger("hide", { id: "softphone" })
     .then(function () {
-      resizeApp();
+      resizeAppDefault();
       console.info("successfully closed the CTI app");
       // showNotify("success", "Successfully closed the CTI app.");
     })
@@ -1024,7 +1024,7 @@ function clickToCall() {
 
     /**làm thé nào de getContact by Id?*/
     // goToContact(data?.id);
-    // var aaaaaa = filterContactData(data?.number ? data?.number : undefined);
+    filterContactData(data?.number);
     // console.log("aaaaaa:", aaaaaa);
 
     /**click to call as7*/
@@ -1069,7 +1069,7 @@ function goToContact(contactId) {
 /**
  * To resize the height of the CTI app
  */
-function resizeApp() {
+function resizeAppDefault() {
   client.instance.resize({ height: "560px" });
 }
 
@@ -1111,7 +1111,7 @@ function viewScreenCollapseClickToCall() {
 }
 
 function onAppActivate() {
-  resizeApp();
+  resizeAppDefault();
 
   client.data.get("loggedInUser").then(
     function (data) {
@@ -1126,12 +1126,11 @@ function onAppActivate() {
       // dialpadEvents();
       checkPhone();
 
-      getContactData();
       // document
       //   .getElementById("btnShowContact")
       //   .addEventListener("fwClick", getContactData);
+      // showContact();
 
-      // document.getElementById("ouput").innerText = $(this).data("id");
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
@@ -1146,12 +1145,12 @@ function onAppActivate() {
       document
         .getElementById("btnCollapseClickToCall")
         .addEventListener("fwClick", viewScreenCollapseClickToCall);
-      // mo rong man hinh click to call
 
+      // mo rong man hinh click to call
       document
         .getElementById("mainCollapseClickToCall")
         .addEventListener("click", () => {
-          resizeApp();
+          resizeAppDefault();
           document.getElementById("mainCollapseClickToCall").style.display =
             "none";
           document.getElementById("mainContent").style.display = "none";
@@ -1175,7 +1174,8 @@ function onAppActivate() {
             let call = webphone.calls[0];
             call.clearConnection();
             /**as7 backend **/
-            resizeApp();
+            onAppDeactive();
+            resizeAppDefault();
             // console.info("successfully closed the CTI app");
           })
           .catch(function (error) {
@@ -1204,7 +1204,7 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-              onAppDeactive;
+              onAppDeactive();
               // console.info("successfully closed the CTI app");
             })
             .catch(function (error) {
@@ -1374,7 +1374,9 @@ function renderListContact(listContacts) {
           </p>
         </div>
         <div class="absolute-info action">
-          <a id="customer-link-${contact?.id}" href="#">
+          <a id="customer-link" attr-id-contact="${
+            contact?.id
+          }" onclick="redirectContactInfo(this)" href="#">
             <img src="./images/icon-info.png">
           </a>
         </div>
@@ -1400,7 +1402,7 @@ function clickContactCall(elem) {
     .trigger("show", { id: "softphone" })
     .then(function () {
       console.log(`Success: Opened the app`);
-      // resizeApp();
+      // resizeAppDefault();
       document.getElementById("mainContent").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
@@ -1426,6 +1428,7 @@ function clickContactCall(elem) {
       } else {
         // otherwise we release the call
         call.clearConnection();
+        onAppDeactive();
       }
       /**Call tu man hinh dialpad **/
     })
@@ -1433,44 +1436,24 @@ function clickContactCall(elem) {
       console.error("Error: Failed to open the app");
       console.error(error);
     });
+}
 
-  // client.events.on("cti.triggerDialer", function (event) {
-  //   openApp();
-  //   document
-  //     .getElementById("userPhoneContact")
-  //     .addEventListener("click", () => {
-  //       let textElementDialpad = document.getElementById("output").value;
-  //       document.getElementById("mainOutbound").style.display = "block";
-  //       document.getElementById("mainListContacts").style.display = "none";
-  //       document.getElementById("mainContent").style.display = "none";
-  //       document.getElementById("mainCollapseClickToCall").style.display =
-  //         "none";
-
-  //       phoneNumberReceiver = textElementDialpad;
-  //       document.getElementById("appTextPhone").value = phoneNumberReceiver;
-  //       document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
-  //       /**click to call as7*/
-  //       let call = webphone.calls[0];
-  //       if (!call) {
-  //         // click without an active call -> start a video call to number 23
-  //         webphone.makeCall(phoneNumberReceiver, {
-  //           autoOriginate: "doNotPrompt",
-  //           audio: true,
-  //           video: false,
-  //         });
-  //       } else if (call.localConnectionInfo == "alerting") {
-  //         // click while we have an alerting call -> accept it
-  //         call.answerCall({ audio: true, video: true });
-  //       } else {
-  //         // otherwise we release the call
-  //         call.clearConnection();
-  //       }
-  //       /**end click to call as7*/
-  //     });
-  //   var data = event.helper.getData();
-  //   console.log(
-  //     "click to call contact",
-  //     `Clicked phone number: ${data.number}`
-  //   );
-  // });
+function redirectContactInfo(elem) {
+  let contactId = $(elem).attr("attr-id-contact");
+  client.interface.trigger("show", { id: "softphone" }).then(function () {
+    client.interface
+      .trigger("click", { id: "contact", value: contactId })
+      .then(function (data) {
+        document.getElementById("mainListContacts").style.display = "block";
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("mainCollapseClickToCall").style.display =
+          "none";
+        document.getElementById("mainOutbound").style.display = "none";
+        console.info("successfully navigated to contact", data);
+      })
+      .catch(function (error) {
+        console.error("Error: Failed to navigate to contact");
+        console.error(error);
+      });
+  });
 }
