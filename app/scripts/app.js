@@ -1444,11 +1444,12 @@ function redirectContactInfo(elem) {
     client.interface
       .trigger("click", { id: "contact", value: contactId })
       .then(function (data) {
-        document.getElementById("mainListContacts").style.display = "block";
-        document.getElementById("mainContent").style.display = "none";
-        document.getElementById("mainCollapseClickToCall").style.display =
-          "none";
-        document.getElementById("mainOutbound").style.display = "none";
+        showContact();
+        // document.getElementById("mainListContacts").style.display = "block";
+        // document.getElementById("mainContent").style.display = "none";
+        // document.getElementById("mainCollapseClickToCall").style.display =
+        //   "none";
+        // document.getElementById("mainOutbound").style.display = "none";
         console.info("successfully navigated to contact", data);
       })
       .catch(function (error) {
