@@ -962,28 +962,26 @@ function closeApp() {
 
 async function getContactData() {
   try {
-    // var data = await client.request.invokeTemplate("getContacts", {});
-    // console.log("data contact:", JSON.parse(data?.response));
-    // var arr = data?.response ? JSON.parse(data?.response) : [];
-    // console.log("arrr", arr);
-    // if (arr.length > 0) {
-    //   arr.sort((a, b) => {
-    //     const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-    //     const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-    //     if (nameA < nameB) {
-    //       return -1;
-    //     }
-    //     if (nameA > nameB) {
-    //       return 1;
-    //     }
+    var data = await client.request.invokeTemplate("getContacts", {});
+    var arr = data?.response ? JSON.parse(data?.response) : [];
+    console.log("data contact:", JSON.parse(data?.response));
+    if (arr.length > 0) {
+      arr.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // names must be equal
+        return 0;
+      });
+      renderListContact(arr);
+    }
 
-    //     // names must be equal
-    //     return 0;
-    //   });
-    //   renderListContact(arr);
-    // }
-
-    renderListContact(listContactsExample);
+    // renderListContact(listContactsExample);
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1028,8 +1026,8 @@ function clickToCall() {
 
     /**làm thé nào de getContact by Id?*/
     // goToContact(data?.id);
-    var aaaaaa = filterContactData(data?.number ? data?.number : undefined);
-    console.log("aaaaaa:", aaaaaa);
+    // var aaaaaa = filterContactData(data?.number ? data?.number : undefined);
+    // console.log("aaaaaa:", aaaaaa);
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -1143,11 +1141,6 @@ function onAppActivate() {
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
-      // document
-      //   .getElementById("btnContactCall")
-      //   .addEventListener("click", () => {
-      //     showContact;
-      //   });
 
       // thu gon màn hinh khi callbtnCollapseClickToCall
       document
@@ -1239,7 +1232,6 @@ function onAppDeactive() {
 }
 
 function checkPhone() {
-  console.log("đã check");
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
   if (x.value.includes("+")) {
@@ -1304,7 +1296,6 @@ function ResetTxtPhone() {
  * call dialpad events
  **/
 function eventHandlecallDialpad() {
-  console.log("vảo eventHandlecallDialpad");
   $("#callEnter").attr("disabled", false);
   $("#callEnter").css({ backgroundColor: "green" });
   document.getElementById("appTextPhone1").innerText = "Correct";
@@ -1320,6 +1311,10 @@ function eventHandlecallDialpad() {
     phoneNumberReceiver = textElementDialpad;
     document.getElementById("appTextPhone").value = phoneNumberReceiver;
     document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
+
+    //filter contacts
+    filterContacts("+84353293254");
+
     /**click to call as7*/
     let call = webphone.calls[0];
     if (!call) {
@@ -1335,12 +1330,17 @@ function eventHandlecallDialpad() {
     } else {
       // otherwise we release the call
       call.clearConnection();
+      console.log("call.clearConnection()", call.clearConnection());
     }
     /**end click to call as7*/
   });
   /**Call tu man hinh dialpad **/
 
   // return true;
+}
+
+function filterContacts(value) {
+  filterContactData(value);
 }
 
 function showContact() {
@@ -1389,6 +1389,12 @@ function enableCharacterContact(elem) {
 
 function clickContactCall(elem) {
   var phone_contact = $(elem).attr("id-user-phone");
+  client.events.on("cti.triggerDialer", function (event) {
+    openApp();
+    var data = event.helper.getData();
+    textElement.innerText = `Clicked phone number: ${data.number}`;
+  });
+
   document.getElementById("callEnter1").addEventListener("click", () => {
     openApp();
     let textElementDialpad = document.getElementById("output").value;
