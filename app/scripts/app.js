@@ -4,7 +4,7 @@ let listContactsExample = [
     active: false,
     address: null,
     description: null,
-    email: "aaa@gmail.com",
+    email: "anntp.work30@outlook.com",
     id: 153004219353,
     job_title: null,
     language: "en",
@@ -16,7 +16,7 @@ let listContactsExample = [
     custom_fields: {},
     facebook_id: null,
     created_at: "2023-11-15T10:08:04Z",
-    updated_at: "2023-11-27T08:14:47Z",
+    updated_at: "2023-12-01T03:24:04Z",
     csat_rating: null,
     preferred_source: null,
     company_id: null,
@@ -25,33 +25,6 @@ let listContactsExample = [
     last_name: "Adora",
     visitor_id: "f56159fa-1d68-4ba3-803c-b4dcfb144782",
     org_contact_id: 1724730982397542400,
-    other_phone_numbers: [],
-  },
-  {
-    active: false,
-    address: null,
-    description: null,
-    email: "tuandm@fpt.com",
-    id: 153004219232,
-    job_title: null,
-    language: "en",
-    mobile: "0989248962",
-    name: "Anh TuanDM30",
-    phone: "0989248962",
-    time_zone: "Eastern Time (US & Canada)",
-    twitter_id: null,
-    custom_fields: {},
-    facebook_id: null,
-    created_at: "2023-11-15T09:54:50Z",
-    updated_at: "2023-11-17T05:07:37Z",
-    csat_rating: null,
-    preferred_source: "phone",
-    company_id: null,
-    unique_external_id: null,
-    first_name: "Anh",
-    last_name: "TuanDM30",
-    visitor_id: "e6a46f23-8719-49de-b722-5000e6d1a43e",
-    org_contact_id: 1724727652233867300,
     other_phone_numbers: [],
   },
   {
@@ -79,6 +52,33 @@ let listContactsExample = [
     last_name: "VuNT2",
     visitor_id: "d807cdfd-9740-4cc6-ab9a-334291706df2",
     org_contact_id: 1725444269225898000,
+    other_phone_numbers: [],
+  },
+  {
+    active: false,
+    address: null,
+    description: null,
+    email: "tuandm@fpt.com",
+    id: 153004219232,
+    job_title: null,
+    language: "en",
+    mobile: "0989248962",
+    name: "Anh TuanDM30",
+    phone: "0989248962",
+    time_zone: "Eastern Time (US & Canada)",
+    twitter_id: null,
+    custom_fields: {},
+    facebook_id: null,
+    created_at: "2023-11-15T09:54:50Z",
+    updated_at: "2023-11-17T05:07:37Z",
+    csat_rating: null,
+    preferred_source: "phone",
+    company_id: null,
+    unique_external_id: null,
+    first_name: "Anh",
+    last_name: "TuanDM30",
+    visitor_id: "e6a46f23-8719-49de-b722-5000e6d1a43e",
+    org_contact_id: 1724727652233867300,
     other_phone_numbers: [],
   },
   {
@@ -140,7 +140,7 @@ let listContactsExample = [
     active: false,
     address: null,
     description: null,
-    email: "nganttt17@fpt.com",
+    email: "nganttt18@fpt.com",
     id: 153002172716,
     job_title: null,
     language: "en",
@@ -152,7 +152,7 @@ let listContactsExample = [
     custom_fields: {},
     facebook_id: null,
     created_at: "2023-10-04T01:48:48Z",
-    updated_at: "2023-10-04T01:48:48Z",
+    updated_at: "2023-12-01T03:25:55Z",
     csat_rating: null,
     preferred_source: null,
     company_id: 153000085841,
@@ -162,34 +162,6 @@ let listContactsExample = [
     last_name: "Ngân",
     visitor_id: "b1d9a311-2492-4f9e-b824-8a41505c5f75",
     org_contact_id: 1709385045827227600,
-    other_phone_numbers: [],
-  },
-  {
-    active: false,
-    address: null,
-    description: "Kích hoạt test Contact",
-    email: "enngocy6@gmail.com",
-    id: 153001446297,
-    job_title: null,
-    language: "en",
-    mobile: "0348397610",
-    name: "Chị Yến Ngọc Én",
-    phone: null,
-    time_zone: "Hanoi",
-    twitter_id: null,
-    custom_fields: {},
-    facebook_id: null,
-    created_at: "2023-09-22T07:26:49Z",
-    updated_at: "2023-09-22T07:41:53Z",
-    csat_rating: null,
-    preferred_source: "phone",
-    company_id: 153000064236,
-    other_companies: [],
-    unique_external_id: null,
-    first_name: "Chị Yến Ngọc",
-    last_name: "Én",
-    visitor_id: "10bb73a0-30fa-4a23-963c-3a783dd46b96",
-    org_contact_id: 1705121458634518500,
     other_phone_numbers: [],
   },
   {
@@ -686,6 +658,33 @@ let listContactsExample = [
     active: true,
     address: null,
     description: null,
+    email: "duongnh103.bds@gmail.com",
+    id: 153004638900,
+    job_title: null,
+    language: "en",
+    mobile: "0353293254",
+    name: "Nguyễn Hoàng Dương",
+    phone: "+84353293254",
+    time_zone: "Eastern Time (US & Canada)",
+    twitter_id: null,
+    custom_fields: {},
+    facebook_id: null,
+    created_at: "2023-12-01T03:30:13Z",
+    updated_at: "2023-12-01T03:40:14Z",
+    csat_rating: null,
+    preferred_source: null,
+    company_id: null,
+    unique_external_id: null,
+    first_name: "Nguyễn Hoàng",
+    last_name: "Dương",
+    visitor_id: "60976ba1-3401-4fa9-aced-37ba301bc54a",
+    org_contact_id: 1730429066071920600,
+    other_phone_numbers: [],
+  },
+  {
+    active: true,
+    address: null,
+    description: null,
     email: "aroundtheworld80@freshdesk.com",
     id: 153000350491,
     job_title: null,
@@ -962,26 +961,25 @@ function closeApp() {
 
 async function getContactData() {
   try {
-    var data = await client.request.invokeTemplate("getContacts", {});
-    var arr = data?.response ? JSON.parse(data?.response) : [];
-    console.log("data contact:", JSON.parse(data?.response));
-    if (arr.length > 0) {
-      arr.sort((a, b) => {
-        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        // names must be equal
-        return 0;
-      });
-      renderListContact(arr);
-    }
-
-    // renderListContact(listContactsExample);
+    // var data = await client.request.invokeTemplate("getContacts", {});
+    // var arr = data?.response ? JSON.parse(data?.response) : [];
+    // console.log("data contact:", JSON.parse(data?.response));
+    // if (arr.length > 0) {
+    //   arr.sort((a, b) => {
+    //     const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+    //     const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+    //     if (nameA < nameB) {
+    //       return -1;
+    //     }
+    //     if (nameA > nameB) {
+    //       return 1;
+    //     }
+    //     // names must be equal
+    //     return 0;
+    //   });
+    //   renderListContact(arr);
+    // }
+    renderListContact(listContactsExample);
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1127,6 +1125,8 @@ function onAppActivate() {
       /* Outgoing call functionality */
       // dialpadEvents();
       checkPhone();
+
+      getContactData();
       // document
       //   .getElementById("btnShowContact")
       //   .addEventListener("fwClick", getContactData);
@@ -1313,7 +1313,7 @@ function eventHandlecallDialpad() {
     document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
 
     //filter contacts
-    filterContacts("+84353293254");
+    filterContacts("%2B84353293254");
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -1362,9 +1362,12 @@ function renderListContact(listContacts) {
           <p class="user-name">
             <b>${contact.name}</b>
           </p>
-          <p class="user__phone" id-user-phone="${
-            contact?.mobile ? contact?.mobile : contact?.phone
-          }" onclick="clickContactCall(this)" >
+          <p class="user__phone"
+            attr-user-phone="${
+              contact?.mobile ? contact?.mobile : contact?.phone
+            }" 
+            attr-user-contact="${contact?.name ? contact?.name : "unknown"}"
+            onclick="clickContactCall(this)" >
             <span class="" id="userPhoneContact">${
               contact?.mobile ? contact?.mobile : contact?.phone
             }</span>
@@ -1383,46 +1386,91 @@ function renderListContact(listContacts) {
 }
 
 function enableCharacterContact(elem) {
-  var id = $(elem).attr("id");
+  let id = $(elem).attr("id");
   document.getElementById("showCharacter").innerText = id;
 }
 
 function clickContactCall(elem) {
-  var phone_contact = $(elem).attr("id-user-phone");
-  client.events.on("cti.triggerDialer", function (event) {
-    openApp();
-    var data = event.helper.getData();
-    textElement.innerText = `Clicked phone number: ${data.number}`;
-  });
-
-  document.getElementById("callEnter1").addEventListener("click", () => {
-    openApp();
-    let textElementDialpad = document.getElementById("output").value;
-    document.getElementById("mainContent").style.display = "none";
-    document.getElementById("mainOutbound").style.display = "block";
-    document.getElementById("mainCollapseClickToCall").style.display = "none";
-
-    phoneNumberReceiver = textElementDialpad;
-    document.getElementById("appTextPhone").value = phoneNumberReceiver;
-    document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
-    /**click to call as7*/
-    let call = webphone.calls[0];
-    if (!call) {
-      // click without an active call -> start a video call to number 23
-      webphone.makeCall(phoneNumberReceiver, {
-        autoOriginate: "doNotPrompt",
-        audio: true,
-        video: false,
-      });
-    } else if (call.localConnectionInfo == "alerting") {
-      // click while we have an alerting call -> accept it
-      call.answerCall({ audio: true, video: true });
-    } else {
-      // otherwise we release the call
-      call.clearConnection();
-    }
-    /**end click to call as7*/
-  });
-  /**Call tu man hinh dialpad **/
+  let phone_contact = $(elem).attr("attr-user-phone");
+  let name_contact = $(elem).attr("attr-user-contact");
   console.log("vvavav", phone_contact);
+
+  //show app
+  client.interface
+    .trigger("show", { id: "softphone" })
+    .then(function () {
+      console.log(`Success: Opened the app`);
+      // resizeApp();
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+      document.getElementById("mainListContacts").style.display = "none";
+      document.getElementById("mainOutbound").style.display = "block";
+
+      document.getElementById("appTxtNameContact").value = name_contact;
+      document.getElementById("appTxtNameContact").innerText = name_contact;
+
+      document.getElementById("appTextPhone").value = phone_contact;
+      document.getElementById("appTextPhone").innerText = phone_contact;
+
+      let call = webphone.calls[0];
+      if (!call) {
+        // click without an active call -> start a video call to number 23
+        webphone.makeCall(phone_contact, {
+          autoOriginate: "doNotPrompt",
+          audio: true,
+          video: false,
+        });
+      } else if (call.localConnectionInfo == "alerting") {
+        // click while we have an alerting call -> accept it
+        call.answerCall({ audio: true, video: true });
+      } else {
+        // otherwise we release the call
+        call.clearConnection();
+      }
+      /**Call tu man hinh dialpad **/
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to open the app");
+      console.error(error);
+    });
+
+  // client.events.on("cti.triggerDialer", function (event) {
+  //   openApp();
+  //   document
+  //     .getElementById("userPhoneContact")
+  //     .addEventListener("click", () => {
+  //       let textElementDialpad = document.getElementById("output").value;
+  //       document.getElementById("mainOutbound").style.display = "block";
+  //       document.getElementById("mainListContacts").style.display = "none";
+  //       document.getElementById("mainContent").style.display = "none";
+  //       document.getElementById("mainCollapseClickToCall").style.display =
+  //         "none";
+
+  //       phoneNumberReceiver = textElementDialpad;
+  //       document.getElementById("appTextPhone").value = phoneNumberReceiver;
+  //       document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
+  //       /**click to call as7*/
+  //       let call = webphone.calls[0];
+  //       if (!call) {
+  //         // click without an active call -> start a video call to number 23
+  //         webphone.makeCall(phoneNumberReceiver, {
+  //           autoOriginate: "doNotPrompt",
+  //           audio: true,
+  //           video: false,
+  //         });
+  //       } else if (call.localConnectionInfo == "alerting") {
+  //         // click while we have an alerting call -> accept it
+  //         call.answerCall({ audio: true, video: true });
+  //       } else {
+  //         // otherwise we release the call
+  //         call.clearConnection();
+  //       }
+  //       /**end click to call as7*/
+  //     });
+  //   var data = event.helper.getData();
+  //   console.log(
+  //     "click to call contact",
+  //     `Clicked phone number: ${data.number}`
+  //   );
+  // });
 }
