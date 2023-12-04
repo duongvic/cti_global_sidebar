@@ -1392,7 +1392,9 @@ function enableCharacterContact(elem) {
   if (def === "default" || (def !== id && def !== "")) {
     document.getElementById("showCharacter").innerText = id;
     document.getElementById("valueShowCharacter").value = id;
-    let filteredNames = listContacts.filter((item) => item.name.includes(id));
+    let filteredNames = listContacts.filter((item) =>
+      item.name.startsWith(id, 0)
+    );
     renderListContact(filteredNames);
     console.log("filteredNames", filteredNames);
   } else if (def === id) {
@@ -1405,47 +1407,49 @@ function clickContactCall(elem) {
   let phone_contact = $(elem).attr("attr-user-phone");
   let name_contact = $(elem).attr("attr-user-contact");
   console.log("vvavav", phone_contact);
+  if (phone_contact !== "null") {
+    //show app
+    client.interface
+      .trigger("show", { id: "softphone" })
+      .then(function () {
+        resizeAppDefault();
+        console.log(`Success: Opened the app`);
 
-  //show app
-  client.interface
-    .trigger("show", { id: "softphone" })
-    .then(function () {
-      resizeAppDefault();
-      console.log(`Success: Opened the app`);
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("mainCollapseClickToCall").style.display =
+          "none";
+        document.getElementById("mainListContacts").style.display = "none";
+        document.getElementById("mainOutbound").style.display = "block";
 
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
-      document.getElementById("mainListContacts").style.display = "none";
-      document.getElementById("mainOutbound").style.display = "block";
+        document.getElementById("appTxtNameContact").value = name_contact;
+        document.getElementById("appTxtNameContact").innerText = name_contact;
 
-      document.getElementById("appTxtNameContact").value = name_contact;
-      document.getElementById("appTxtNameContact").innerText = name_contact;
+        document.getElementById("appTextPhone").value = phone_contact;
+        document.getElementById("appTextPhone").innerText = phone_contact;
 
-      document.getElementById("appTextPhone").value = phone_contact;
-      document.getElementById("appTextPhone").innerText = phone_contact;
-
-      let call = webphone.calls[0];
-      if (!call) {
-        // click without an active call -> start a video call to number 23
-        webphone.makeCall(phone_contact, {
-          autoOriginate: "doNotPrompt",
-          audio: true,
-          video: false,
-        });
-      } else if (call.localConnectionInfo == "alerting") {
-        // click while we have an alerting call -> accept it
-        call.answerCall({ audio: true, video: true });
-      } else {
-        // otherwise we release the call
-        call.clearConnection();
-        onAppDeactive();
-      }
-      /**Call tu man hinh dialpad **/
-    })
-    .catch(function (error) {
-      console.error("Error: Failed to open the app");
-      console.error(error);
-    });
+        let call = webphone.calls[0];
+        if (!call) {
+          // click without an active call -> start a video call to number 23
+          webphone.makeCall(phone_contact, {
+            autoOriginate: "doNotPrompt",
+            audio: true,
+            video: false,
+          });
+        } else if (call.localConnectionInfo == "alerting") {
+          // click while we have an alerting call -> accept it
+          call.answerCall({ audio: true, video: true });
+        } else {
+          // otherwise we release the call
+          call.clearConnection();
+          onAppDeactive();
+        }
+        /**Call tu man hinh dialpad **/
+      })
+      .catch(function (error) {
+        console.error("Error: Failed to open the app");
+        console.error(error);
+      });
+  } else return null;
 }
 
 function redirectContactInfo(elem) {
