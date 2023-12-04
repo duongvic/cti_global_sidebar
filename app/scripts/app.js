@@ -823,6 +823,8 @@ let listContactsExample = [
     ],
   },
 ];
+let agent_ref = undefined;
+let isMainActive = false;
 
 /**as7 backend **/
 let agent = anCti.newAgent();
@@ -950,6 +952,11 @@ function closeApp() {
     .trigger("hide", { id: "softphone" })
     .then(function () {
       resizeAppDefault();
+      document.getElementById("appTxtNameContact").value = "";
+      document.getElementById("appTxtNameContact").innerText = "";
+
+      document.getElementById("appTextPhone").value = "";
+      document.getElementById("appTextPhone").innerText = "";
       console.info("successfully closed the CTI app");
       // showNotify("success", "Successfully closed the CTI app.");
     })
@@ -960,26 +967,27 @@ function closeApp() {
 }
 
 async function getContactData() {
+  document.getElementById("mainListContacts").style.display = "block";
   try {
-    // var data = await client.request.invokeTemplate("getContacts", {});
-    // var arr = data?.response ? JSON.parse(data?.response) : [];
-    // console.log("data contact:", JSON.parse(data?.response));
-    // if (arr.length > 0) {
-    //   arr.sort((a, b) => {
-    //     const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-    //     const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-    //     if (nameA < nameB) {
-    //       return -1;
-    //     }
-    //     if (nameA > nameB) {
-    //       return 1;
-    //     }
-    //     // names must be equal
-    //     return 0;
-    //   });
-    //   renderListContact(arr);
-    // }
-    renderListContact(listContactsExample);
+    var data = await client.request.invokeTemplate("getContacts", {});
+    var arr = data?.response ? JSON.parse(data?.response) : [];
+    console.log("data contact:", JSON.parse(data?.response));
+    if (arr.length > 0) {
+      arr.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // names must be equal
+        return 0;
+      });
+      renderListContact(arr);
+    }
+    // renderListContact(listContactsExample);
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1079,28 +1087,7 @@ async function init() {
   client = await app.initialized();
   client.events.on("app.activated", onAppActivate);
   client.events.on("app.deactivated", onAppDeactive);
-
-  // client.events.on("app.activated", getContactData);
 }
-
-// async function getContacts() {
-//   const iparamData = await client.iparams.get("creatorDomain");
-//   const URL = `https://${iparamData.creatorDomain}.freshdesk.com/api/v2/contacts`;
-//   const options = {
-//     headers: {
-//       Authorization: `Basic <%= encode(iparam.api_key) %>`, // substitution happens by platform
-//       "Content-Type": "application/json",
-//     },
-//   };
-
-//   let { response } = await client.request.get(URL, options);
-//   let contacts = JSON.parse(response);
-
-//   document.body.insertAdjacentHTML("beforebegin", "<h2>Listing contacts</h2>");
-//   contacts.forEach(function renderContact({ name }) {
-//     return document.body.insertAdjacentHTML("afterbegin", `${name}<br>`);
-//   });
-// }
 
 function viewScreenCollapseClickToCall() {
   client.instance.resize({ height: "48px" });
@@ -1115,6 +1102,9 @@ function onAppActivate() {
 
   client.data.get("loggedInUser").then(
     function (data) {
+      agent_ref = data?.loggedInUser?.availability?.agent_ref
+        ? data?.loggedInUser?.availability?.agent_ref
+        : undefined;
       const phone = data.loggedInUser.contact.phone
         ? data.loggedInUser.contact.phone
         : data.loggedInUser.contact.mobile
@@ -1137,6 +1127,8 @@ function onAppActivate() {
       document
         .getElementById("btnClose1")
         .addEventListener("fwClick", closeApp);
+
+      document.getElementById("mainContent").style.display = "block";
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
@@ -1191,10 +1183,12 @@ function onAppActivate() {
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(function () {
+              document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
               document.getElementById("mainCollapseClickToCall").style.display =
                 "none";
-              document.getElementById("mainContent").style.display = "block";
+              document.getElementById("mainListContacts").style.display =
+                "none";
 
               phoneNumberReceiver = document.getElementById("output").value =
                 "";
@@ -1344,9 +1338,12 @@ function filterContacts(value) {
 }
 
 function showContact() {
+  client.instance.resize({ height: "800px" });
   document.getElementById("mainListContacts").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+
   getContactData();
 }
 
@@ -1374,11 +1371,11 @@ function renderListContact(listContacts) {
           </p>
         </div>
         <div class="absolute-info action">
-          <a id="customer-link" attr-id-contact="${
+          <span id="customer-link" attr-id-contact="${
             contact?.id
-          }" onclick="redirectContactInfo(this)" href="#">
+          }" onclick="redirectContactInfo(this)">
             <img src="./images/icon-info.png">
-          </a>
+          </span>
         </div>
       </div>
     </li>`;
@@ -1440,21 +1437,43 @@ function clickContactCall(elem) {
 
 function redirectContactInfo(elem) {
   let contactId = $(elem).attr("attr-id-contact");
-  client.interface.trigger("show", { id: "softphone" }).then(function () {
-    client.interface
-      .trigger("click", { id: "contact", value: contactId })
-      .then(function (data) {
-        showContact();
-        // document.getElementById("mainListContacts").style.display = "block";
-        // document.getElementById("mainContent").style.display = "none";
-        // document.getElementById("mainCollapseClickToCall").style.display =
-        //   "none";
-        // document.getElementById("mainOutbound").style.display = "none";
-        console.info("successfully navigated to contact", data);
-      })
-      .catch(function (error) {
-        console.error("Error: Failed to navigate to contact");
-        console.error(error);
-      });
-  });
+
+  console.log(contactId);
+  isMainActive = true;
+
+  let str = agent_ref;
+  let sindex = agent_ref.lastIndexOf(".freshdesk.com");
+  console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
+  let a = str.slice(0, sindex);
+  const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
+  window.open(urlParams, "_blank");
+
+  // client.interface
+  //   .trigger("click", { id: "contact", value: contactId })
+  //   .then(function (data) {
+  //     showContact();
+  //     // document.getElementById("mainListContacts").style.display = "block";
+  //     // document.getElementById("mainContent").style.display = "none";
+  //     // document.getElementById("mainCollapseClickToCall").style.display =
+  //     //   "none";
+  //     // document.getElementById("mainOutbound").style.display = "none";
+  //     console.info("successfully navigated to contact", data);
+  //   })
+  //   .catch(function (error) {
+  //     console.error("Error: Failed to navigate to contact");
+  //     console.error(error);
+  //   });
+
+  // client.interface
+  //   .trigger("show", { id: "softphone" })
+  //   .then(function () {
+  //     resizeAppDefault();
+  //     document.getElementById("mainListContacts").style.display = "block";
+
+  //     console.log(`Success: Opened the app`);
+  //   })
+  //   .catch(function (error) {
+  //     console.error("Error: Failed to open the app");
+  //     console.error(error);
+  //   });
 }

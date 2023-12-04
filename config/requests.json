@@ -11,6 +11,7 @@
       }
     },
     "options": {
+      "retryDelay": 500,
       "isOAuth": true
     }
   },
@@ -29,6 +30,7 @@
       }
     },
     "options": {
+      "retryDelay": 500,
       "isOAuth": true
     }
   }
