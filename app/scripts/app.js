@@ -1,4 +1,5 @@
 let phoneNumberReceiver = "";
+let listContacts = [];
 let listContactsExample = [
   {
     active: false,
@@ -985,7 +986,8 @@ async function getContactData() {
         // names must be equal
         return 0;
       });
-      renderListContact(arr);
+      listContacts = [...arr];
+      renderListContact(listContacts);
     }
     // renderListContact(listContactsExample);
   } catch (error) {
@@ -1119,7 +1121,6 @@ function onAppActivate() {
       // document
       //   .getElementById("btnShowContact")
       //   .addEventListener("fwClick", getContactData);
-      // showContact();
 
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
@@ -1338,7 +1339,7 @@ function filterContacts(value) {
 }
 
 function showContact() {
-  client.instance.resize({ height: "800px" });
+  // client.instance.resize({ height: "900px" });
   document.getElementById("mainListContacts").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -1385,8 +1386,19 @@ function renderListContact(listContacts) {
 }
 
 function enableCharacterContact(elem) {
+  let def = document.getElementById("valueShowCharacter").value;
   let id = $(elem).attr("id");
-  document.getElementById("showCharacter").innerText = id;
+
+  if (def === "default" || (def !== id && def !== "")) {
+    document.getElementById("showCharacter").innerText = id;
+    document.getElementById("valueShowCharacter").value = id;
+    let filteredNames = listContacts.filter((item) => item.name.includes(id));
+    renderListContact(filteredNames);
+    console.log("filteredNames", filteredNames);
+  } else if (def === id) {
+    document.getElementById("showCharacter").innerText = "";
+    renderListContact(listContacts);
+  }
 }
 
 function clickContactCall(elem) {
@@ -1398,8 +1410,9 @@ function clickContactCall(elem) {
   client.interface
     .trigger("show", { id: "softphone" })
     .then(function () {
+      resizeAppDefault();
       console.log(`Success: Opened the app`);
-      // resizeAppDefault();
+
       document.getElementById("mainContent").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
