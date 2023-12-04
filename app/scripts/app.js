@@ -970,26 +970,26 @@ function closeApp() {
 async function getContactData() {
   document.getElementById("mainListContacts").style.display = "block";
   try {
-    var data = await client.request.invokeTemplate("getContacts", {});
-    var arr = data?.response ? JSON.parse(data?.response) : [];
-    console.log("data contact:", JSON.parse(data?.response));
-    if (arr.length > 0) {
-      arr.sort((a, b) => {
-        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        // names must be equal
-        return 0;
-      });
-      listContacts = [...arr];
-      renderListContact(listContacts);
-    }
-    // renderListContact(listContactsExample);
+    // var data = await client.request.invokeTemplate("getContacts", {});
+    // var arr = data?.response ? JSON.parse(data?.response) : [];
+    // console.log("data contact:", JSON.parse(data?.response));
+    // if (arr.length > 0) {
+    //   arr.sort((a, b) => {
+    //     const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+    //     const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+    //     if (nameA < nameB) {
+    //       return -1;
+    //     }
+    //     if (nameA > nameB) {
+    //       return 1;
+    //     }
+    //     // names must be equal
+    //     return 0;
+    //   });
+    //   listContacts = [...arr];
+    //   renderListContact(listContacts);
+    // }
+    renderListContact(listContactsExample);
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1004,7 +1004,25 @@ async function filterContactData(phone) {
         mobile: parseInt(phone),
       },
     });
+
     console.log("view a contact:", data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+async function getContactById(idContact) {
+  console.log("phone view contact:", idContact);
+  try {
+    const data = await client.request.invokeTemplate("getContactById", {
+      context: {
+        id: parseInt(idContact),
+      },
+    });
+    var detail = data?.response ? JSON.parse(data?.response) : [];
+    name_contact = detail?.name ? detail?.name : "";
+    document.getElementById("appTxtNameContact").value = name_contact;
+    document.getElementById("appTxtNameContact").innerText = name_contact;
+    console.log("contact detail:", data);
   } catch (error) {
     console.log(error);
   }
@@ -1033,7 +1051,7 @@ function clickToCall() {
     // document.getElementById("output").value = data.number;
 
     /**làm thé nào de getContact by Id?*/
-    // goToContact(data?.id);
+    getContactById(data?.id);
     filterContactData(data?.number);
     // console.log("aaaaaa:", aaaaaa);
 
@@ -1392,14 +1410,14 @@ function enableCharacterContact(elem) {
   if (def === "default" || (def !== id && def !== "")) {
     document.getElementById("showCharacter").innerText = id;
     document.getElementById("valueShowCharacter").value = id;
-    let filteredNames = listContacts.filter((item) =>
+    let filteredNames = listContactsExample.filter((item) =>
       item.name.startsWith(id, 0)
     );
     renderListContact(filteredNames);
     console.log("filteredNames", filteredNames);
   } else if (def === id) {
     document.getElementById("showCharacter").innerText = "";
-    renderListContact(listContacts);
+    renderListContact(listContactsExample);
   }
 }
 
