@@ -4,7 +4,7 @@
       "method": "GET",
       "protocol": "https",
       "host": "<%= iparam.subdomain %>.freshdesk.com",
-      "path": "/api/v2/contacts",
+      "path": "/api/v2/contacts?per_page=30&page=<%= context.page %>",
       "headers": {
         "Authorization": "Basic <%= encode(iparam.apiKey) %>",
         "Content-Type": "application/json"
@@ -18,20 +18,12 @@
   "filterContacts": {
     "schema": {
       "method": "GET",
-      "protocol": "https",
       "host": "<%= iparam.subdomain %>.freshdesk.com",
-      "path": "/api/v2/contacts",
+      "path": "/api/v2/contacts?mobile=<%= context.mobile %>",
       "headers": {
         "Authorization": "Basic <%= encode(iparam.apiKey) %>",
         "Content-Type": "application/json"
-      },
-      "query": {
-        "mobile": "<%= context.phone %>"
       }
-    },
-    "options": {
-      "retryDelay": 500,
-      "isOAuth": true
     }
   },
   "getContactById": {
@@ -39,6 +31,17 @@
       "method": "GET",
       "host": "<%= iparam.subdomain %>.freshdesk.com",
       "path": "/api/v2/contacts/<%= context.id %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  "searchContacts": {
+    "schema": {
+      "method": "GET",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/contacts?mobile=0353293254",
       "headers": {
         "Authorization": "Basic <%= encode(iparam.apiKey) %>",
         "Content-Type": "application/json"

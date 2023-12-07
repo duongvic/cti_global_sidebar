@@ -1,3 +1,4 @@
+let avtarContact = "";
 let phoneNumberReceiver = "";
 let listContacts = [];
 let listContactsExample = [
@@ -853,32 +854,95 @@ agent.on("remotestream", (event) => {
   document.getElementById("remoteView").srcObject = event.stream;
   audio.srcObject = event.stream;
 });
-//   $("#toggle").on('click',() => {
-//     $("#toggle").removeClass("hint");
-//     $("#call").toggleClass("open");
 
-// });
-
-function showTime() {
-  var date = new Date();
-  var h = date.getHours(); // 0 - 23
-  console.log(h);
-  var m = date.getMinutes(); // 0 - 59
-  var s = date.getSeconds(); // 0 - 59
-
-  m = m < 10 ? "0" + m : m;
-  s = s < 10 ? "0" + s : s;
-
-  var time = m + ":" + s + " ";
-  document.getElementById("MyClockDisplay").innerText = time;
-  document.getElementById("MyClockDisplay").textContent = time;
-
-  document.getElementById("MyClockDisplayCollapseClickToCall").innerText = time;
-  document.getElementById("MyClockDisplayCollapseClickToCall").textContent =
-    time;
-  setTimeout(showTime, 1000);
+// end call
+document.endCall = () => {
+  let call = webphone.calls[0];
+  call.clearConnection();
+  onAppDeactive();
+};
+// click start stop
+function myFunction(x) {
+  x.classList.toggle("change");
 }
-showTime();
+
+// timer call
+// timer call
+let ret = document.getElementById("timer");
+
+console.log("ret", ret);
+
+let counter = 0;
+let interval;
+
+function convertSec(cnt) {
+  let sec = cnt % 60;
+  let min = Math.floor(cnt / 60);
+  if (sec < 10) {
+    if (min < 10) {
+      return "0" + min + ":0" + sec;
+    } else {
+      return min + ":0" + sec;
+    }
+  } else if (min < 10 && sec >= 10) {
+    return "0" + min + ":" + sec;
+  } else {
+    return min + ":" + sec;
+  }
+}
+
+agent.on("call", (event) => {
+  function start() {
+    interval = setInterval(async function () {
+      ret.innerHTML = await convertSec(counter++); // timer start counting here...
+    }, 1000);
+    // ret.innerHTML = convertSec(counter++);
+  }
+  function stop() {
+    clearInterval(interval);
+    ret.innerHTML = "00:00:00";
+  }
+
+  let call = event.call;
+  switch (call.localConnectionInfo) {
+    case "alerting":
+      console.log(`incomming call from ${call.number} ${call.name}`);
+      break;
+    case "connected":
+      console.log(`connected to ${call.number}`);
+      return start();
+    case "fail":
+      console.log(`call failed, cause is ${event.content.cause}`);
+      break;
+    case "hold":
+      console.log(`holding call to ${call.number}`);
+      break;
+    case "null":
+      console.log(`call to ${call.number} is gone. Cancel`);
+
+      document.getElementById("mainContent").style.display = "block";
+      document.getElementById("mainOutbound").style.display = "none";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+      document.getElementById("mainBusyCall").style.display = "none";
+      document.getElementById("mainListContacts").style.display = "none";
+
+      location.reload();
+      return stop();
+  }
+});
+
+agent.on("call", (event) => {
+  if (event?.content?.cause == "busy") {
+    console.log("event?.content?.cause", event?.content?.cause);
+    ///view màn bận
+    document.getElementById("mainBusyCall").style.display = "block";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainCollapseClickToCall").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+  }
+});
+
 /**as7 backend **/
 
 // var client;
@@ -958,7 +1022,9 @@ function closeApp() {
 
       document.getElementById("appTextPhone").value = "";
       document.getElementById("appTextPhone").innerText = "";
-      console.info("successfully closed the CTI app");
+
+      ret.innerHTML = "00:00:00";
+      // console.info("successfully closed the CTI app");
       // showNotify("success", "Successfully closed the CTI app.");
     })
     .catch(function (error) {
@@ -967,29 +1033,44 @@ function closeApp() {
     });
 }
 
-async function getContactData() {
-  document.getElementById("mainListContacts").style.display = "block";
+async function getContactData(page) {
+  // let current_page = page;
+  console.log("page", page);
+  // document.getElementById("mainListContacts").style.display = "block";
   try {
-    // var data = await client.request.invokeTemplate("getContacts", {});
-    // var arr = data?.response ? JSON.parse(data?.response) : [];
-    // console.log("data contact:", JSON.parse(data?.response));
-    // if (arr.length > 0) {
-    //   arr.sort((a, b) => {
-    //     const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-    //     const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-    //     if (nameA < nameB) {
-    //       return -1;
-    //     }
-    //     if (nameA > nameB) {
-    //       return 1;
-    //     }
-    //     // names must be equal
-    //     return 0;
-    //   });
-    //   listContacts = [...arr];
-    //   renderListContact(listContacts);
-    // }
-    renderListContact(listContactsExample);
+    var data = await client.request.invokeTemplate("getContacts", {
+      context: {
+        page: page ? page : 1,
+      },
+    });
+    var arr = data?.response ? JSON.parse(data?.response) : [];
+    console.log("data contact:", JSON.parse(data?.response));
+    if (arr.length > 0) {
+      arr.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // names must be equal
+        return 0;
+      });
+      listContacts = [...arr];
+      localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
+      // console.log(
+      //   "gaga",
+      //   JSON.stringify(localStorage.getItem("cacheDataContact"))
+      // );
+      renderListContact(listContacts);
+    }
+    // localStorage.setItem(
+    //   "cacheDataContact",
+    //   JSON.stringify(listContactsExample)
+    // );
+    // renderListContact(listContactsExample);
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1004,14 +1085,28 @@ async function filterContactData(phone) {
         mobile: parseInt(phone),
       },
     });
-
-    console.log("view a contact:", data);
+    var detail = data?.response ? JSON.parse(data?.response) : [];
+    console.log("filterContactData:", detail);
   } catch (error) {
     console.log(error);
   }
 }
+
+async function searchContactData(term) {
+  console.log("term:", term);
+  // context: {
+  //   term: term,
+  // },
+  try {
+    const data = await client.request.invokeTemplate("searchContacts", {});
+    var detail = data?.response ? JSON.parse(data?.response) : [];
+    console.log("search contact:", detail);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 async function getContactById(idContact) {
-  console.log("phone view contact:", idContact);
   try {
     const data = await client.request.invokeTemplate("getContactById", {
       context: {
@@ -1022,7 +1117,8 @@ async function getContactById(idContact) {
     name_contact = detail?.name ? detail?.name : "";
     document.getElementById("appTxtNameContact").value = name_contact;
     document.getElementById("appTxtNameContact").innerText = name_contact;
-    console.log("contact detail:", data);
+    avtarContact = detail?.avatar?.avatar_url;
+    document.getElementById("avatarContact").src = avtarContact;
   } catch (error) {
     console.log(error);
   }
@@ -1052,7 +1148,7 @@ function clickToCall() {
 
     /**làm thé nào de getContact by Id?*/
     getContactById(data?.id);
-    filterContactData(data?.number);
+
     // console.log("aaaaaa:", aaaaaa);
 
     /**click to call as7*/
@@ -1150,6 +1246,7 @@ function onAppActivate() {
       document.getElementById("mainContent").style.display = "block";
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
+      document.getElementById("mainBusyCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
 
       // thu gon màn hinh khi callbtnCollapseClickToCall
@@ -1178,6 +1275,7 @@ function onAppActivate() {
             document.getElementById("mainCollapseClickToCall").style.display =
               "none";
 
+            document.getElementById("output").innerText = "";
             phoneNumberReceiver = document.getElementById("output").value = "";
             document.getElementById("appTextPhone").value = "";
             document.getElementById("appTextPhone").innerText = "";
@@ -1186,6 +1284,7 @@ function onAppActivate() {
             call.clearConnection();
             /**as7 backend **/
             onAppDeactive();
+            ret.innerHTML = "00:00:00";
             resizeAppDefault();
             // console.info("successfully closed the CTI app");
           })
@@ -1217,6 +1316,7 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
+              ret.innerHTML = "00:00:00";
               onAppDeactive();
               // console.info("successfully closed the CTI app");
             })
@@ -1250,6 +1350,8 @@ function checkPhone() {
   if (x.value.includes("+")) {
     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     if (x.value.match(phone) && x.value.length == 12) {
+      filterContactData(x.value);
+      searchContactData(x.value);
       eventHandlecallDialpad();
     } else {
       $("#callEnter").attr("disabled", true);
@@ -1268,6 +1370,8 @@ function checkPhone() {
   } else {
     var phone = /^\d{10}$/;
     if (x.value.match(phone)) {
+      filterContactData(x.value);
+      searchContactData(x.value);
       eventHandlecallDialpad();
     } else {
       $("#callEnter").attr("disabled", true);
@@ -1326,7 +1430,7 @@ function eventHandlecallDialpad() {
     document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
 
     //filter contacts
-    filterContacts("%2B84353293254");
+    // filterContacts("%2B84353293254");
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -1363,7 +1467,10 @@ function showContact() {
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
 
-  getContactData();
+  getContactData(1);
+
+  // console.log("scrollTop", $(window).scrollTop());
+  // console.log("odn lai", $(document).height() - $(window).height());
 }
 
 function renderListContact(listContacts) {
@@ -1410,14 +1517,14 @@ function enableCharacterContact(elem) {
   if (def === "default" || (def !== id && def !== "")) {
     document.getElementById("showCharacter").innerText = id;
     document.getElementById("valueShowCharacter").value = id;
-    let filteredNames = listContactsExample.filter((item) =>
+    let filteredNames = listContacts.filter((item) =>
       item.name.startsWith(id, 0)
     );
     renderListContact(filteredNames);
     console.log("filteredNames", filteredNames);
   } else if (def === id) {
     document.getElementById("showCharacter").innerText = "";
-    renderListContact(listContactsExample);
+    renderListContact(listContacts);
   }
 }
 
@@ -1512,3 +1619,39 @@ function redirectContactInfo(elem) {
   //     console.error(error);
   //   });
 }
+
+$(document).ready(function () {
+  // $(window).scroll(function () {
+  //   if (
+  //     Math.ceil($(window).scrollTop()) ==
+  //     Math.ceil($(document).height() - $(window).height())
+  //   ) {
+  //     // ajax call get data from server and append to the div
+  //   }
+  // });
+  $(function () {
+    let count = 1;
+    $(".scrollpane").scroll(function () {
+      var $this = $(this);
+      var $results = $("#listContact");
+
+      console.log("$results.height()", $results.height());
+
+      console.log("$this.scrollTop()", $this.scrollTop());
+      console.log("$this.height()", $this.height());
+
+      if (
+        Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
+        Math.ceil($results.height())
+      ) {
+        console.log("count", count);
+        getContactData(count + 1);
+        // alert("bang nhau");
+      }
+      if (Math.ceil($this.scrollTop()) == 0 && count > 1) {
+        console.log("count-1", count);
+        getContactData(count - 1);
+      }
+    });
+  });
+});
