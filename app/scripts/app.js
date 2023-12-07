@@ -1100,6 +1100,7 @@ async function getContactData(page) {
       listContacts = [...newData, ...arr];
       console.log("newew dâttaa", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
+      current_page = page;
       renderListContact(listContacts);
     }
   } catch (error) {
@@ -1109,45 +1110,52 @@ async function getContactData(page) {
 }
 
 async function fetchContactData(page) {
-  if (page > 1) {
-    try {
-      var data = await client.request.invokeTemplate("getContacts", {
-        context: {
-          page: page ? page : 1,
-        },
+  console.log("page", page);
+  if (page == 1) {
+    current_page = 2;
+  } else if (page > 1) {
+    current_page = page;
+  }
+  console.log("current_page", current_page);
+  try {
+    var data = await client.request.invokeTemplate("getContacts", {
+      context: {
+        page: current_page ? current_page : 1,
+      },
+    });
+    var arr = data?.response ? JSON.parse(data?.response) : [];
+    console.log("data contact:", JSON.parse(data?.response));
+    if (arr.length > 0) {
+      arr.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // names must be equal
+        return 0;
       });
-      var arr = data?.response ? JSON.parse(data?.response) : [];
-      console.log("data contact:", JSON.parse(data?.response));
-      if (arr.length > 0) {
-        arr.sort((a, b) => {
-          const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-          const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-        var newData = [...arr];
-        let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
-        listContacts = [...oldData, ...newData];
-        localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
+      var newData = [...arr];
+      let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
+      listContacts = [...oldData, ...newData];
+      console.log("newData []", listContacts);
+      localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
 
-        renderListContact(listContacts);
-      } else {
-        let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
-        listContacts = [...newData, ...arr];
-        localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
-        renderListContact(listContacts);
-        current_page - 1;
-      }
-    } catch (error) {
-      // Failure operation
-      console.log(error);
+      renderListContact(listContacts);
+    } else {
+      let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
+      listContacts = [...newData, ...arr];
+      console.log("newData []", listContacts);
+      localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
+      current_page = page;
+      renderListContact(listContacts);
     }
+  } catch (error) {
+    // Failure operation
+    console.log(error);
   }
 }
 
@@ -1304,6 +1312,7 @@ function onAppActivate() {
       window.userPhone = phone;
       console.log("data loggedInUser", data);
 
+      current_page = 1;
       // var dataUser = getUserAS7(data?.contact?.email);
 
       /* Outgoing call functionality */
@@ -1584,7 +1593,8 @@ function showContact() {
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
 
-  getContactData(1);
+  current_page = 1;
+  getContactData(current_page);
 
   // console.log("scrollTop", $(window).scrollTop());
   // console.log("odn lai", $(document).height() - $(window).height());
