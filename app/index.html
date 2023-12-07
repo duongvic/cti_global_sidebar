@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="styles/outbount.css">
   <link rel="stylesheet" href="styles/collapseClickToCall.css">
   <link rel="stylesheet" href="styles/contact.css" />
+  <link rel="stylesheet" href="styles/busyCall.css" />
   <link rel="stylesheet" type="text/css" href="styles/style.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
@@ -214,8 +215,8 @@
             <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div>
             <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
             <div class="ct__calling"><span><img class="icon__calling" src="./images/pauseCall.png" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend Transfer.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind Transfer.svg" /></span></div>
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend_Transfer.svg" /></span></div>
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind_Transfer.svg" /></span></div>
           </div>
         </div>
         <button id="toggleEndCall" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
@@ -232,27 +233,32 @@
         </fw-button><br><br>
       </div>
 
-      <div id="busycall" class="w3-container city">
+      <div id="busycall" class="busy__call">
         <p class="text-algin" style="padding-top: 9% ; padding-bottom: 3rem;">Outbound Call...</p>
 
-        <h4><span id="appTxtNameContact"></span></h4>
-        <p id="appTextPhone"></p>
+        <h4 id="appTxtNameContactBusyCall"></h4>
+        <p id="appTextPhoneBusyCall"></p>
         <p>Người dùng bận</p>
-        <div><img class="avatar" id="avatarContact" src="./images/avatar_none.png"></div>
-        <div style="padding-top: 30%;">
-          <div class="ac__calling">
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/pauseCall.png" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend Transfer.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind Transfer.svg" /></span></div>
-          </div>
+        <div><img class="avatar__busy" id="avatarContact" src="./images/avatar_none.png"></div>
+        <div class="ac__calling__busy">
+          <button class="btn-ac__busy" onclick="openCity('calls')"><img class="icon__calling tablinks"
+              src="./images/DialPad-InCall.svg"></button>
+          <button class="btn-ac__busy" onclick="recordaudio()"><img class="icon__calling tablinks"
+              src="./images/Mic-InCall.svg"></button>
+          <button class="btn-ac__busy change" onclick="myFunction(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+          </button>
+          <button class="btn-ac__busy" onclick="openCity('maincall')"><img class="icon__calling tablinks"
+              src="./images/Blind_Transfer.svg"></button>
+          <button class="btn-ac__busy" onclick="openCity('busycall')"><img class="icon__calling tablinks"
+              src="./images/Attend_Transfer.svg"></button>
         </div>
         <div class="btn-bus">
-          <button id="toggleEndCall" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
+          <button id="toggleEndCallBusy" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
                 src="./images/endcall.png" /></span> Cancel</button>
-          <button id="toggle" onclick="endCall()" class="hint-green precall" type="button"><span><img
-                class="icon__calling icon-call" src="./images/Call.png" /></span> Pre-Call</button>
+          <button id="togglePreCall" onclick="preCall()" class="hint-green precall" type="button"><span><img
+                class="icon__preCall" src="./images/call.png" /></span> Pre-Call</button>
         </div>
 
       </div>

@@ -1,0 +1,113 @@
+.busy__call {
+  background-color: #3b3b3b;
+  text-align: center;
+  /* height: 470px; */
+  border-bottom-right-radius: 3ch;
+  border-bottom-left-radius: 3ch;
+}
+.busy__call .text-algin {
+  text-align: left;
+  padding-left: 20px;
+  color: #ccc;
+}
+.busy__call h4 {
+  font-size: 24px;
+  color: #fff;
+}
+
+.busy__call p {
+  font-size: 16px;
+  color: #ccc;
+  padding: 6px;
+}
+
+.busy__call .avatar__busy {
+  width: 94px;
+  margin: 57px 0;
+  height: 94px;
+  border-radius: 50%;
+}
+
+.busy__call .ac__calling__busy {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background: #0c0c0c;
+  height: 44px;
+  line-height: 63px;
+}
+
+.busy__call .ac__calling__busy .btn-ac__busy {
+  background: none;
+  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.bar1,
+.bar2,
+.bar3 {
+  width: 7px;
+  height: 22px;
+  background-color: #aaa;
+  margin: 3px 3px;
+  transition: 0.4s;
+}
+.btn-bus {
+  display: flex;
+}
+
+.busy__call .hint {
+  background: #bd4130;
+  border: 0;
+  width: 100%;
+  clear: both;
+  color: #fff;
+  height: 52px;
+  border-radius: 0px 0px 0px 20px;
+}
+
+.busy__call .hint-green {
+  background: #038821;
+  border: 0;
+  width: 100%;
+  clear: both;
+  color: #fff;
+}
+.precall {
+  border-radius: 0px 0px 20px 0px !important;
+}
+.bar1,
+.bar2,
+.bar3 {
+  width: 7px;
+  height: 22px;
+  background-color: #aaa;
+  margin: 3px 3px;
+  transition: 0.4s;
+}
+
+.change .bar1 {
+  width: 0;
+  background: none;
+  height: 0;
+  border-top: 16px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 19px solid #aaa;
+}
+
+.change .bar2 {
+  display: none;
+}
+
+.p10 {
+  padding: 10px;
+}
+
+.busy__call .unknown__name__busy {
+  color: #3b3b3b;
+}
+
+.busy__call .icon__preCall {
+  width: 22px;
+}
