@@ -1221,6 +1221,7 @@ function clickToCall() {
     document.getElementById("mainListContacts").style.display = "none";
 
     document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("").style.display = "none";
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
@@ -1286,6 +1287,7 @@ function viewScreenCollapseClickToCall() {
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "none";
 }
 
 let client;
@@ -1329,6 +1331,10 @@ function onAppActivate() {
       document
         .getElementById("btnClose1")
         .addEventListener("fwClick", closeApp);
+      document
+        .getElementById("btnCloseHistoryCall")
+        .addEventListener("fwClick", closeApp);
+
       // document
       //   .getElementById("btnCloseBusyCall")
       //   .addEventListener("fwClick", closeApp);
@@ -1339,6 +1345,7 @@ function onAppActivate() {
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainBusyCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
+      document.getElementById("mainListHistoryCall").style.display = "none";
 
       // thu gon màn hinh khi callbtnCollapseClickToCall
       document
@@ -1350,10 +1357,13 @@ function onAppActivate() {
         .getElementById("mainCollapseClickToCall")
         .addEventListener("click", () => {
           resizeAppDefault();
+          document.getElementById("mainContent").style.display = "block";
+          document.getElementById("mainOutbound").style.display = "none";
           document.getElementById("mainCollapseClickToCall").style.display =
             "none";
-          document.getElementById("mainContent").style.display = "none";
-          document.getElementById("mainOutbound").style.display = "block";
+          document.getElementById("mainBusyCall").style.display = "none";
+          document.getElementById("mainListContacts").style.display = "none";
+          document.getElementById("mainListHistoryCall").style.display = "none";
         });
 
       /**End Call **/
@@ -1365,6 +1375,8 @@ function onAppActivate() {
             document.getElementById("mainOutbound").style.display = "none";
             document.getElementById("mainCollapseClickToCall").style.display =
               "none";
+            document.getElementById("mainListHistoryCall").style.display =
+              "none";
 
             document.getElementById("output").innerText = "";
             phoneNumberReceiver = document.getElementById("output").value = "";
@@ -1375,8 +1387,8 @@ function onAppActivate() {
             call.clearConnection();
             /**as7 backend **/
             onAppDeactive();
-            ret.innerHTML = "00:00:00";
-            resizeAppDefault();
+            // ret.innerHTML = "00:00:00";
+            // resizeAppDefault();
             // console.info("successfully closed the CTI app");
           })
           .catch(function (error) {
@@ -1394,6 +1406,8 @@ function onAppActivate() {
               document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
               document.getElementById("mainCollapseClickToCall").style.display =
+                "none";
+              document.getElementById("mainListHistoryCall").style.display =
                 "none";
 
               document.getElementById("output").innerText = "";
@@ -1428,6 +1442,8 @@ function onAppActivate() {
               document.getElementById("mainCollapseClickToCall").style.display =
                 "none";
               document.getElementById("mainListContacts").style.display =
+                "none";
+              document.getElementById("mainListHistoryCall").style.display =
                 "none";
 
               phoneNumberReceiver = document.getElementById("output").value =
@@ -1592,7 +1608,7 @@ function showContact() {
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
-
+  document.getElementById("mainListHistoryCall").style.display = "none";
   current_page = 1;
   getContactData(current_page);
 
@@ -1748,41 +1764,32 @@ function redirectContactInfo(elem) {
 }
 
 $(document).ready(function () {
-  // $(window).scroll(function () {
-  //   if (
-  //     Math.ceil($(window).scrollTop()) ==
-  //     Math.ceil($(document).height() - $(window).height())
-  //   ) {
-  //     // ajax call get data from server and append to the div
-  //   }
-  // });
   $(function () {
     $(".scrollpane").scroll(function () {
       var $this = $(this);
       var $results = $("#listContact"); // 1050
-
-      // console.log("$results.height()", $results.height());
-
-      // console.log("$this.scrollTop()", $this.scrollTop());
-      // console.log("$this.height()", $this.height());
-
-      // var sumg_scrollTop_Heigh =
-      //   Math.ceil($this.scrollTop()) + Math.ceil($this.height()); //842
-      // console.log("sumg_scrollTop_Heigh", sumg_scrollTop_Heigh);
       if (
         Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
         Math.ceil($results.height())
       ) {
         fetchContactData(current_page++);
       }
-      // if (Math.ceil($this.scrollTop()) == 0 && count > 1) {
-      //   console.log("count-1", count);
-      //   getContactData(count - 1);
-      // }
     });
   });
 });
 
-// function getUserAS7(email) {
+function showHistoryCall() {
+  document.getElementById("mainListHistoryCall").style.display = "block";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+}
 
-// }
+function showMain() {
+  document.getElementById("mainContent").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+}
