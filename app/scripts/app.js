@@ -1357,10 +1357,10 @@ function onAppActivate() {
         .getElementById("mainCollapseClickToCall")
         .addEventListener("click", () => {
           resizeAppDefault();
-          document.getElementById("mainContent").style.display = "block";
-          document.getElementById("mainOutbound").style.display = "none";
+          document.getElementById("mainOutbound").style.display = "block";
           document.getElementById("mainCollapseClickToCall").style.display =
             "none";
+          document.getElementById("mainContent").style.display = "none";
           document.getElementById("mainBusyCall").style.display = "none";
           document.getElementById("mainListContacts").style.display = "none";
           document.getElementById("mainListHistoryCall").style.display = "none";
@@ -1373,8 +1373,10 @@ function onAppActivate() {
           .then(function () {
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("mainOutbound").style.display = "none";
+            document.getElementById("mainBusyCall").style.display = "none";
             document.getElementById("mainCollapseClickToCall").style.display =
               "none";
+            document.getElementById("mainListContacts").style.display = "none";
             document.getElementById("mainListHistoryCall").style.display =
               "none";
 
@@ -1405,11 +1407,15 @@ function onAppActivate() {
             .then(function () {
               document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
+              document.getElementById("mainBusyCall").style.display = "none";
+              
               document.getElementById("mainCollapseClickToCall").style.display =
                 "none";
-              document.getElementById("mainListHistoryCall").style.display =
+              document.getElementById("mainListContacts").style.display =
                 "none";
-
+                document.getElementById("mainListHistoryCall").style.display =
+                "none";
+                
               document.getElementById("output").innerText = "";
               phoneNumberReceiver = document.getElementById("output").value =
                 "";
@@ -1421,6 +1427,7 @@ function onAppActivate() {
               /**as7 backend **/
               ret.innerHTML = "00:00:00";
               resizeAppDefault();
+              resetText();
               // onAppDeactive();
 
               // console.info("successfully closed the CTI app");
