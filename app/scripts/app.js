@@ -842,9 +842,12 @@ audio.autoplay = true;
 agent.startApplicationSession({
   username: "duongnh4@fpt.com",
   password: "DuongNH4!!!",
+  // username: "phuln6@fpt.com",
+  // password: "Phuln6!!!",
 });
 agent.on("applicationsessionstarted", () => {
   webphone = agent.getDevice("sip:1073@term.133");
+  // webphone = agent.getDevice("sip:1973@term.115");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
   webphone.monitorStart({ rtc: true });
@@ -1245,11 +1248,11 @@ function clickToCall() {
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
     document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("mainBusyCall").style.display = "none";
     document.getElementById("mainCollapseClickToCall").style.display = "none";
     document.getElementById("mainListContacts").style.display = "none";
-
-    document.getElementById("mainOutbound").style.display = "block";
-    document.getElementById("").style.display = "none";
+    document.getElementById("mainListHistoryCall").style.display = "none";
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
