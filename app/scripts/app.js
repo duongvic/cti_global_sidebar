@@ -1144,6 +1144,8 @@ async function fetchContactData(page) {
       // console.log("newData", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       renderListContact(listContacts);
+      current_page = current_page + 1;
+      console.log("after curteent page", current_page);
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...newData];
@@ -1813,7 +1815,7 @@ $(document).ready(function () {
         Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
         Math.ceil($results.height())
       ) {
-        fetchContactData(current_page++);
+        fetchContactData(current_page);
       }
     });
   });
