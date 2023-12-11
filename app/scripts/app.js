@@ -840,11 +840,11 @@ let audio = new Audio();
 audio.autoplay = true;
 
 agent.startApplicationSession({
-  username: "phuln6@fpt.com",
-  password: "Phuln6!!!",
+  username: "duongnh4@fpt.com",
+  password: "DuongNH4!!!",
 });
 agent.on("applicationsessionstarted", () => {
-  webphone = agent.getDevice("sip:1973@term.115");
+  webphone = agent.getDevice("sip:1073@term.133");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
   webphone.monitorStart({ rtc: true });
@@ -1098,7 +1098,7 @@ async function getContactData(page) {
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...newData, ...arr];
-      console.log("newew dâttaa", listContacts);
+      // console.log("newew dâttaa", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       current_page = page;
       renderListContact(listContacts);
@@ -1110,7 +1110,7 @@ async function getContactData(page) {
 }
 
 async function fetchContactData(page) {
-  console.log("page", page);
+  // console.log("page", page);
   if (page == 1) {
     current_page = 2;
   } else if (page > 1) {
@@ -1141,16 +1141,16 @@ async function fetchContactData(page) {
       var newData = [...arr];
       let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...oldData, ...newData];
-      console.log("newData []", listContacts);
+      // console.log("newData", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
-
       renderListContact(listContacts);
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
-      listContacts = [...newData, ...arr];
-      console.log("newData []", listContacts);
+      listContacts = [...newData];
+      // console.log("newData rõng []", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       current_page = page;
+      // console.log("current_page rỗng ", current_page);
       renderListContact(listContacts);
     }
   } catch (error) {
@@ -1183,6 +1183,32 @@ async function searchContactData(term) {
     const data = await client.request.invokeTemplate("searchContacts", {});
     var detail = data?.response ? JSON.parse(data?.response) : [];
     console.log("search contact:", detail);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function filteredContactSearch(term) {
+  console.log("term:", term);
+
+  try {
+    const data = await client.request.invokeTemplate("filteredContactSearch", {
+      context: {
+        term: term,
+      },
+    });
+    var detail = data?.response ? JSON.parse(data?.response) : [];
+    if (detail.length > 0) {
+      document.getElementById("appTxtNameContact").innerText = detail[0].name;
+      document.getElementById("appTxtNameContact").value = detail[0].name;
+    } else {
+      document.getElementById("appTxtNameContact").innerText =
+        "contact not exist";
+      document.getElementById("appTxtNameContact").value = "contact not exist";
+      document.getElementById("appTxtNameContact").style.color = "#3b3b3b";
+    }
+
+    console.log("filteredContactSearch contact:", detail);
   } catch (error) {
     console.log(error);
   }
@@ -1387,8 +1413,11 @@ function onAppActivate() {
             /**as7 backend **/
             let call = webphone.calls[0];
             call.clearConnection();
+
+            console.log("đã gọi vào end call as7");
             /**as7 backend **/
             onAppDeactive();
+            location.reload();
             // ret.innerHTML = "00:00:00";
             // resizeAppDefault();
             // console.info("successfully closed the CTI app");
@@ -1408,14 +1437,14 @@ function onAppActivate() {
               document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
               document.getElementById("mainBusyCall").style.display = "none";
-              
+
               document.getElementById("mainCollapseClickToCall").style.display =
                 "none";
               document.getElementById("mainListContacts").style.display =
                 "none";
-                document.getElementById("mainListHistoryCall").style.display =
+              document.getElementById("mainListHistoryCall").style.display =
                 "none";
-                
+
               document.getElementById("output").innerText = "";
               phoneNumberReceiver = document.getElementById("output").value =
                 "";
@@ -1425,9 +1454,10 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-              ret.innerHTML = "00:00:00";
+              // ret.innerHTML = "00:00:00";
               resizeAppDefault();
               resetText();
+              location.reload();
               // onAppDeactive();
 
               // console.info("successfully closed the CTI app");
@@ -1461,8 +1491,9 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-              ret.innerHTML = "00:00:00";
+              // ret.innerHTML = "00:00:00";
               onAppDeactive();
+              location.reload();
               // console.info("successfully closed the CTI app");
             })
             .catch(function (error) {
@@ -1495,8 +1526,9 @@ function checkPhone() {
   if (x.value.includes("+")) {
     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     if (x.value.match(phone) && x.value.length == 12) {
-      filterContactData(x.value);
-      searchContactData(x.value);
+      // filterContactData(x.value);
+      // searchContactData(x.value);
+      filteredContactSearch(x.value);
       eventHandlecallDialpad();
     } else {
       $("#callEnter").attr("disabled", true);
@@ -1515,8 +1547,9 @@ function checkPhone() {
   } else {
     var phone = /^\d{10}$/;
     if (x.value.match(phone)) {
-      filterContactData(x.value);
-      searchContactData(x.value);
+      // filterContactData(x.value);
+      // searchContactData(x.value);
+      filteredContactSearch(x.value);
       eventHandlecallDialpad();
     } else {
       $("#callEnter").attr("disabled", true);
@@ -1596,6 +1629,7 @@ function eventHandlecallDialpad() {
       // otherwise we release the call
       call.clearConnection();
       onAppDeactive();
+      location.reload();
       console.log("call.clearConnection()", call.clearConnection());
     }
     /**end click to call as7*/

@@ -47,5 +47,16 @@
         "Content-Type": "application/json"
       }
     }
+  },
+  "filteredContactSearch": {
+    "schema": {
+      "method": "GET",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/contacts/autocomplete?term=<%= context.term %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      }
+    }
   }
 }

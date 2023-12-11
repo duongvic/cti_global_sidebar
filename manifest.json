@@ -16,7 +16,8 @@
         "getContacts": {},
         "filterContacts": {},
         "getContactById": {},
-        "searchContacts": {}
+        "searchContacts": {},
+        "filteredContactSearch": {}
       }
     }
   },
