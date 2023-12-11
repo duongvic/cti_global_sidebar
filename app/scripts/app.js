@@ -1206,11 +1206,14 @@ async function filteredContactSearch(term) {
     if (detail.length > 0) {
       document.getElementById("appTxtNameContact").innerText = detail[0].name;
       document.getElementById("appTxtNameContact").value = detail[0].name;
+      renderListContact(detail);
     } else {
       document.getElementById("appTxtNameContact").innerText =
         "contact not exist";
       document.getElementById("appTxtNameContact").value = "contact not exist";
       document.getElementById("appTxtNameContact").style.color = "#3b3b3b";
+      current_page = 1;
+      renderListContactEmpty;
     }
 
     console.log("filteredContactSearch contact:", detail);
@@ -1662,6 +1665,10 @@ function showContact() {
   // console.log("odn lai", $(document).height() - $(window).height());
 }
 
+function renderListContactEmpty() {
+  document.getElementById("listContact").innerHTML = "";
+}
+
 function renderListContact(listContacts) {
   document.getElementById("listContact").innerHTML = listContacts
     .map((contact) => {
@@ -1839,3 +1846,25 @@ function showMain() {
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
 }
+
+// function searchContact() {
+//   const val = document.querySelector('input[name="search_contact"]').value;
+//   if (val !== "") {
+//     filteredContactSearch(val);
+//   } else getContactData(1);
+//   console.log("val", val);
+// }
+
+$("#search_contact").keypress(function (event) {
+  const val = document.querySelector('input[name="search_contact"]').value;
+  let keycode = event.keyCode ? event.keyCode : event.which;
+
+  if (keycode == "13" && (val != "" || val != null)) {
+    filteredContactSearch(val);
+  }
+  if (keycode == "13" && (val == "" || val == null)) {
+    current_page = 1;
+    getContactData(current_page);
+  }
+  event.stop();
+});
