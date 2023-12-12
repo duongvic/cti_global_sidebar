@@ -871,11 +871,41 @@ agent.on("remotestream", (event) => {
 // };
 
 // click start stop action button
-function myFunction(x) {
-  x.classList.toggle("change");
-}
+// var input = document.test.savereport;
+// function mic(x) {
+//   x.classList.toggle("mic");
+//   if (input.value === String(false)) {
+//     input.value = true;
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "muted",
+//     });
+//   } else {
+//     input.value = false;
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "true",
+//     });
+//   }
+// }
+// var input = document.test.savereport;
+// function change(x) {
+//   x.classList.toggle("change");
+//   if (input.value === String(false)) {
+//     input.value = true;
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "muted",
+//     });
+//   } else {
+//     input.value = false;
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "true",
+//     });
+//   }
+// }
 
-// timer call
 // timer call
 let ret = document.getElementById("timer");
 let retCollapse = document.getElementById("timerCollapse");
@@ -917,10 +947,33 @@ agent.on("call", (event) => {
   switch (call.localConnectionInfo) {
     case "alerting":
       console.log(`incomming call from ${call.number} ${call.name}`);
+      client.interface
+        .trigger("show", { id: "softphone" })
+        .then(function () {
+          resizeAppDefault();
+          document.getElementById("mainInbound").style.display = "block";
+          document.getElementById("mainContent").style.display = "none";
+          document.getElementById("mainOutbound").style.display = "none";
+          document.getElementById("mainCollapseClickToCall").style.display =
+            "none";
+          document.getElementById("mainBusyCall").style.display = "none";
+          document.getElementById("mainListContacts").style.display = "none";
+          //check contact
+          filterContactDataInbound(call?.number);
+          document.getElementById("appTextPhoneInbound").value = call?.number;
+          document.getElementById("appTextPhoneInbound").innerText =
+            call?.number;
+        })
+        .catch(function (error) {
+          console.error("Error: Failed to open the app");
+          console.error(error);
+        });
+      start();
       break;
     case "connected":
       console.log(`connected to ${call.number}`);
-      return start();
+      start();
+      break;
     case "fail":
       console.log(`call failed, cause is ${event.content.cause}`);
       break;
@@ -937,6 +990,7 @@ agent.on("call", (event) => {
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainBusyCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
+      document.getElementById("mainInbound").style.display = "none";
 
       document.getElementById("appTextPhone").value = "";
       document.getElementById("appTextPhone").innerText = "";
@@ -948,20 +1002,21 @@ agent.on("call", (event) => {
       $("#callEnter").attr("disabled", true);
       $("#callEnter").css({ backgroundColor: "darkgray" });
 
+      stop();
       document.getElementById("timer").value = "";
       document.getElementById("timer").innerText = "";
+
       ret.innerHTML = "";
       retCollapse = "";
-      // location.reload();
       onAppDeactive();
-      location.reload();
-      return stop();
+      // location.reload();
+      break;
   }
 });
 
 agent.on("call", (event) => {
   if (event?.content?.cause == "busy") {
-    console.log("event?.content?.cause", event?.content?.cause);
+    console.log("trường hợp máy bận :", event?.content?.cause);
     ///view màn bận
     document.getElementById("mainBusyCall").style.display = "block";
     document.getElementById("mainContent").style.display = "none";
@@ -1159,7 +1214,7 @@ async function fetchContactData(page) {
   }
 }
 
-async function filterContactData(phone) {
+async function filterContactDataInbound(phone) {
   try {
     const data = await client.request.invokeTemplate("filterContacts", {
       context: {
@@ -1167,7 +1222,20 @@ async function filterContactData(phone) {
       },
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
-    console.log("filterContactData context:", detail);
+    // kiểm tra số phone có trong hệ thống không
+    if (detail?.length > 0) {
+      document.getElementById("appTxtNameContactInbound").value =
+        "Khách hàng ".concat(detail[0].name);
+      document.getElementById("appTxtNameContactInbound").innerText =
+        "Khách hàng ".concat(detail[0].name);
+    } else {
+      document.getElementById("appTxtNameContactInbound").value =
+        "Khách hàng Unkown";
+      document.getElementById("appTxtNameContactInbound").innerText =
+        "Khách hàng Unkown";
+    }
+    console.log("filterContactDataInbound context:", detail);
+    return detail;
   } catch (error) {
     console.log(error);
   }
@@ -1330,15 +1398,6 @@ function onAppActivate() {
       console.log("data loggedInUser", data);
 
       current_page = 1;
-      // var dataUser = getUserAS7(data?.contact?.email);
-
-      /* Outgoing call functionality */
-      // dialpadEvents();
-      // checkPhone();
-
-      // document
-      //   .getElementById("btnShowContact")
-      //   .addEventListener("fwClick", getContactData);
 
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
@@ -1350,18 +1409,15 @@ function onAppActivate() {
         .getElementById("btnCloseHistoryCall")
         .addEventListener("fwClick", closeApp);
 
-      // document
-      //   .getElementById("btnCloseBusyCall")
-      //   .addEventListener("fwClick", closeApp);
-      // document.getElementById("appTxtNameContactBusyCall").innerText = "";
-
       document.getElementById("mainContent").style.display = "block";
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainBusyCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
       document.getElementById("mainListHistoryCall").style.display = "none";
-
+      document.getElementById("mainInbound").style.display = "none";
+      $("#callEnter").attr("disabled", true);
+      $("#callEnter").css({ backgroundColor: "darkgray" });
       // thu gon màn hinh khi callbtnCollapseClickToCall
       document
         .getElementById("btnCollapseClickToCall")
@@ -1379,6 +1435,7 @@ function onAppActivate() {
           document.getElementById("mainBusyCall").style.display = "none";
           document.getElementById("mainListContacts").style.display = "none";
           document.getElementById("mainListHistoryCall").style.display = "none";
+          document.getElementById("mainInbound").style.display = "none";
         });
 
       /**End Call **/
@@ -1394,6 +1451,7 @@ function onAppActivate() {
             document.getElementById("mainListContacts").style.display = "none";
             document.getElementById("mainListHistoryCall").style.display =
               "none";
+            document.getElementById("mainInbound").style.display = "none";
 
             document.getElementById("output").innerText = "";
             phoneNumberReceiver = document.getElementById("output").value = "";
@@ -1433,6 +1491,7 @@ function onAppActivate() {
                 "none";
               document.getElementById("mainListHistoryCall").style.display =
                 "none";
+              document.getElementById("mainInbound").style.display = "none";
 
               document.getElementById("output").innerText = "";
               phoneNumberReceiver = document.getElementById("output").value =
@@ -1471,6 +1530,7 @@ function onAppActivate() {
                 "none";
               document.getElementById("mainListHistoryCall").style.display =
                 "none";
+              document.getElementById("mainInbound").style.display = "none";
 
               phoneNumberReceiver = document.getElementById("output").value =
                 "";
@@ -1516,7 +1576,6 @@ function checkPhone() {
     console.log("vao co dau + ");
     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     if (x.value.match(phone) && x.value.length == 12) {
-      // filterContactData(x.value);
       filteredContactSearch(x.value);
       eventHandlecallDialpad();
     } else {
@@ -1537,7 +1596,6 @@ function checkPhone() {
     var phone = /^\d{10}$/;
     if (x.value.match(phone)) {
       console.log("không co dấu + ");
-      // filterContactData(x.value);
       filteredContactSearch(x.value);
       eventHandlecallDialpad();
     } else {
@@ -1600,7 +1658,6 @@ function eventHandlecallDialpad() {
     document.getElementById("appTextPhoneBusyCall").innerText =
       phoneNumberReceiver;
     //filter contacts
-    // filterContacts("%2B84353293254");
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -1626,10 +1683,6 @@ function eventHandlecallDialpad() {
   /**Call tu man hinh dialpad **/
 
   // return true;
-}
-
-function filterContacts(value) {
-  filterContactData(value);
 }
 
 function showContact() {
@@ -1841,3 +1894,39 @@ $("#search_contact").keypress(function (event) {
   }
   event.stop();
 });
+
+function endCallDecline() {
+  let call = webphone.calls[0];
+  call.clearConnection();
+  onAppDeactive();
+  location.reload();
+}
+
+function acceptCall() {
+  console.log("có vào acceptCall");
+  /**click to call as7*/
+  let call = webphone.calls[0];
+  if (!call) {
+    // click without an active call -> start a video call to number 23
+    webphone.makeCall(phoneNumberReceiver, {
+      autoOriginate: "doNotPrompt",
+      audio: true,
+      video: false,
+      // subjectOfCall: "PredictiveCall",
+    });
+    let recordedMessage;
+    call.recordMessage().then((response) => {
+      console.log("goi từ inbound", response);
+      recordedMessage = repsonse.resultingMessage;
+      console.log("recording started:", recordedMessage);
+    });
+  } else if (call.localConnectionInfo == "alerting") {
+    // click while we have an alerting call -> accept it
+    call.answerCall({ audio: true, video: false });
+  } else {
+    // otherwise we release the call
+    call.clearConnection();
+    onAppDeactive();
+  }
+  /**end click to call as7*/
+}
