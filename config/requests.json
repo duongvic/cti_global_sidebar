@@ -58,5 +58,16 @@
         "Content-Type": "application/json"
       }
     }
+  },
+  "createTicket": {
+    "schema": {
+      "method": "POST",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/tickets",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      }
+    }
   }
 }

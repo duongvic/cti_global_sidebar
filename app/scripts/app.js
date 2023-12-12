@@ -840,14 +840,14 @@ let audio = new Audio();
 audio.autoplay = true;
 
 agent.startApplicationSession({
-  username: "duongnh4@fpt.com",
-  password: "DuongNH4!!!",
-  // username: "phuln6@fpt.com",
-  // password: "Phuln6!!!",
+  // username: "duongnh4@fpt.com",
+  // password: "DuongNH4!!!",
+  username: "phuln6@fpt.com",
+  password: "Phuln6!!!",
 });
 agent.on("applicationsessionstarted", () => {
-  webphone = agent.getDevice("sip:1073@term.133");
-  // webphone = agent.getDevice("sip:1973@term.115");
+  // webphone = agent.getDevice("sip:1073@term.133");
+  webphone = agent.getDevice("sip:1973@term.115");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
   webphone.monitorStart({ rtc: true });
@@ -878,6 +878,7 @@ function myFunction(x) {
 // timer call
 // timer call
 let ret = document.getElementById("timer");
+let retCollapse = document.getElementById("timerCollapse");
 
 console.log("ret", ret);
 
@@ -903,12 +904,13 @@ function convertSec(cnt) {
 agent.on("call", (event) => {
   function start() {
     interval = setInterval(function () {
-      ret.innerHTML = convertSec(counter++); // timer start counting here...
+      retCollapse.innerHTML = ret.innerHTML = convertSec(counter++); // timer start counting here...
     }, 1000);
   }
   function stop() {
+    ret.innerHTML = "";
+    retCollapse.innerHTML = "";
     clearInterval(interval);
-    // ret.innerHTML = "00:00:00";
   }
 
   let call = event.call;
@@ -945,7 +947,14 @@ agent.on("call", (event) => {
       document.getElementById("output").innerText = "";
       $("#callEnter").attr("disabled", true);
       $("#callEnter").css({ backgroundColor: "darkgray" });
+
+      document.getElementById("timer").value = "";
+      document.getElementById("timer").innerText = "";
+      ret.innerHTML = "";
+      retCollapse = "";
       // location.reload();
+      onAppDeactive();
+      location.reload();
       return stop();
   }
 });
@@ -971,25 +980,6 @@ agent.on("call", (event) => {
 });
 
 /**as7 backend **/
-
-// var client;
-
-// init();
-
-// async function init() {
-//   client = await app.initialized();
-//   client.events.on('app.activated', renderText);
-// }
-
-// async function renderText() {
-//   const textElement = document.getElementById('apptext');
-//   const contactData = await client.data.get('contact');
-//   const {
-//     contact: { name }
-//   } = contactData;
-
-//   textElement.innerHTML = `Ticket is created by ${name}`;
-// }
 
 /**
  * Show a notification toast with the given type and message
@@ -1052,6 +1042,11 @@ function resetText() {
 
   $("#callEnter").attr("disabled", true);
   $("#callEnter").css({ backgroundColor: "darkgray" });
+
+  document.getElementById("timer").value = "";
+  document.getElementById("timer").innerText = "";
+  document.getElementById("timerCollapse").value = "";
+  document.getElementById("timerCollapse").innerText = "";
 }
 /**
  * To close the CTI app
@@ -1165,29 +1160,14 @@ async function fetchContactData(page) {
 }
 
 async function filterContactData(phone) {
-  console.log("phone view contact:", phone);
   try {
     const data = await client.request.invokeTemplate("filterContacts", {
       context: {
-        mobile: parseInt(phone),
+        mobile: encodeURIComponent(phone),
       },
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
-    console.log("filterContactData:", detail);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function searchContactData(term) {
-  console.log("term:", term);
-  // context: {
-  //   term: term,
-  // },
-  try {
-    const data = await client.request.invokeTemplate("searchContacts", {});
-    var detail = data?.response ? JSON.parse(data?.response) : [];
-    console.log("search contact:", detail);
+    console.log("filterContactData context:", detail);
   } catch (error) {
     console.log(error);
   }
@@ -1319,6 +1299,7 @@ function viewScreenCollapseClickToCall() {
   client.instance.resize({ height: "48px" });
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "block";
   document.getElementById("mainListHistoryCall").style.display = "none";
@@ -1353,7 +1334,7 @@ function onAppActivate() {
 
       /* Outgoing call functionality */
       // dialpadEvents();
-      checkPhone();
+      // checkPhone();
 
       // document
       //   .getElementById("btnShowContact")
@@ -1532,10 +1513,10 @@ function checkPhone() {
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
   if (x.value.includes("+")) {
+    console.log("vao co dau + ");
     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     if (x.value.match(phone) && x.value.length == 12) {
       // filterContactData(x.value);
-      // searchContactData(x.value);
       filteredContactSearch(x.value);
       eventHandlecallDialpad();
     } else {
@@ -1555,8 +1536,8 @@ function checkPhone() {
   } else {
     var phone = /^\d{10}$/;
     if (x.value.match(phone)) {
+      console.log("không co dấu + ");
       // filterContactData(x.value);
-      // searchContactData(x.value);
       filteredContactSearch(x.value);
       eventHandlecallDialpad();
     } else {
@@ -1846,14 +1827,6 @@ function showMain() {
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
 }
-
-// function searchContact() {
-//   const val = document.querySelector('input[name="search_contact"]').value;
-//   if (val !== "") {
-//     filteredContactSearch(val);
-//   } else getContactData(1);
-//   console.log("val", val);
-// }
 
 $("#search_contact").keypress(function (event) {
   const val = document.querySelector('input[name="search_contact"]').value;

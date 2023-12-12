@@ -90,7 +90,7 @@
       <div id="mainDialpad">
         <div class="txt-phone">
           <div class="input">
-            <input type="text" name="output" id="output" value="" onblur="checkPhone()" onchange="checkPhone()">
+            <input type="text" name="output" id="output" value="" onblur="checkPhone()">
           </div>
           <div class="reset">
             <button class="btn__back" id="reset_txt_phone" onclick="ResetTxtPhone()"><span><img style="size: 24px;"
@@ -242,7 +242,9 @@
     <div id="mainCollapseClickToCall">
       <div class="waiting__screen">
         <div class="col-6">
-          <span id="MyClockDisplayCollapseClickToCall" class="clock" onload="showTime()"></span>
+          <div class="timer-group">
+            <p id="timerCollapse" style="color: aliceblue;"></p>
+          </div>
         </div>
         <div class="col-6">
           <button class="end__calling_collapse flr" id="toggleEndCallCollapse" onclick="endCall()" size="small"
