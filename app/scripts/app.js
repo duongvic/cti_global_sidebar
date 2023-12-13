@@ -914,6 +914,7 @@ let retTimerInboundCollapse = document.getElementById("timerInboundCollapse");
 let retTimerInboundListenCollapse = document.getElementById(
   "timerInboundListenCollapse"
 );
+let retTimerInbound = document.getElementById("timerInbound");
 
 console.log("ret", ret);
 
@@ -939,6 +940,7 @@ function convertSec(cnt) {
 agent.on("call", (event) => {
   function start() {
     interval = setInterval(function () {
+      retTimerInbound.innerHTML;
       retTimerInboundListenCollapse.innerHTML =
         retTimerInboundCollapse.innerHTML =
         retTimerInboundListen.innerHTML =
@@ -951,8 +953,9 @@ agent.on("call", (event) => {
     ret.innerHTML = "";
     retCollapse.innerHTML = "";
     retTimerInboundListen.innerHTML = "";
-    retTimerInboundCollapse.innerHTML = "00:00:00";
-    retTimerInboundListenCollapse.innerHTML = "00:00:00";
+    retTimerInboundCollapse.innerHTML = "";
+    retTimerInboundListenCollapse.innerHTML = "";
+    retTimerInbound.innerHTML = "";
     clearInterval(interval);
   }
 
@@ -974,12 +977,12 @@ agent.on("call", (event) => {
             call?.number;
           document.getElementById("appTextPhoneInboundListen").innerText =
             call?.number;
+          start();
         })
         .catch(function (error) {
           console.error("Error: Failed to open the app");
           console.error(error);
         });
-
       break;
     case "connected":
       console.log(`connected to ${call.number}`);
@@ -1341,6 +1344,10 @@ function clickToCall() {
     document.getElementById("mainCollapseClickToCall").style.display = "none";
     document.getElementById("mainListContacts").style.display = "none";
     document.getElementById("mainListHistoryCall").style.display = "none";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainInboundCollapse").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+    document.getElementById("mainInboundListenCollapse").style.display = "none";
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
@@ -1409,7 +1416,7 @@ function viewScreenCollapseClickToCall() {
   document.getElementById("mainCollapseClickToCall").style.display = "block";
   document.getElementById("mainListHistoryCall").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
-  retCollapse.innerHTML = "00:00:00";
+  // retCollapse.innerHTML = "00:00:00";
 }
 
 function viewScreenCollapseClickInBound() {
@@ -1424,8 +1431,8 @@ function viewScreenCollapseClickInBound() {
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
 
-  retTimerInboundCollapse.innerText = "00:00:00";
-  retTimerInboundListenCollapse.innerText = "00:00:00";
+  // retTimerInboundCollapse.innerHTML = "00:00:00";
+  // retTimerInboundListenCollapse.innerHTML = "00:00:00";
 }
 
 viewScreeInboundListenCollapse;
@@ -2100,6 +2107,8 @@ function btShowMainInboundListen() {
     .then(function () {
       resizeAppDefault();
       document.getElementById("mainInboundListen").style.display = "block";
+      document.getElementById("mainInboundListenCollapse").style.display =
+        "none";
       document.getElementById("mainContent").style.display = "none";
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainBusyCall").style.display = "none";
