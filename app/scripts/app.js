@@ -937,28 +937,28 @@ function convertSec(cnt) {
   }
 }
 
-agent.on("call", (event) => {
-  function start() {
-    interval = setInterval(function () {
-      retTimerInbound.innerHTML;
-      retTimerInboundListenCollapse.innerHTML =
-        retTimerInboundCollapse.innerHTML =
-        retTimerInboundListen.innerHTML =
-        retCollapse.innerHTML =
-        ret.innerHTML =
-          convertSec(counter++); // timer start counting here...
-    }, 1000);
-  }
-  function stop() {
-    ret.innerHTML = "";
-    retCollapse.innerHTML = "";
-    retTimerInboundListen.innerHTML = "";
-    retTimerInboundCollapse.innerHTML = "";
-    retTimerInboundListenCollapse.innerHTML = "";
-    retTimerInbound.innerHTML = "";
-    clearInterval(interval);
-  }
+function start() {
+  interval = setInterval(function () {
+    retTimerInbound.innerHTML;
+    retTimerInboundListenCollapse.innerHTML =
+      retTimerInboundCollapse.innerHTML =
+      retTimerInboundListen.innerHTML =
+      retCollapse.innerHTML =
+      ret.innerHTML =
+        convertSec(counter++); // timer start counting here...
+  }, 1000);
+}
+function stop() {
+  ret.innerHTML = "";
+  retCollapse.innerHTML = "";
+  retTimerInboundListen.innerHTML = "";
+  retTimerInboundCollapse.innerHTML = "";
+  retTimerInboundListenCollapse.innerHTML = "";
+  retTimerInbound.innerHTML = "";
+  clearInterval(interval);
+}
 
+agent.on("call", (event) => {
   let call = event.call;
   switch (call.localConnectionInfo) {
     case "alerting":
@@ -977,12 +977,12 @@ agent.on("call", (event) => {
             call?.number;
           document.getElementById("appTextPhoneInboundListen").innerText =
             call?.number;
-          start();
         })
         .catch(function (error) {
           console.error("Error: Failed to open the app");
           console.error(error);
         });
+      start();
       break;
     case "connected":
       console.log(`connected to ${call.number}`);
@@ -1023,8 +1023,8 @@ agent.on("call", (event) => {
       ret.innerHTML = "";
       retCollapse.innerHTML = "";
       retTimerInboundListen.innerHTML = "";
-      retTimerInboundCollapse.innerHTML = "00:00:00";
-      retTimerInboundListenCollapse.innerHTML = "00:00:00";
+      retTimerInboundCollapse.innerHTML = "";
+      retTimerInboundListenCollapse.innerHTML = "";
       onAppDeactive();
       // location.reload();
       break;
@@ -1292,10 +1292,8 @@ async function filteredContactSearch(term) {
       document.getElementById("appTxtNameContact").value = detail[0].name;
       renderListContact(detail);
     } else {
-      document.getElementById("appTextPhone").style.fontSize =
-        "20px !important;";
-      document.getElementById("appTextPhone").style.padding =
-        "10px 0px !important;";
+      document.getElementById("appTextPhone").style.fontSize = "20px";
+      document.getElementById("appTextPhone").style.padding = "10px 0px";
       // document.getElementById("appTxtNameContact").innerText =
       //   "contact not exist";
       // document.getElementById("appTxtNameContact").value = "contact not exist";
@@ -2043,6 +2041,7 @@ function acceptCall() {
 function endCall() {
   let call = webphone.calls[0];
   call.clearConnection();
+  stop();
   onAppDeactive();
   location.reload();
 }
