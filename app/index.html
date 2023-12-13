@@ -91,7 +91,7 @@
       <div id="mainDialpad">
         <div class="txt-phone">
           <div class="input">
-            <input type="text" name="output" id="output" value="" onblur="checkPhone()">
+            <input type="text" name="output" id="output" value="" onblur="checkPhone()" onchange="checkPhone()">
           </div>
           <div class="reset">
             <button class="btn__back" id="reset_txt_phone" onclick="ResetTxtPhone()"><span><img style="size: 24px;"
@@ -724,7 +724,7 @@
     </div>
 
     <!-- thu gon màn hình agent call chưa bắt máy -->
-    <div id="mainInboundCollapse">
+    <div id="mainInboundCollapse" onclick="btnShowMainInbound()">
       <div class="waiting__screen">
         <div class="col-6">
           <div class="timer-group">

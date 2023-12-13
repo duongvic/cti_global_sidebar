@@ -964,13 +964,7 @@ agent.on("call", (event) => {
         .trigger("show", { id: "softphone" })
         .then(function () {
           resizeAppDefault();
-          document.getElementById("mainInbound").style.display = "block";
-          document.getElementById("mainContent").style.display = "none";
-          document.getElementById("mainOutbound").style.display = "none";
-          document.getElementById("mainCollapseClickToCall").style.display =
-            "none";
-          document.getElementById("mainBusyCall").style.display = "none";
-          document.getElementById("mainListContacts").style.display = "none";
+          viewMainInbound();
           //check contact
           filterContactDataInbound(call?.number);
           document.getElementById("appTextPhoneInbound").value = call?.number;
@@ -1043,6 +1037,11 @@ agent.on("call", (event) => {
     document.getElementById("mainOutbound").style.display = "none";
     document.getElementById("mainCollapseClickToCall").style.display = "none";
     document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainListHistoryCall").style.display = "none";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainInboundCollapse").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+    document.getElementById("mainInboundListenCollapse").style.display = "none";
 
     document.getElementById("appTextPhoneBusyCall").value = phoneNumberReceiver;
     document.getElementById("appTextPhoneBusyCall").innerText =
@@ -1125,6 +1124,9 @@ function resetText() {
 
   document.getElementById("timerInboundCollapse").value = "00:00:00";
   document.getElementById("timerInboundCollapse").innerText = "00:00:00";
+
+  document.getElementById("timerInboundListen").value = "00:00:00";
+  document.getElementById("timerInboundListen").innerText = "00:00:00";
 }
 /**
  * To close the CTI app
@@ -1248,23 +1250,22 @@ async function filterContactDataInbound(phone) {
     // kiểm tra số phone có trong hệ thống không
     if (detail?.length > 0) {
       document.getElementById("appTxtNameContactInbound").value =
-        "Khách hàng ".concat(detail[0].name);
+        detail[0].name;
       document.getElementById("appTxtNameContactInbound").innerText =
-        "Khách hàng ".concat(detail[0].name);
-
+        detail[0].name;
       document.getElementById("appTxtNameContactInboundListen").value =
-        "Khách hàng ".concat(detail[0].name);
+        detail[0].name;
       document.getElementById("appTxtNameContactInboundListen").innerText =
-        "Khách hàng ".concat(detail[0].name);
+        detail[0].name;
     } else {
-      document.getElementById("appTxtNameContactInbound").value =
-        "Khách hàng Unkown";
-      document.getElementById("appTxtNameContactInbound").innerText =
-        "Khách hàng Unkown";
-      document.getElementById("appTxtNameContactInboundListen").value =
-        "Khách hàng Unkown";
-      document.getElementById("appTxtNameContactInboundListen").innerText =
-        "Khách hàng Unkown";
+      document.getElementById("appTextPhoneInbound").style.fontSize =
+        "22px !important;";
+      document.getElementById("appTextPhoneInbound").style.padding =
+        "10px 0px !important;";
+      document.getElementById("appTextPhoneInboundListen").style.fontSize =
+        "22px !important;";
+      document.getElementById("appTextPhoneInboundListen").style.padding =
+        "10px 0px !important;";
     }
     console.log("filterContactDataInbound context:", detail);
     return detail;
@@ -1288,10 +1289,14 @@ async function filteredContactSearch(term) {
       document.getElementById("appTxtNameContact").value = detail[0].name;
       renderListContact(detail);
     } else {
-      document.getElementById("appTxtNameContact").innerText =
-        "contact not exist";
-      document.getElementById("appTxtNameContact").value = "contact not exist";
-      document.getElementById("appTxtNameContact").style.color = "#3b3b3b";
+      document.getElementById("appTextPhone").style.fontSize =
+        "20px !important;";
+      document.getElementById("appTextPhone").style.padding =
+        "10px 0px !important;";
+      // document.getElementById("appTxtNameContact").innerText =
+      //   "contact not exist";
+      // document.getElementById("appTxtNameContact").value = "contact not exist";
+      // document.getElementById("appTxtNameContact").style.color = "#3b3b3b";
       current_page = 1;
       renderListContactEmpty;
     }
@@ -1404,6 +1409,7 @@ function viewScreenCollapseClickToCall() {
   document.getElementById("mainCollapseClickToCall").style.display = "block";
   document.getElementById("mainListHistoryCall").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
+  retCollapse.innerHTML = "00:00:00";
 }
 
 function viewScreenCollapseClickInBound() {
@@ -1462,7 +1468,7 @@ function onAppActivate() {
 
       showMain();
 
-      // thu gon màn hinh khi callbtnCollapseClickToCall
+      // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       document
         .getElementById("btnCollapseClickToCall")
         .addEventListener("fwClick", viewScreenCollapseClickToCall);
@@ -1606,7 +1612,7 @@ function onAppActivate() {
       document
         .getElementById("btnCollapseInboundListen")
         .addEventListener("fwClick", viewScreeInboundListenCollapse);
-
+      //mở rộng màn hình agent
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
       clickToCall();
 
@@ -1625,6 +1631,7 @@ function onAppDeactive() {
 }
 
 function checkPhone() {
+  console.log("da va checkphone");
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
   if (x.value.includes("+")) {
@@ -1632,7 +1639,12 @@ function checkPhone() {
     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     if (x.value.match(phone) && x.value.length == 12) {
       filteredContactSearch(x.value);
-      eventHandlecallDialpad();
+      // eventHandlecallDialpad();
+      $("#callEnter").attr("disabled", false);
+      $("#callEnter").css({ backgroundColor: "green" });
+      document.getElementById("appTextPhone1").innerText = "Correct";
+      document.getElementById("appTextPhone1").className =
+        "correct__number__phone";
     } else {
       $("#callEnter").attr("disabled", true);
       $("#callEnter").css({ backgroundColor: "darkgray" });
@@ -1652,7 +1664,12 @@ function checkPhone() {
     if (x.value.match(phone)) {
       console.log("không co dấu + ");
       filteredContactSearch(x.value);
-      eventHandlecallDialpad();
+      // eventHandlecallDialpad();
+      $("#callEnter").attr("disabled", false);
+      $("#callEnter").css({ backgroundColor: "green" });
+      document.getElementById("appTextPhone1").innerText = "Correct";
+      document.getElementById("appTextPhone1").className =
+        "correct__number__phone";
     } else {
       $("#callEnter").attr("disabled", true);
       $("#callEnter").css({ backgroundColor: "darkgray" });
@@ -1668,6 +1685,10 @@ function checkPhone() {
       return false;
     }
   }
+}
+
+function toggleCall() {
+  eventHandlecallDialpad();
 }
 
 /**
@@ -1693,55 +1714,53 @@ function ResetTxtPhone() {
  * call dialpad events
  **/
 function eventHandlecallDialpad() {
-  $("#callEnter").attr("disabled", false);
-  $("#callEnter").css({ backgroundColor: "green" });
+  // $("#callEnter").attr("disabled", false);
+  // $("#callEnter").css({ backgroundColor: "green" });
   document.getElementById("appTextPhone1").innerText = "Correct";
   document.getElementById("appTextPhone1").className = "correct__number__phone";
   /**Call tu man hinh dialpad **/
-  document.getElementById("callEnter").addEventListener("click", () => {
-    openApp();
-    let textElementDialpad = document.getElementById("output").value;
-    document.getElementById("mainContent").style.display = "none";
-    document.getElementById("mainOutbound").style.display = "block";
-    document.getElementById("mainCollapseClickToCall").style.display = "none";
-
-    phoneNumberReceiver = textElementDialpad;
-    document.getElementById("appTextPhone").value = phoneNumberReceiver;
-    document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
-
-    document.getElementById("appTextPhoneBusyCall").value = phoneNumberReceiver;
-    document.getElementById("appTextPhoneBusyCall").innerText =
-      phoneNumberReceiver;
-    //filter contacts
-
-    /**click to call as7*/
-    let call = webphone.calls[0];
-    if (!call) {
-      // click without an active call -> start a video call to number 23
-      webphone.makeCall(phoneNumberReceiver, {
-        autoOriginate: "doNotPrompt",
-        audio: true,
-        video: false,
-      });
-    } else if (call.localConnectionInfo == "alerting") {
-      // click while we have an alerting call -> accept it
-      call.answerCall({ audio: true, video: true });
-    } else {
-      // otherwise we release the call
-      call.clearConnection();
-      onAppDeactive();
-      location.reload();
-      console.log("call.clearConnection()", call.clearConnection());
-    }
-    /**end click to call as7*/
-  });
+  //   document.getElementById("callEnter").addEventListener("click", () => {
+  //  });
   /**Call tu man hinh dialpad **/
 
-  // return true;
+  openApp();
+  let textElementDialpad = document.getElementById("output").value;
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "block";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+
+  phoneNumberReceiver = textElementDialpad;
+  document.getElementById("appTextPhone").value = phoneNumberReceiver;
+  document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
+
+  document.getElementById("appTextPhoneBusyCall").value = phoneNumberReceiver;
+  document.getElementById("appTextPhoneBusyCall").innerText =
+    phoneNumberReceiver;
+  //filter contacts
+
+  /**click to call as7*/
+  let call = webphone.calls[0];
+  if (!call) {
+    // click without an active call -> start a video call to number 23
+    webphone.makeCall(phoneNumberReceiver, {
+      autoOriginate: "doNotPrompt",
+      audio: true,
+      video: false,
+    });
+  } else if (call.localConnectionInfo == "alerting") {
+    // click while we have an alerting call -> accept it
+    call.answerCall({ audio: true, video: true });
+  } else {
+    // otherwise we release the call
+    call.clearConnection();
+    onAppDeactive();
+    location.reload();
+    console.log("call.clearConnection()", call.clearConnection());
+  }
+  /**end click to call as7*/
 }
 
 function showContact() {
-  // client.instance.resize({ height: "900px" });
   document.getElementById("mainListContacts").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -1749,9 +1768,6 @@ function showContact() {
   document.getElementById("mainListHistoryCall").style.display = "none";
   current_page = 1;
   getContactData(current_page);
-
-  // console.log("scrollTop", $(window).scrollTop());
-  // console.log("odn lai", $(document).height() - $(window).height());
 }
 
 function renderListContactEmpty() {
@@ -1927,7 +1943,7 @@ function showHistoryCall() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "block";
-  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInbound").style.display = "block";
   document.getElementById("calling__inbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
@@ -2050,4 +2066,30 @@ function viewScreeInboundListenCollapse() {
   document.getElementById("mainListHistoryCall").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
+}
+
+function viewMainInbound() {
+  document.getElementById("mainInbound").style.display = "block";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
+}
+
+function btnShowMainInbound() {
+  client.interface
+    .trigger("show", { id: "softphone" })
+    .then(function () {
+      resizeAppDefault();
+      viewMainInbound();
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to open the app");
+      console.error(error);
+    });
 }
