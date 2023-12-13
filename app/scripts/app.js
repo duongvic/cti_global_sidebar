@@ -2093,3 +2093,24 @@ function btnShowMainInbound() {
       console.error(error);
     });
 }
+
+function btShowMainInboundListen() {
+  client.interface
+    .trigger("show", { id: "softphone" })
+    .then(function () {
+      resizeAppDefault();
+      document.getElementById("mainInboundListen").style.display = "block";
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("mainOutbound").style.display = "none";
+      document.getElementById("mainBusyCall").style.display = "none";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+      document.getElementById("mainListContacts").style.display = "none";
+      document.getElementById("mainListHistoryCall").style.display = "none";
+      document.getElementById("mainInbound").style.display = "none";
+      document.getElementById("mainInboundCollapse").style.display = "none";
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to open the app");
+      console.error(error);
+    });
+}
