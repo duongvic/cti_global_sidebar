@@ -16,12 +16,12 @@
   margin: 0;
 }
 .end__calling_collapse {
-  background: #bd4130;
+  background: #414141;
   border-radius: 50%;
   border: 1px;
   /* float: right; */
   margin-top: 9px;
-  margin-right: 9px;
+  margin-right: 0px;
   line-height: 2.5rem;
 }
 .end__calling_collapse .hint:hover {
