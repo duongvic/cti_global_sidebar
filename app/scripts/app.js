@@ -2,7 +2,10 @@ let username = "";
 let password = "";
 let sip = "";
 
+let idContact = "";
+let nameContact = "";
 let avtarContact = "";
+let emailContact = "";
 let phoneNumberReceiver = "";
 let current_page = 1;
 let listContacts = [];
@@ -833,6 +836,8 @@ let listContactsExample = [
 let agent_ref = undefined;
 let isMainActive = false;
 
+let existContact = false;
+
 /**as7 backend **/
 let agent = anCti.newAgent();
 let webphone;
@@ -983,10 +988,24 @@ agent.on("call", (event) => {
           console.error(error);
         });
       start();
+      if (existContact) {
+        createTicket();
+      } else {
+        createContact();
+      }
+
       break;
     case "connected":
-      console.log(`connected to ${call.number}`);
+      console.log(` khi người dùng nghe máy : connected to ${call.number}`);
+
       start();
+      //tạo ticket khi tồn tại khách hàng trong hệ thống
+      if (existContact) {
+        createTicket();
+      } else {
+        createContact();
+      }
+
       break;
     case "fail":
       console.log(`call failed, cause is ${event.content.cause}`);
@@ -1130,6 +1149,10 @@ function resetText() {
 
   document.getElementById("timerInboundListen").value = "00:00:00";
   document.getElementById("timerInboundListen").innerText = "00:00:00";
+
+  existContact = false;
+  phoneNumberReceiver = "";
+  nameContact = "";
 }
 /**
  * To close the CTI app
@@ -1261,14 +1284,12 @@ async function filterContactDataInbound(phone) {
       document.getElementById("appTxtNameContactInboundListen").innerText =
         detail[0].name;
     } else {
-      document.getElementById("appTextPhoneInbound").style.fontSize =
-        "22px !important;";
-      document.getElementById("appTextPhoneInbound").style.padding =
-        "10px 0px !important;";
+      document.getElementById("appTextPhoneInbound").style.fontSize = "22px";
+      document.getElementById("appTextPhoneInbound").style.padding = "10px 0px";
       document.getElementById("appTextPhoneInboundListen").style.fontSize =
-        "22px !important;";
+        "22px";
       document.getElementById("appTextPhoneInboundListen").style.padding =
-        "10px 0px !important;";
+        "10px 0px";
     }
     console.log("filterContactDataInbound context:", detail);
     return detail;
@@ -1278,8 +1299,6 @@ async function filterContactDataInbound(phone) {
 }
 
 async function filteredContactSearch(term) {
-  console.log("term:", term);
-
   try {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
       context: {
@@ -1288,12 +1307,17 @@ async function filteredContactSearch(term) {
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
     if (detail.length > 0) {
+      existContact = true;
       document.getElementById("appTxtNameContact").innerText = detail[0].name;
       document.getElementById("appTxtNameContact").value = detail[0].name;
+      nameContact = detail[0].name;
+      getContactById(detail[0].id);
       renderListContact(detail);
     } else {
+      existContact = false;
       document.getElementById("appTextPhone").style.fontSize = "20px";
       document.getElementById("appTextPhone").style.padding = "10px 0px";
+      nameContact = "";
       // document.getElementById("appTxtNameContact").innerText =
       //   "contact not exist";
       // document.getElementById("appTxtNameContact").value = "contact not exist";
@@ -1308,19 +1332,35 @@ async function filteredContactSearch(term) {
   }
 }
 
-async function getContactById(idContact) {
+async function getContactById(id_contact) {
   try {
     const data = await client.request.invokeTemplate("getContactById", {
       context: {
-        id: parseInt(idContact),
+        id: parseInt(id_contact),
       },
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
-    name_contact = detail?.name ? detail?.name : "";
-    document.getElementById("appTxtNameContact").value = name_contact;
-    document.getElementById("appTxtNameContact").innerText = name_contact;
-    avtarContact = detail?.avatar?.avatar_url;
-    document.getElementById("avatarContact").src = avtarContact;
+
+    if (Object.keys(detail).length > 0) {
+      existContact = true;
+      idContact = id_contact;
+      emailContact = detail.email;
+      nameContact = detail.name;
+      emailContact = detail.email;
+      // document.getElementById("appTxtNameContact").value = name_contact;
+      // document.getElementById("appTxtNameContact").innerText = name_contact;
+      document.getElementById("appTxtNameContact").textContent = nameContact;
+      avtarContact = detail?.avatar?.avatar_url;
+      document.getElementById("avatarContact").src = avtarContact;
+    } else {
+      existContact = false;
+      nameContact = "";
+      emailContact = "";
+      document.getElementById("appTextPhone").style.fontSize = "20px";
+      document.getElementById("appTextPhone").style.padding = "10px 0px";
+    }
+    console.log("existContact:", existContact);
+    console.log("detail getContactById:", detail);
   } catch (error) {
     console.log(error);
   }
@@ -1796,6 +1836,8 @@ function renderListContact(listContacts) {
               contact?.mobile ? contact?.mobile : contact?.phone
             }" 
             attr-user-contact="${contact?.name ? contact?.name : "unknown"}"
+            attr-user-email = "${contact?.email ? contact?.email : ""}"
+            attr-user-id = "${contact?.id ? contact?.id : ""}"
             onclick="clickContactCall(this)" >
             <span class="" id="userPhoneContact">${
               contact?.mobile ? contact?.mobile : contact?.phone
@@ -1837,7 +1879,9 @@ function enableCharacterContact(elem) {
 function clickContactCall(elem) {
   let phone_contact = $(elem).attr("attr-user-phone");
   let name_contact = $(elem).attr("attr-user-contact");
-  console.log("vvavav", phone_contact);
+  emailContact = $(elem).attr("attr-user-email");
+  idContact = $(elem).attr("attr-user-id");
+  nameContact = name_contact;
   if (phone_contact !== "null") {
     //show app
     client.interface
@@ -1845,7 +1889,7 @@ function clickContactCall(elem) {
       .then(function () {
         resizeAppDefault();
         console.log(`Success: Opened the app`);
-
+        existContact = true;
         document.getElementById("mainContent").style.display = "none";
         document.getElementById("mainCollapseClickToCall").style.display =
           "none";
@@ -1858,10 +1902,11 @@ function clickContactCall(elem) {
         document.getElementById("appTextPhone").value = phone_contact;
         document.getElementById("appTextPhone").innerText = phone_contact;
 
+        phoneNumberReceiver = phone_contact;
         let call = webphone.calls[0];
         if (!call) {
           // click without an active call -> start a video call to number 23
-          webphone.makeCall(phone_contact, {
+          webphone.makeCall(phoneNumberReceiver, {
             autoOriginate: "doNotPrompt",
             audio: true,
             video: false,
@@ -2121,4 +2166,47 @@ function btShowMainInboundListen() {
       console.error("Error: Failed to open the app");
       console.error(error);
     });
+}
+
+async function createTicket() {
+  let _subject = "";
+  if (existContact) {
+    _subject = "Served Outbound Call"; // khách hang da co so dien thoai
+  } else {
+    _subject = `Served Outbound Call - ${phoneNumberReceiver}`;
+  }
+  console.log("bat dau tao ticket", _subject);
+  try {
+    const ticketDetails = JSON.stringify({
+      email: emailContact,
+      subject: _subject,
+      priority: 1,
+      description: `Hey ${
+        nameContact ? nameContact : "Unknown Contact"
+      } - ${phoneNumberReceiver} 👋, created ticket!`,
+      status: 2,
+      source: 3, // phone
+    });
+    // Send request
+    const dataTicket = await client.request.invokeTemplate("createTicket", {
+      body: ticketDetails,
+    });
+
+    console.info("Successfully created ticket in Freshdesk", dataTicket);
+    showNotify("success", `Successfully created a ticket for: ${emailContact}`);
+    let str = agent_ref;
+    let sindex = agent_ref.lastIndexOf(".freshdesk.com");
+    console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
+    let a = str.slice(0, sindex);
+    const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
+    window.open(urlParams, "_blank");
+  } catch (error) {
+    console.error("Error: Failed to create a ticket");
+    console.error(error);
+    showNotify("danger", "Failed to create a ticket.");
+  }
+}
+
+function createContact() {
+  createTicket();
 }
