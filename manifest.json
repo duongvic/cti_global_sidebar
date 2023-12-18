@@ -18,7 +18,8 @@
         "getContactById": {},
         "searchContacts": {},
         "filteredContactSearch": {},
-        "createTicket": {}
+        "createTicket": {},
+        "createContact": {}
       }
     }
   },

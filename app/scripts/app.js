@@ -989,7 +989,7 @@ agent.on("call", (event) => {
         });
       start();
       if (existContact) {
-        createTicket();
+        createTicket(idContact);
       } else {
         createContact();
       }
@@ -1326,6 +1326,7 @@ async function filteredContactSearch(term) {
       renderListContactEmpty;
     }
 
+    console.log("existContact", existContact);
     console.log("filteredContactSearch contact:", detail);
   } catch (error) {
     console.log(error);
@@ -2176,17 +2177,32 @@ async function createTicket() {
     _subject = `Served Outbound Call - ${phoneNumberReceiver}`;
   }
   console.log("bat dau tao ticket", _subject);
+  let ticketDetails = {};
   try {
-    const ticketDetails = JSON.stringify({
-      email: emailContact,
-      subject: _subject,
-      priority: 1,
-      description: `Hey ${
-        nameContact ? nameContact : "Unknown Contact"
-      } - ${phoneNumberReceiver} 👋, created ticket!`,
-      status: 2,
-      source: 3, // phone
-    });
+    if (existContact) {
+      ticketDetails = JSON.stringify({
+        email: emailContact,
+        subject: _subject,
+        priority: 1,
+        description: `Hey ${
+          nameContact ? nameContact : "Unknown Contact"
+        } - ${phoneNumberReceiver} 👋, created ticket!`,
+        status: 2,
+        source: 3, // phone
+      });
+    } else {
+      ticketDetails = JSON.stringify({
+        requester_id: idContact,
+        subject: _subject,
+        priority: 1,
+        description: `Hey ${
+          nameContact ? nameContact : "Unknown Contact"
+        } - ${phoneNumberReceiver} 👋, created ticket!`,
+        status: 2,
+        source: 3, // phone
+      });
+    }
+
     // Send request
     const dataTicket = await client.request.invokeTemplate("createTicket", {
       body: ticketDetails,
@@ -2201,12 +2217,34 @@ async function createTicket() {
     const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
     window.open(urlParams, "_blank");
   } catch (error) {
+    idContact = "";
     console.error("Error: Failed to create a ticket");
     console.error(error);
     showNotify("danger", "Failed to create a ticket.");
   }
 }
 
-function createContact() {
-  createTicket();
+async function createContact() {
+  try {
+    const properties = JSON.stringify({
+      name: `${"Unknown Contact"} - ${phoneNumberReceiver}`,
+      phone: phoneNumberReceiver,
+      email: `unknown_contact${phoneNumberReceiver}@gmail.com`,
+    });
+    // Send request
+    const dataContact = await client.request.invokeTemplate("createContact", {
+      body: properties,
+    });
+
+    var detail = dataContact?.response ? JSON.parse(dataContact?.response) : [];
+    console.log("dataContact thành công:", dataContact?.response);
+    if (Object.keys(detail).length > 0) {
+      idContact = detail.id;
+      createTicket();
+    }
+  } catch (error) {
+    console.error(`Error: Failed to create a contact ${phoneNumberReceiver}`);
+    console.error(error);
+    showNotify("danger", "Failed to create a contact.");
+  }
 }
