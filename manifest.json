@@ -16,7 +16,6 @@
         "getContacts": {},
         "filterContacts": {},
         "getContactById": {},
-        "searchContacts": {},
         "filteredContactSearch": {},
         "createTicket": {},
         "createContact": {}

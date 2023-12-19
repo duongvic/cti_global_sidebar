@@ -970,11 +970,14 @@ agent.on("call", (event) => {
       console.log(`incomming call from ${call.number} ${call.name}`);
       client.interface
         .trigger("show", { id: "softphone" })
-        .then(function () {
+        .then(async function () {
           resizeAppDefault();
           viewMainInbound();
+          isInboundCall = true;
+          console.log("existContact trươc khi check", existContact);
           //check contact
-          filterContactDataInbound(call?.number);
+          await filterContactDataInbound(call?.number);
+          console.log("existContact sau khi check", existContact);
           document.getElementById("appTextPhoneInbound").value = call?.number;
           document.getElementById("appTextPhoneInbound").innerText =
             call?.number;
@@ -984,15 +987,10 @@ agent.on("call", (event) => {
             call?.number;
         })
         .catch(function (error) {
+          isInboundCall = false;
           console.error("Error: Failed to open the app");
           console.error(error);
         });
-      start();
-      if (existContact) {
-        createTicket(idContact);
-      } else {
-        createContact();
-      }
 
       break;
     case "connected":
@@ -1275,6 +1273,7 @@ async function filterContactDataInbound(phone) {
     var detail = data?.response ? JSON.parse(data?.response) : [];
     // kiểm tra số phone có trong hệ thống không
     if (detail?.length > 0) {
+      existContact = true;
       document.getElementById("appTxtNameContactInbound").value =
         detail[0].name;
       document.getElementById("appTxtNameContactInbound").innerText =
@@ -1283,16 +1282,24 @@ async function filterContactDataInbound(phone) {
         detail[0].name;
       document.getElementById("appTxtNameContactInboundListen").innerText =
         detail[0].name;
+      phoneNumberReceiver = phone;
+      nameContact = detail[0].name;
+      emailContact = detail[0].email;
+      idContact = detail[0].id;
     } else {
+      existContact = false;
       document.getElementById("appTextPhoneInbound").style.fontSize = "22px";
       document.getElementById("appTextPhoneInbound").style.padding = "10px 0px";
       document.getElementById("appTextPhoneInboundListen").style.fontSize =
         "22px";
       document.getElementById("appTextPhoneInboundListen").style.padding =
         "10px 0px";
+      nameContact = "";
+      idContact = "";
+      emailContact = "";
     }
     console.log("filterContactDataInbound context:", detail);
-    return detail;
+    // return detail;
   } catch (error) {
     console.log(error);
   }
@@ -1988,13 +1995,13 @@ $(document).ready(function () {
 });
 
 function showHistoryCall() {
-  document.getElementById("mainContent").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "block";
+  document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "block";
-  document.getElementById("mainInbound").style.display = "block";
+  document.getElementById("mainInbound").style.display = "none";
   document.getElementById("calling__inbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
@@ -2041,7 +2048,7 @@ function endCallDecline() {
 }
 
 // nghe máy từ ngoài gọi vào
-function listenCall() {
+async function listenCall() {
   /**click to call as7*/
   let call = webphone.calls[0];
   if (!call) {
@@ -2061,6 +2068,12 @@ function listenCall() {
   } else if (call.localConnectionInfo == "alerting") {
     // click while we have an alerting call -> accept it
     call.answerCall({ audio: true, video: false });
+    start();
+    if (existContact) {
+      createTicket();
+    } else {
+      createContact();
+    }
   } else {
     // otherwise we release the call
     call.clearConnection();
@@ -2172,9 +2185,17 @@ function btShowMainInboundListen() {
 async function createTicket() {
   let _subject = "";
   if (existContact) {
-    _subject = "Served Outbound Call"; // khách hang da co so dien thoai
+    if (isInboundCall) {
+      _subject = "Answered Inbound Call";
+    } else {
+      _subject = "Served Outbound Call"; // khách hang da co so dien thoai Outbound
+    }
   } else {
-    _subject = `Served Outbound Call - ${phoneNumberReceiver}`;
+    if (isInboundCall) {
+      _subject = ` Answered Inbound Call - ${phoneNumberReceiver}`;
+    } else {
+      _subject = `Served Outbound Call - ${phoneNumberReceiver}`;
+    }
   }
   console.log("bat dau tao ticket", _subject);
   let ticketDetails = {};
@@ -2195,9 +2216,7 @@ async function createTicket() {
         requester_id: idContact,
         subject: _subject,
         priority: 1,
-        description: `Hey ${
-          nameContact ? nameContact : "Unknown Contact"
-        } - ${phoneNumberReceiver} 👋, created ticket!`,
+        description: `Hey "Unknown Contact" - ${phoneNumberReceiver} 👋, created ticket!`,
         status: 2,
         source: 3, // phone
       });
