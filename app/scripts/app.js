@@ -7,6 +7,9 @@ let nameContact = "";
 let avtarContact = "";
 let emailContact = "";
 let phoneNumberReceiver = "";
+let isInboundCall = false;
+let existContact = false;
+
 let current_page = 1;
 let listContacts = [];
 let listContactsExample = [
@@ -836,8 +839,6 @@ let listContactsExample = [
 let agent_ref = undefined;
 let isMainActive = false;
 
-let existContact = false;
-
 /**as7 backend **/
 let agent = anCti.newAgent();
 let webphone;
@@ -968,12 +969,13 @@ agent.on("call", (event) => {
   switch (call.localConnectionInfo) {
     case "alerting":
       console.log(`incomming call from ${call.number} ${call.name}`);
+      isInboundCall = true;
+      console.log("isMainActive", isMainActive);
       client.interface
         .trigger("show", { id: "softphone" })
         .then(async function () {
           resizeAppDefault();
           viewMainInbound();
-          isInboundCall = true;
           console.log("existContact trươc khi check", existContact);
           //check contact
           await filterContactDataInbound(call?.number);
@@ -990,20 +992,33 @@ agent.on("call", (event) => {
           isInboundCall = false;
           console.error("Error: Failed to open the app");
           console.error(error);
+          stop();
         });
 
+      console.log("isInboundCall alerting", isInboundCall);
+      // // //tạo ticket khi tồn tại khách hàng trong hệ thống
+      // if (isMainActive) {
+      //   start();
+      //   if (existContact) {
+      //     createTicket();
+      //   } else {
+      //     createContact();
+      //   }
+      // }
       break;
     case "connected":
       console.log(` khi người dùng nghe máy : connected to ${call.number}`);
-
-      start();
-      //tạo ticket khi tồn tại khách hàng trong hệ thống
-      if (existContact) {
-        createTicket();
+      if (isInboundCall !== true) {
+        start();
+        //tạo ticket khi tồn tại khách hàng trong hệ thống
+        if (existContact) {
+          createTicket();
+        } else {
+          createContact();
+        }
       } else {
-        createContact();
+        stop();
       }
-
       break;
     case "fail":
       console.log(`call failed, cause is ${event.content.cause}`);
@@ -1145,12 +1160,16 @@ function resetText() {
   document.getElementById("timerInboundCollapse").value = "00:00:00";
   document.getElementById("timerInboundCollapse").innerText = "00:00:00";
 
-  document.getElementById("timerInboundListen").value = "00:00:00";
-  document.getElementById("timerInboundListen").innerText = "00:00:00";
+  // document.getElementById("timerInboundListen").value = "00:00:00";
+  // document.getElementById("timerInboundListen").innerText = "00:00:00";
+  document.getElementById("timerInboundListen").textContent = "";
 
   existContact = false;
   phoneNumberReceiver = "";
   nameContact = "";
+  idContact = "";
+  isInboundCall = false;
+  emailContact = "";
 }
 /**
  * To close the CTI app
@@ -1312,15 +1331,33 @@ async function filteredContactSearch(term) {
         term: term,
       },
     });
-    var detail = data?.response ? JSON.parse(data?.response) : [];
-    if (detail.length > 0) {
+    let detail = data?.response ? JSON.parse(data?.response) : [];
+
+    let filteredDataMobile = detail.filter((item) => item.mobile === term);
+    let filteredDataPhone = detail.filter((item) => item.phone === term);
+    console.log("filteredDataMobile", filteredDataMobile);
+    console.log("filteredDataPhone", filteredDataPhone);
+
+    if (filteredDataMobile.length > 0) {
       existContact = true;
-      document.getElementById("appTxtNameContact").innerText = detail[0].name;
-      document.getElementById("appTxtNameContact").value = detail[0].name;
-      nameContact = detail[0].name;
-      getContactById(detail[0].id);
-      renderListContact(detail);
-    } else {
+      // document.getElementById("appTxtNameContact").innerText = detail[i].name;
+      // document.getElementById("appTxtNameContact").value = detail[i].name;
+      document.getElementById("appTxtNameContact").textContent =
+        filteredDataMobile[0].name;
+      nameContact = filteredDataMobile[0].name;
+      getContactById(filteredDataMobile[0].id);
+      return renderListContact(detail);
+    } else if (filteredDataPhone.length > 0) {
+      existContact = true;
+      document.getElementById("appTxtNameContact").textContent =
+        filteredDataPhone[0].name;
+      nameContact = filteredDataPhone[0].name;
+      getContactById(filteredDataPhone[0].id);
+      return renderListContact(detail);
+    } else if (
+      filteredDataMobile.length <= 0 ||
+      filteredDataPhone.length <= 0
+    ) {
       existContact = false;
       document.getElementById("appTextPhone").style.fontSize = "20px";
       document.getElementById("appTextPhone").style.padding = "10px 0px";
@@ -1332,7 +1369,6 @@ async function filteredContactSearch(term) {
       current_page = 1;
       renderListContactEmpty;
     }
-
     console.log("existContact", existContact);
     console.log("filteredContactSearch contact:", detail);
   } catch (error) {
@@ -1354,7 +1390,6 @@ async function getContactById(id_contact) {
       idContact = id_contact;
       emailContact = detail.email;
       nameContact = detail.name;
-      emailContact = detail.email;
       // document.getElementById("appTxtNameContact").value = name_contact;
       // document.getElementById("appTxtNameContact").innerText = name_contact;
       document.getElementById("appTxtNameContact").textContent = nameContact;
@@ -1399,12 +1434,8 @@ function clickToCall() {
     console.log("data event.helper :", data);
     textElementPhone.innerText = data.number;
     phoneNumberReceiver = data.number;
-    // document.getElementById("output").value = data.number;
-
-    /**làm thé nào de getContact by Id?*/
+    isInboundCall = false;
     getContactById(data?.id);
-
-    // console.log("aaaaaa:", aaaaaa);
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -1684,7 +1715,7 @@ function onAppDeactive() {
 }
 
 function checkPhone() {
-  console.log("da va checkphone");
+  console.log("da vao checkphone");
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
   if (x.value.includes("+")) {
@@ -1890,6 +1921,7 @@ function clickContactCall(elem) {
   emailContact = $(elem).attr("attr-user-email");
   idContact = $(elem).attr("attr-user-id");
   nameContact = name_contact;
+  isInboundCall = false;
   if (phone_contact !== "null") {
     //show app
     client.interface
@@ -2066,14 +2098,17 @@ async function listenCall() {
       console.log("recording started:", recordedMessage);
     });
   } else if (call.localConnectionInfo == "alerting") {
+    // //tạo ticket khi tồn tại khách hàng trong hệ thống
+    if (isMainActive) {
+      start();
+      if (existContact) {
+        createTicket();
+      } else {
+        createContact();
+      }
+    }
     // click while we have an alerting call -> accept it
     call.answerCall({ audio: true, video: false });
-    start();
-    if (existContact) {
-      createTicket();
-    } else {
-      createContact();
-    }
   } else {
     // otherwise we release the call
     call.clearConnection();
@@ -2093,7 +2128,7 @@ function acceptCall() {
   document.getElementById("mainListHistoryCall").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
-
+  isMainActive = true;
   listenCall();
 }
 
@@ -2105,6 +2140,14 @@ function endCall() {
   location.reload();
 }
 
+function endCallInboundListen() {
+  let call = webphone.calls[0];
+  call.clearConnection();
+  stop();
+  document.getElementById("mainInboundListen").style.display = "none";
+  onAppDeactive();
+  location.reload();
+}
 function showMainInboundListen() {
   resizeAppDefault();
   document.getElementById("mainInboundListen").style.display = "block";
