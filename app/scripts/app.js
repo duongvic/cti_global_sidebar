@@ -987,6 +987,7 @@ agent.on("call", (event) => {
             call?.number;
           document.getElementById("appTextPhoneInboundListen").innerText =
             call?.number;
+          phoneNumberReceiver = call?.number;
         })
         .catch(function (error) {
           isInboundCall = false;
