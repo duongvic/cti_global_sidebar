@@ -1034,11 +1034,17 @@ agent.on("call", (event) => {
 
       document.getElementById("mainContent").style.display = "block";
       document.getElementById("mainOutbound").style.display = "none";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainBusyCall").style.display = "none";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+  
       document.getElementById("mainListContacts").style.display = "none";
+      document.getElementById("mainListHistoryCall").style.display = "none";
+      
       document.getElementById("mainInbound").style.display = "none";
-
+      document.getElementById("mainInboundCollapse").style.display = "none";
+      document.getElementById("mainInboundListen").style.display = "none";
+      document.getElementById("mainInboundListenCollapse").style.display = "none";
+      
       document.getElementById("appTextPhone").value = "";
       document.getElementById("appTextPhone").innerText = "";
       document.getElementById("appTextPhoneBusyCall").value = "";
@@ -1490,10 +1496,14 @@ function viewScreenCollapseClickToCall() {
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "block";
+  document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
+
   // retCollapse.innerHTML = "00:00:00";
 }
 
@@ -1503,11 +1513,12 @@ function viewScreenCollapseClickInBound() {
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
 
   // retTimerInboundCollapse.innerHTML = "00:00:00";
   // retTimerInboundListenCollapse.innerHTML = "00:00:00";
@@ -1571,6 +1582,10 @@ function onAppActivate() {
           document.getElementById("mainListContacts").style.display = "none";
           document.getElementById("mainListHistoryCall").style.display = "none";
           document.getElementById("mainInbound").style.display = "none";
+          document.getElementById("mainInboundCollapse").style.display = "none";
+          document.getElementById("mainInboundListen").style.display = "none";
+          document.getElementById("mainInboundListenCollapse").style.display =
+            "none";
         });
 
       /**End Call **/
@@ -1587,6 +1602,11 @@ function onAppActivate() {
             document.getElementById("mainListHistoryCall").style.display =
               "none";
             document.getElementById("mainInbound").style.display = "none";
+            document.getElementById("mainInboundCollapse").style.display =
+              "none";
+            document.getElementById("mainInboundListen").style.display = "none";
+            document.getElementById("mainInboundListenCollapse").style.display =
+              "none";
 
             document.getElementById("output").innerText = "";
             phoneNumberReceiver = document.getElementById("output").value = "";
@@ -1627,6 +1647,13 @@ function onAppActivate() {
               document.getElementById("mainListHistoryCall").style.display =
                 "none";
               document.getElementById("mainInbound").style.display = "none";
+              document.getElementById("mainInboundCollapse").style.display =
+                "none";
+              document.getElementById("mainInboundListen").style.display =
+                "none";
+              document.getElementById(
+                "mainInboundListenCollapse"
+              ).style.display = "none";
 
               document.getElementById("output").innerText = "";
               phoneNumberReceiver = document.getElementById("output").value =
@@ -1659,6 +1686,7 @@ function onAppActivate() {
             .then(function () {
               document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
+              document.getElementById("mainBusyCall").style.display = "none";
               document.getElementById("mainCollapseClickToCall").style.display =
                 "none";
               document.getElementById("mainListContacts").style.display =
@@ -1666,6 +1694,13 @@ function onAppActivate() {
               document.getElementById("mainListHistoryCall").style.display =
                 "none";
               document.getElementById("mainInbound").style.display = "none";
+              document.getElementById("mainInboundCollapse").style.display =
+                "none";
+              document.getElementById("mainInboundListen").style.display =
+                "none";
+              document.getElementById(
+                "mainInboundListenCollapse"
+              ).style.display = "none";
 
               phoneNumberReceiver = document.getElementById("output").value =
                 "";
@@ -1812,7 +1847,14 @@ function eventHandlecallDialpad() {
   let textElementDialpad = document.getElementById("output").value;
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "block";
+  document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
 
   phoneNumberReceiver = textElementDialpad;
   document.getElementById("appTextPhone").value = phoneNumberReceiver;
@@ -1849,8 +1891,14 @@ function showContact() {
   document.getElementById("mainListContacts").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
+
   current_page = 1;
   getContactData(current_page);
 }
@@ -1931,11 +1979,18 @@ function clickContactCall(elem) {
         resizeAppDefault();
         console.log(`Success: Opened the app`);
         existContact = true;
+        document.getElementById("mainOutbound").style.display = "block";
         document.getElementById("mainContent").style.display = "none";
+        document.getElementById("mainListContacts").style.display = "none";
+        document.getElementById("mainBusyCall").style.display = "none";
         document.getElementById("mainCollapseClickToCall").style.display =
           "none";
-        document.getElementById("mainListContacts").style.display = "none";
-        document.getElementById("mainOutbound").style.display = "block";
+        document.getElementById("mainListHistoryCall").style.display = "none";
+        document.getElementById("mainInbound").style.display = "none";
+        document.getElementById("mainInboundCollapse").style.display = "none";
+        document.getElementById("mainInboundListen").style.display = "none";
+        document.getElementById("mainInboundListenCollapse").style.display =
+          "none";
 
         document.getElementById("appTxtNameContact").value = name_contact;
         document.getElementById("appTxtNameContact").innerText = name_contact;
@@ -2160,6 +2215,8 @@ function showMainInboundListen() {
   document.getElementById("mainListHistoryCall").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
+
   listenCall();
 }
 
