@@ -1022,6 +1022,7 @@ agent.on("call", (event) => {
             console.log("existContact trươc khi check", existContact);
             //check contact
             await filterContactDataInbound(call?.number);
+            await filteredContactSearch(call?.number);
             console.log("existContact sau khi check", existContact);
             document.getElementById("appTextPhoneInbound").value = call?.number;
             document.getElementById("appTextPhoneInbound").innerText =
@@ -1256,6 +1257,7 @@ function closeApp() {
       // ret.innerHTML = "00:00:00";
       // console.info("successfully closed the CTI app");
       // showNotify("success", "Successfully closed the CTI app.");
+      location.reload();
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
@@ -1418,15 +1420,25 @@ async function filteredContactSearch(term) {
       existContact = true;
       // document.getElementById("appTxtNameContact").innerText = detail[i].name;
       // document.getElementById("appTxtNameContact").value = detail[i].name;
+      document.getElementById("appTxtNameContactInbound").textContent =
+        filteredDataMobile[0].name;
+      document.getElementById("appTxtNameContactInboundListen").textContent =
+        filteredDataMobile[0].name;
       document.getElementById("appTxtNameContact").textContent =
         filteredDataMobile[0].name;
+
       nameContact = filteredDataMobile[0].name;
       getContactById(filteredDataMobile[0].id);
       return renderListContact(detail);
     } else if (filteredDataPhone.length > 0) {
       existContact = true;
+      document.getElementById("appTxtNameContactInbound").textContent =
+        filteredDataPhone[0].name;
+      document.getElementById("appTxtNameContactInboundListen").textContent =
+        filteredDataPhone[0].name;
       document.getElementById("appTxtNameContact").textContent =
         filteredDataPhone[0].name;
+        
       nameContact = filteredDataPhone[0].name;
       getContactById(filteredDataPhone[0].id);
       return renderListContact(detail);
