@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="{{{appclient}}}"></script>
+  <script async src="{{{appclient}}}"></script>
   <!-- <script async src="https://static.freshdev.io/fdk/2.0/assets/fresh_client.js"></script> -->
   <link rel="stylesheet" type="text/css" href="https://static.freshdev.io/fdk/2.0/assets/freshdesk.css">
 
@@ -724,16 +724,16 @@
     </div>
 
     <!-- thu gon màn hình agent call chưa bắt máy -->
-    <div id="mainInboundCollapse" onclick="btnShowMainInbound()">
+    <div id="mainInboundCollapse">
       <div class="waiting__screen">
-        <div class="col-6">
+        <div class="col-6" onclick="btnShowMainInbound()">
           <div class="timer-group">
-            <p id="timerInboundCollapse" style="color: aliceblue;line-height: 4.5rem;"></p>
+            <p id="nameNotListen" style="color: aliceblue;line-height: 4.5rem;margin-left: 6px;"></p>
           </div>
         </div>
         <div class="col-6">
-          <button class="end__calling_collapse flr" id="toggleShowMainInboundListen" onclick="showMainInboundListen()"
-            size="small" color="primary"><span><img class="icon__calling__collapse"
+          <button onclick="showMainInboundListen()" class="end__calling_collapse flr" size="small"
+            color="primary"><span><img id="toggleShowMainInboundListen" class="icon__calling__collapse"
                 src="./images/call_inbound.png" /></span>
           </button>
           <button class="end__calling_collapse flr" id="toggleEndCallInboundCollapse" onclick="endCall()" size="small"
