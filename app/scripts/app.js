@@ -1427,6 +1427,14 @@ async function filteredContactSearch(term) {
       document.getElementById("appTxtNameContact").textContent =
         filteredDataMobile[0].name;
 
+      document.getElementById("appTextPhoneInbound").style.fontSize = "14px";
+      document.getElementById("appTextPhoneInbound").style.padding = "0px 0px";
+
+      document.getElementById("appTextPhoneInboundListen").style.fontSize =
+        "14px";
+      document.getElementById("appTextPhoneInboundListen").style.padding =
+        "0px 0px";
+
       nameContact = filteredDataMobile[0].name;
       getContactById(filteredDataMobile[0].id);
       return renderListContact(detail);
@@ -1438,7 +1446,14 @@ async function filteredContactSearch(term) {
         filteredDataPhone[0].name;
       document.getElementById("appTxtNameContact").textContent =
         filteredDataPhone[0].name;
-        
+
+      document.getElementById("appTextPhoneInboundListen").style.fontSize =
+        "14px";
+      document.getElementById("appTextPhoneInboundListen").style.padding =
+        "0px 0px";
+
+      document.getElementById("appTextPhoneInbound").style.fontSize = "14px";
+      document.getElementById("appTextPhoneInbound").style.padding = "0px 0px";
       nameContact = filteredDataPhone[0].name;
       getContactById(filteredDataPhone[0].id);
       return renderListContact(detail);
