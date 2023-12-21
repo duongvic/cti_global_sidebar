@@ -925,7 +925,9 @@ let retTimerInbound = document.getElementById("timerInbound");
 console.log("ret", ret);
 
 let counter = 0;
-let interval;
+let counter_time_inbound = 0;
+
+let interval, intervalInbound;
 
 function convertSec(cnt) {
   let sec = cnt % 60;
@@ -945,15 +947,23 @@ function convertSec(cnt) {
 
 function start() {
   interval = setInterval(function () {
-    retTimerInbound.innerHTML;
-    retTimerInboundListenCollapse.innerHTML =
-      retTimerInboundCollapse.innerHTML =
-      retTimerInboundListen.innerHTML =
-      retCollapse.innerHTML =
-      ret.innerHTML =
-        convertSec(counter++); // timer start counting here...
+    document.getElementById("timer").textContent = convertSec(counter++);
+    // retCollapse.innerHTML = convertSec(counter++);
+    // retTimerInboundListenCollapse.innerHTML = convertSec(counter++);
+    // timer start counting here...
+    console.log("goi start time Outbound");
   }, 1000);
 }
+
+function startTimeInbound() {
+  intervalInbound = setInterval(function () {
+    document.getElementById("timerInboundListen").textContent = convertSec(
+      counter_time_inbound++
+    );
+    console.log("goi start time Inbound");
+  }, 1000);
+}
+
 function stop() {
   ret.innerHTML = "";
   retCollapse.innerHTML = "";
@@ -962,38 +972,52 @@ function stop() {
   retTimerInboundListenCollapse.innerHTML = "";
   retTimerInbound.innerHTML = "";
   clearInterval(interval);
+  clearInterval(intervalInbound);
 }
 
 agent.on("call", (event) => {
   let call = event.call;
   switch (call.localConnectionInfo) {
-    case "alerting":
+    case "alerting": // case inbound gọi
       console.log(`incomming call from ${call.number} ${call.name}`);
+      console.log("chạy 1 alerting");
       isInboundCall = true;
       console.log("isMainActive", isMainActive);
       client.interface
         .trigger("show", { id: "softphone" })
         .then(async function () {
-          resizeAppDefault();
-          viewMainInbound();
-          console.log("existContact trươc khi check", existContact);
-          //check contact
-          await filterContactDataInbound(call?.number);
-          console.log("existContact sau khi check", existContact);
-          document.getElementById("appTextPhoneInbound").value = call?.number;
-          document.getElementById("appTextPhoneInbound").innerText =
-            call?.number;
-          document.getElementById("appTextPhoneInboundListen").value =
-            call?.number;
-          document.getElementById("appTextPhoneInboundListen").innerText =
-            call?.number;
-          phoneNumberReceiver = call?.number;
+          client.data.get("loggedInUser").then(async function (data) {
+            agent_ref = data?.loggedInUser?.availability?.agent_ref
+              ? data?.loggedInUser?.availability?.agent_ref
+              : undefined;
+            const phone = data?.loggedInUser?.contact?.phone
+              ? data?.loggedInUser?.contact?.phone
+              : data?.loggedInUser?.contact?.mobile
+              ? data?.loggedInUser?.contact?.mobile
+              : null;
+            window.userPhone = phone;
+            console.log("data loggedInUser Inbound", data);
+
+            resizeAppDefault();
+            viewMainInbound();
+            console.log("existContact trươc khi check", existContact);
+            //check contact
+            await filterContactDataInbound(call?.number);
+            console.log("existContact sau khi check", existContact);
+            document.getElementById("appTextPhoneInbound").value = call?.number;
+            document.getElementById("appTextPhoneInbound").innerText =
+              call?.number;
+            document.getElementById("appTextPhoneInboundListen").value =
+              call?.number;
+            document.getElementById("appTextPhoneInboundListen").innerText =
+              call?.number;
+            phoneNumberReceiver = call?.number;
+          });
         })
         .catch(function (error) {
           isInboundCall = false;
           console.error("Error: Failed to open the app");
           console.error(error);
-          stop();
         });
 
       console.log("isInboundCall alerting", isInboundCall);
@@ -1006,9 +1030,11 @@ agent.on("call", (event) => {
       //     createContact();
       //   }
       // }
+      // start();
       break;
     case "connected":
       console.log(` khi người dùng nghe máy : connected to ${call.number}`);
+      console.log("connected to man hinh:", isMainActive);
       if (isInboundCall !== true) {
         start();
         //tạo ticket khi tồn tại khách hàng trong hệ thống
@@ -1017,8 +1043,19 @@ agent.on("call", (event) => {
         } else {
           createContact();
         }
-      } else {
-        stop();
+      }
+
+      if (isMainActive && isInboundCall) {
+        startTimeInbound();
+        //tạo ticket khi tồn tại khách hàng trong hệ thống
+        if (existContact) {
+          console.log("chạy vao đay không? inbound");
+          createTicket();
+        } else {
+          createContact();
+        }
+      } else if (!isMainActive && !isInboundCall) {
+        clearInterval(intervalInbound);
       }
       break;
     case "fail":
@@ -1036,15 +1073,16 @@ agent.on("call", (event) => {
       document.getElementById("mainOutbound").style.display = "none";
       document.getElementById("mainBusyCall").style.display = "none";
       document.getElementById("mainCollapseClickToCall").style.display = "none";
-  
+
       document.getElementById("mainListContacts").style.display = "none";
       document.getElementById("mainListHistoryCall").style.display = "none";
-      
+
       document.getElementById("mainInbound").style.display = "none";
       document.getElementById("mainInboundCollapse").style.display = "none";
       document.getElementById("mainInboundListen").style.display = "none";
-      document.getElementById("mainInboundListenCollapse").style.display = "none";
-      
+      document.getElementById("mainInboundListenCollapse").style.display =
+        "none";
+
       document.getElementById("appTextPhone").value = "";
       document.getElementById("appTextPhone").innerText = "";
       document.getElementById("appTextPhoneBusyCall").value = "";
@@ -1055,7 +1093,6 @@ agent.on("call", (event) => {
       $("#callEnter").attr("disabled", true);
       $("#callEnter").css({ backgroundColor: "darkgray" });
 
-      stop();
       document.getElementById("timer").value = "";
       document.getElementById("timer").innerText = "";
 
@@ -1064,6 +1101,16 @@ agent.on("call", (event) => {
       retTimerInboundListen.innerHTML = "";
       retTimerInboundCollapse.innerHTML = "";
       retTimerInboundListenCollapse.innerHTML = "";
+
+      isInboundCall = false;
+      isMainActive = false;
+      existContact = false;
+      idContact = "";
+      nameContact = "";
+      phoneNumberReceiver = "";
+      emailContact = "";
+
+      stop();
       onAppDeactive();
       // location.reload();
       break;
@@ -1290,6 +1337,7 @@ async function fetchContactData(page) {
 }
 
 async function filterContactDataInbound(phone) {
+  console.log("phone,phone", phone);
   try {
     const data = await client.request.invokeTemplate("filterContacts", {
       context: {
@@ -1297,6 +1345,7 @@ async function filterContactDataInbound(phone) {
       },
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
+    console.log("filterContactDataInbound context:", detail);
     // kiểm tra số phone có trong hệ thống không
     if (detail?.length > 0) {
       existContact = true;
@@ -1319,14 +1368,15 @@ async function filterContactDataInbound(phone) {
       document.getElementById("appTextPhoneInboundListen").style.fontSize =
         "22px";
       document.getElementById("appTextPhoneInboundListen").style.padding =
-        "10px 0px";
+        "9px 0px";
       nameContact = "";
       idContact = "";
       emailContact = "";
     }
-    console.log("filterContactDataInbound context:", detail);
+    console.log("filterContactDataInbound ton tai:", existContact);
     // return detail;
   } catch (error) {
+    existContact = false;
     console.log(error);
   }
 }
@@ -2030,10 +2080,29 @@ function redirectContactInfo(elem) {
   console.log(contactId);
   isMainActive = true;
 
+  // client.data.get("loggedInUser").then(function (data) {
+  //   let agent_ref = data?.loggedInUser?.availability?.agent_ref
+  //     ? data?.loggedInUser?.availability?.agent_ref
+  //     : undefined;
+  //   const phone = data.loggedInUser.contact.phone
+  //     ? data.loggedInUser.contact.phone
+  //     : data.loggedInUser.contact.mobile
+  //     ? data.loggedInUser.contact.mobile
+  //     : null;
+  //   window.userPhone = phone;
+
+  //   // let str = agent_ref;
+  //   let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
+  //   console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
+  //   let a = str?.slice(0, sindex);
+  //   const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
+  //   window.open(urlParams, "_blank");
+  // });
+
   let str = agent_ref;
-  let sindex = agent_ref.lastIndexOf(".freshdesk.com");
+  let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
   console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-  let a = str.slice(0, sindex);
+  let a = str?.slice(0, sindex);
   const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
   window.open(urlParams, "_blank");
 
@@ -2102,8 +2171,8 @@ function showMain() {
   document.getElementById("appTextPhone1").className = "correct__number__phone";
   ret.innerHTML = "";
   retCollapse = "";
-  retTimerInboundListen = "";
-  retTimerInboundListenCollapse = "";
+  document.getElementById("timerInboundListen").textContent = "";
+  document.getElementById("timerInboundListenCollapse").textContent = "";
   document.getElementById("mainContent").style.display = "block";
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainBusyCall").style.display = "none";
@@ -2114,6 +2183,13 @@ function showMain() {
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInboundListenCollapse").style.display = "none";
+
+  idContact = "";
+  nameContact = "";
+  phoneNumberReceiver = "";
+  isInboundCall = false;
+  existContact = false;
+  isMainActive = false;
 }
 
 $("#search_contact").keypress(function (event) {
@@ -2155,14 +2231,17 @@ async function listenCall() {
     });
   } else if (call.localConnectionInfo == "alerting") {
     // //tạo ticket khi tồn tại khách hàng trong hệ thống
-    if (isMainActive) {
-      start();
-      if (existContact) {
-        createTicket();
-      } else {
-        createContact();
-      }
-    }
+
+    // console.log("isMainActive khi accpet", isMainActive);
+    // if (isMainActive) {
+    //   console.log("vào đây trước 1 listenCall");
+    //   await filterContactDataInbound(phoneNumberReceiver);
+    //   if (existContact) {
+    //     createTicket();
+    //   } else {
+    //     createContact();
+    //   }
+    // }
     // click while we have an alerting call -> accept it
     call.answerCall({ audio: true, video: false });
   } else {
@@ -2330,10 +2409,31 @@ async function createTicket() {
 
     console.info("Successfully created ticket in Freshdesk", dataTicket);
     showNotify("success", `Successfully created a ticket for: ${emailContact}`);
+
+    // client.data.get("loggedInUser").then(function (data) {
+    //   let agent_ref = data?.loggedInUser?.availability?.agent_ref
+    //     ? data?.loggedInUser?.availability?.agent_ref
+    //     : undefined;
+    //   const phone = data.loggedInUser.contact.phone
+    //     ? data.loggedInUser.contact.phone
+    //     : data.loggedInUser.contact.mobile
+    //     ? data.loggedInUser.contact.mobile
+    //     : null;
+    //   window.userPhone = phone;
+
+    //   // let str = agent_ref;
+    //   let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
+    //   console.log(
+    //     "Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex
+    //   );
+    //   let a = str?.slice(0, sindex);
+    //   const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
+    //   window.open(urlParams, "_blank");
+    // });
     let str = agent_ref;
-    let sindex = agent_ref.lastIndexOf(".freshdesk.com");
+    let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
     console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-    let a = str.slice(0, sindex);
+    let a = str?.slice(0, sindex);
     const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
     window.open(urlParams, "_blank");
   } catch (error) {
@@ -2348,7 +2448,7 @@ async function createContact() {
   try {
     const properties = JSON.stringify({
       name: `${"Unknown Contact"} - ${phoneNumberReceiver}`,
-      phone: phoneNumberReceiver,
+      phone: encodeURIComponent(phoneNumberReceiver),
       email: `unknown_contact${phoneNumberReceiver}@gmail.com`,
     });
     // Send request
