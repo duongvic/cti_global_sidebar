@@ -1684,6 +1684,7 @@ function onAppActivate() {
 
       /**End Call **/
       document.getElementById("toggleEndCall").addEventListener("click", () => {
+        updateTicket(idTicket);
         client.interface
           .trigger("hide", { id: "softphone" })
           .then(function () {
@@ -2477,8 +2478,9 @@ async function createTicket() {
     const dataTicket = await client.request.invokeTemplate("createTicket", {
       body: ticketDetails,
     });
-
-    console.info("Successfully created ticket in Freshdesk", dataTicket);
+    var detail = dataTicket?.response ? JSON.parse(dataTicket?.response) : [];
+    idTicket = detail?.id;
+    console.info("Successfully created ticket in Freshdesk", detail);
     showNotify("success", `Successfully created a ticket for: ${nameContact}`);
 
     // client.data.get("loggedInUser").then(function (data) {
@@ -2537,5 +2539,49 @@ async function createContact() {
     console.error(`Error: Failed to create a contact ${phoneNumberReceiver}`);
     console.error(error);
     showNotify("danger", "Failed to create a contact.");
+  }
+}
+
+async function updateTicket(idTicket) {
+  console.log("co chay vao update ticket:", idContact);
+  let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px">
+    <div dir="ltr">
+      <a href="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231214-181002_74f27a787217f9c3_cc1ftistg-47ff13b483f38676.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=UbW8YRAMdtze3h7EeLYKHiFRG1Q%3D&Expires=1703241027" rel="noreferrer" target="_blank" heap-ignore="true" class="_ar_hide_"
+          _ar_hide_="width:62px;height:19px;margin:0px;position:static;display:inline-block;" style="
+          text-decoration: unset; padding: 10px 10px;">
+          file record
+      </a>
+      <br />
+      <audio controls preload="auto" style="height: 30px;margin-top: 10px;">
+        <source src="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231214-181002_74f27a787217f9c3_cc1ftistg-47ff13b483f38676.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=UbW8YRAMdtze3h7EeLYKHiFRG1Q%3D&Expires=1703241027" />
+      </audio>
+    </div>
+  </div>`;
+  try {
+    const properties = JSON.stringify({
+      attachment_ids: [],
+      cloud_files: [],
+      requester_id: idContact,
+      description: html,
+    });
+    // Send request
+    var dataUpdateTicket = await client.request.invokeTemplate("updateTicket", {
+      context: {
+        id_ticket: idTicket,
+      },
+      body: properties,
+    });
+
+    var detail = dataUpdateTicket?.response
+      ? JSON.parse(dataUpdateTicket?.response)
+      : [];
+    console.log("dataUpdateTicket thành công:", detail);
+    showNotify("success", `Successfully update a ticket for: ${idTicket}`);
+  } catch (error) {
+    console.error(
+      `Error: Failed to update a ticket ${phoneNumberReceiver}-${idTicket}`
+    );
+    console.error(error);
+    showNotify("danger", "Failed to update a ticket.");
   }
 }

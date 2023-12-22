@@ -59,7 +59,17 @@
       }
     }
   },
-
+  "updateTicket": {
+    "schema": {
+      "method": "PUT",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/tickets/<%= context.id_ticket %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      }
+    }
+  },
   "createContact": {
     "schema": {
       "method": "POST",
