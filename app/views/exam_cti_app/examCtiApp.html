@@ -21,7 +21,7 @@
             </a>
             <br />
             <audio
-                src="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231214-181002_74f27a787217f9c3_cc1ftistg-47ff13b483f38676.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=UbW8YRAMdtze3h7EeLYKHiFRG1Q%3D&Expires=1703241027"
+                src="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231213-101742_d2513899694f2517_cc2ftistg-c767fb89e698082e.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=5p3cGTNgpTRw17kWz5WycimXu9g%3D&Expires=1703477777"
                 controls autoplay loop style="height: 30px;margin-top: 10px;">
             </audio>
 
@@ -29,10 +29,22 @@
                 <source
                     src="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231214-181002_74f27a787217f9c3_cc1ftistg-47ff13b483f38676.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=UbW8YRAMdtze3h7EeLYKHiFRG1Q%3D&Expires=1703241027" />
             </audio>
+
+            <audio controls>
+                <source src="../../audio/audio1.wav" />
+            </audio>
         </div>
     </div>
 
     <script>
+
+        var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        if (!isChrome) {
+            $('#iframeAudio').remove()
+        }
+        else {
+            $('#playAudio').remove() // just to make sure that it will not have 2x audio in the background 
+        }
 
         let agent = AnCti.newAgent();
         let webphone;

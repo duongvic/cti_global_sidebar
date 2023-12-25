@@ -16,5 +16,23 @@
     "type_attributes": {
       "product": "freshdesk"
     }
+  },
+  "terminalId": {
+    "display_name": "terminalId",
+    "description": "Please enter your terminalId as7",
+    "type": "text",
+    "required": true
+  },
+  "usernameAs7": {
+    "display_name": "Username AS7",
+    "description": "Please enter your username",
+    "type": "text",
+    "required": true
+  },
+  "passwordAs7": {
+    "display_name": "Password AS7",
+    "description": "Please enter your password",
+    "type": "text",
+    "required": true
   }
 }

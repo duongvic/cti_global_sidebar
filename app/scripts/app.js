@@ -1683,47 +1683,55 @@ function onAppActivate() {
         });
 
       /**End Call **/
-      document.getElementById("toggleEndCall").addEventListener("click", () => {
-        updateTicket(idTicket);
-        client.interface
-          .trigger("hide", { id: "softphone" })
-          .then(function () {
-            document.getElementById("mainContent").style.display = "block";
-            document.getElementById("mainOutbound").style.display = "none";
-            document.getElementById("mainBusyCall").style.display = "none";
-            document.getElementById("mainCollapseClickToCall").style.display =
-              "none";
-            document.getElementById("mainListContacts").style.display = "none";
-            document.getElementById("mainListHistoryCall").style.display =
-              "none";
-            document.getElementById("mainInbound").style.display = "none";
-            document.getElementById("mainInboundCollapse").style.display =
-              "none";
-            document.getElementById("mainInboundListen").style.display = "none";
-            document.getElementById("mainInboundListenCollapse").style.display =
-              "none";
+      document
+        .getElementById("toggleEndCall")
+        .addEventListener("click", async () => {
+          await updateTicket(idTicket);
+          await insertIdTicketAs7(idTicket);
+          client.interface
+            .trigger("hide", { id: "softphone" })
+            .then(async function () {
+              document.getElementById("mainContent").style.display = "block";
+              document.getElementById("mainOutbound").style.display = "none";
+              document.getElementById("mainBusyCall").style.display = "none";
+              document.getElementById("mainCollapseClickToCall").style.display =
+                "none";
+              document.getElementById("mainListContacts").style.display =
+                "none";
+              document.getElementById("mainListHistoryCall").style.display =
+                "none";
+              document.getElementById("mainInbound").style.display = "none";
+              document.getElementById("mainInboundCollapse").style.display =
+                "none";
+              document.getElementById("mainInboundListen").style.display =
+                "none";
+              document.getElementById(
+                "mainInboundListenCollapse"
+              ).style.display = "none";
 
-            document.getElementById("output").innerText = "";
-            phoneNumberReceiver = document.getElementById("output").value = "";
-            document.getElementById("appTextPhone").value = "";
-            document.getElementById("appTextPhone").innerText = "";
-            /**as7 backend **/
-            let call = webphone.calls[0];
-            call.clearConnection();
+              document.getElementById("output").innerText = "";
+              phoneNumberReceiver = document.getElementById("output").value =
+                "";
+              document.getElementById("appTextPhone").value = "";
+              document.getElementById("appTextPhone").innerText = "";
+              /**as7 backend **/
 
-            console.log("đã gọi vào end call as7");
-            /**as7 backend **/
-            onAppDeactive();
-            location.reload();
-            // ret.innerHTML = "00:00:00";
-            // resizeAppDefault();
-            // console.info("successfully closed the CTI app");
-          })
-          .catch(function (error) {
-            console.error("Error: Failed to close the CTI app");
-            console.error(error);
-          });
-      });
+              let call = webphone.calls[0];
+              call.clearConnection();
+
+              console.log("đã gọi vào end call as7");
+              /**as7 backend **/
+              onAppDeactive();
+              // location.reload();
+              // ret.innerHTML = "00:00:00";
+              // resizeAppDefault();
+              // console.info("successfully closed the CTI app");
+            })
+            .catch(function (error) {
+              console.error("Error: Failed to close the CTI app");
+              console.error(error);
+            });
+        });
 
       document
         .getElementById("toggleEndCallBusy")
@@ -2542,18 +2550,20 @@ async function createContact() {
   }
 }
 
+let url_record =
+  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231213-140710_f6369b7d658b3a2e_cc2ftistg-aae15c8057620e40.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=fG8%2FgGArKMkMtQ4pAML9A7Kg7ww%3D&Expires=1703481977";
 async function updateTicket(idTicket) {
   console.log("co chay vao update ticket:", idContact);
   let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px">
     <div dir="ltr">
-      <a href="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231214-181002_74f27a787217f9c3_cc1ftistg-47ff13b483f38676.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=UbW8YRAMdtze3h7EeLYKHiFRG1Q%3D&Expires=1703241027" rel="noreferrer" target="_blank" heap-ignore="true" class="_ar_hide_"
+      <a href="${url_record} rel="noreferrer" target="_blank" heap-ignore="true" class="_ar_hide_"
           _ar_hide_="width:62px;height:19px;margin:0px;position:static;display:inline-block;" style="
           text-decoration: unset; padding: 10px 10px;">
           file record
       </a>
       <br />
       <audio controls preload="auto" style="height: 30px;margin-top: 10px;">
-        <source src="https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231214-181002_74f27a787217f9c3_cc1ftistg-47ff13b483f38676.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=UbW8YRAMdtze3h7EeLYKHiFRG1Q%3D&Expires=1703241027" />
+        <source src="${url_record}" />
       </audio>
     </div>
   </div>`;
@@ -2585,3 +2595,28 @@ async function updateTicket(idTicket) {
     showNotify("danger", "Failed to update a ticket.");
   }
 }
+
+async function insertIdTicketAs7(idTicket) {
+  console.log("co chay vao insertIdTicketAs7:", idTicket);
+  try {
+    var data = await client.request.invokeTemplate("insertIdTicketAs7", {
+      context: {
+        // terminalId: 115,
+        accountCode: idTicket,
+        accountName: idContact,
+      },
+    });
+
+    var detail = data?.response ? JSON.parse(data?.response) : [];
+    console.info("Successfully created insertIdTicketAs7 in Freshdesk", detail);
+    console.log("detail insertIdTicketAs7", detail?.pcdr?.id);
+  } catch (error) {
+    console.error("data insertIdTicketAs7", error);
+  }
+}
+
+// async function recordS3(data) {
+//   console.log("da vao day", data);
+//   var detail = data?.response ? JSON.parse(data?.response) : [];
+//   console.log("data insertIdTicketAs7", detail);
+// }

@@ -19,7 +19,8 @@
         "filteredContactSearch": {},
         "createTicket": {},
         "updateTicket": {},
-        "createContact": {}
+        "createContact": {},
+        "insertIdTicketAs7": {}
       }
     }
   },

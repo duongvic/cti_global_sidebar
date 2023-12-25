@@ -80,5 +80,17 @@
         "Content-Type": "application/json"
       }
     }
+  },
+  "insertIdTicketAs7": {
+    "schema": {
+      "method": "PUT",
+      "protocol": "https",
+      "host": "pbx-stg.oncallcx.vn",
+      "path": "/rest/service/accountCode?terminalId=<%= iparam.terminalId %>&accountCode=<%= context.accountCode %>&accountName=<%= context.accountName %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.usernameAs7 + ':' + iparam.passwordAs7) %>",
+        "Content-Type": "application/json"
+      }
+    }
   }
 }
