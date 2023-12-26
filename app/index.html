@@ -187,14 +187,37 @@
         <div><img class="avatar" id="avatarContact" src="./images/avatar_none.png"></div>
         <div style="padding-top: 22%;">
           <div class="ac__calling">
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/pauseCall.png" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend_Transfer.svg" /></span></div>
-            <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind_Transfer.svg" /></span></div>
+            <!-- <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div> -->
+            <button class="btn-ac"><img class="icon__calling" src="./images/DialPad-InCall.svg" />
+            </button>
+            <!-- Mic - UnMic -->
+            <form name="testMic" method="post" style="display: none;">
+              <input type="text" name="savereportMic" value="false" />
+            </form>
+            <button class="btn-mic" value="false" id="check" onclick="mic(this)">
+              <i class="material-icons mic-un">&#xe02b;</i>
+              <i class="material-icons mic-top">&#xe029;</i>
+              <!-- <span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span> -->
+            </button>
+            <!-- Mic - UnMic -->
+
+            <!-- Hold - UnHold -->
+            <form name="testHold_Unhold" method="post" style="display: none;">
+              <input type="text" name="savereportHold_Unhold" value="false" />
+            </form>
+            <button class="btn-ac" value="false" id="check" onclick="change(this)">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+            </button>
+            <!-- <div class="ct__calling"><span><img class="icon__calling" src="./images/pauseCall.png" /></span></div> -->
+            <!-- Hold - UnHold -->
+            <!-- <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend_Transfer.svg" /></span></div>
+            <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind_Transfer.svg" /></span></div> -->
+            <button class="btn-ac"><img class="icon__calling" src="./images/Blind_Transfer.svg" /></button>
+            <button class="btn-ac"><img class="icon__calling" src="./images/Attend_Transfer.svg" /></button>
           </div>
         </div>
-        <button id="toggleEndCall" class="hint" type="button"><span><img class="icon__calling"
+        <button id="toggleEndCall" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
               src="./images/end_call.png" /></span> End call</button>
       </div>
     </div>

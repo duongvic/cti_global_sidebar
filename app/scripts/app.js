@@ -9,6 +9,7 @@ let emailContact = "";
 let phoneNumberReceiver = "";
 let isInboundCall = false;
 let existContact = false;
+let isUpdateCallAs7 = false;
 
 let current_page = 1;
 let listContacts = [];
@@ -877,40 +878,42 @@ agent.on("remotestream", (event) => {
 // };
 
 // click start stop action button
-// var input = document.test.savereport;
-// function mic(x) {
-//   x.classList.toggle("mic");
-//   if (input.value === String(false)) {
-//     input.value = true;
-//     let call = webphone.calls[0];
-//     call.updateCall({
-//       audio: "muted",
-//     });
-//   } else {
-//     input.value = false;
-//     let call = webphone.calls[0];
-//     call.updateCall({
-//       audio: "true",
-//     });
-//   }
-// }
-// var input = document.test.savereport;
-// function change(x) {
-//   x.classList.toggle("change");
-//   if (input.value === String(false)) {
-//     input.value = true;
-//     let call = webphone.calls[0];
-//     call.updateCall({
-//       audio: "muted",
-//     });
-//   } else {
-//     input.value = false;
-//     let call = webphone.calls[0];
-//     call.updateCall({
-//       audio: "true",
-//     });
-//   }
-// }
+var input = document.testMic.savereportMic;
+function mic(x) {
+  x.classList.toggle("mic");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "muted",
+    });
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+  }
+  isUpdateCallAs7 = true;
+}
+var input = document.testHold_Unhold.savereportHold_Unhold;
+function change(x) {
+  x.classList.toggle("change");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "muted",
+    });
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+  }
+  isUpdateCallAs7 = true;
+}
 
 // timer call
 let ret = document.getElementById("timer");
@@ -951,7 +954,7 @@ function convertSec(cnt) {
 function start() {
   interval = setInterval(function () {
     document.getElementById("timer").textContent = convertSec(counter++);
-    console.log("goi start time Outbound");
+    // console.log("goi start time Outbound");
   }, 1000);
 }
 
@@ -960,7 +963,7 @@ function startTimeCollapse() {
     document.getElementById("timerCollapse").textContent = convertSec(
       counter_time_collapse++
     );
-    console.log("goi start time Outbound Collapse");
+    // console.log("goi start time Outbound Collapse");
   }, 1000);
 }
 
@@ -969,7 +972,7 @@ function startTimeInbound() {
     document.getElementById("timerInboundListen").textContent = convertSec(
       counter_time_inbound++
     );
-    console.log("goi start time Inbound Listen");
+    // console.log("goi start time Inbound Listen");
   }, 1000);
 }
 
@@ -977,7 +980,7 @@ function startTimeInboundListenCollapse() {
   intervalInboundListenCollapse = setInterval(function () {
     document.getElementById("timerInboundListenCollapse").textContent =
       convertSec(counter_time_inbound_listen_collapse++);
-    console.log("goi start time InboundListenCollapse");
+    // console.log("goi start time InboundListenCollapse");
   }, 1000);
 }
 
@@ -1049,10 +1052,12 @@ agent.on("call", (event) => {
         start();
         startTimeCollapse();
         //tạo ticket khi tồn tại khách hàng trong hệ thống
-        if (existContact) {
-          createTicket();
-        } else {
-          createContact();
+        if (!isUpdateCallAs7) {
+          if (existContact) {
+            createTicket();
+          } else {
+            createContact();
+          }
         }
       }
 
@@ -1060,11 +1065,13 @@ agent.on("call", (event) => {
         startTimeInbound();
         startTimeInboundListenCollapse();
         //tạo ticket khi tồn tại khách hàng trong hệ thống
-        if (existContact) {
-          console.log("chạy vao đay không? inbound");
-          createTicket();
-        } else {
-          createContact();
+        if (!isUpdateCallAs7) {
+          if (existContact) {
+            console.log("chạy vao đay không? inbound");
+            createTicket();
+          } else {
+            createContact();
+          }
         }
       } else if (!isMainActive && !isInboundCall) {
         clearInterval(intervalInbound);
@@ -1165,6 +1172,14 @@ agent.on("call", (event) => {
       });
   }
 });
+
+// navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
+//   mediaDevices
+//     .filter(({ kind }) => kind == "audioinput")
+//     .forEach((dev) => {
+//       console.log(`${dev.label} => ${dev.deviceId}`);
+//     });
+// });
 
 /**as7 backend **/
 
