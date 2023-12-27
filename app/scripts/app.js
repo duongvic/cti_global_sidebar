@@ -839,6 +839,7 @@ let listContactsExample = [
 ];
 let agent_ref = undefined;
 let isMainActive = false;
+isMainContactActive = false;
 
 /**as7 backend **/
 let agent = anCti.newAgent();
@@ -870,13 +871,6 @@ agent.on("remotestream", (event) => {
   audio.srcObject = event.stream;
 });
 
-// end call
-// document.endCall = () => {
-//   let call = webphone.calls[0];
-//   call.clearConnection();
-//   onAppDeactive();
-// };
-
 // click start stop action button
 var input = document.testMic.savereportMic;
 function mic(x) {
@@ -885,12 +879,13 @@ function mic(x) {
     input.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
-      audio: "muted",
+      audio: "false",
     });
     clearInterval(interval);
     clearInterval(intervalOutCollapse),
       clearInterval(intervalInbound),
       clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
   } else {
     input.value = "false";
     let call = webphone.calls[0];
@@ -901,34 +896,34 @@ function mic(x) {
     clearInterval(intervalOutCollapse),
       clearInterval(intervalInbound),
       clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
   }
-  isUpdateCallAs7 = true;
 }
 var input = document.testHold_Unhold.savereportHold_Unhold;
+
 function change(x) {
   x.classList.toggle("change");
   if (input.value === String(false)) {
     input.value = "true";
     let call = webphone.calls[0];
-    call.updateCall({
-      audio: "muted",
-    });
+    call.holdCall();
+
     clearInterval(interval);
     clearInterval(intervalOutCollapse),
       clearInterval(intervalInbound),
       clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
   } else {
     input.value = "false";
     let call = webphone.calls[0];
-    call.updateCall({
-      audio: "true",
-    });
+    call.retrieveCall();
+
     clearInterval(interval);
     clearInterval(intervalOutCollapse),
       clearInterval(intervalInbound),
       clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
   }
-  isUpdateCallAs7 = true;
 }
 
 // timer call
@@ -1068,6 +1063,15 @@ agent.on("call", (event) => {
         start();
         startTimeCollapse();
         //tạo ticket khi tồn tại khách hàng trong hệ thống
+        console.log(
+          "chạy vao đay không connected isUpdateCallAs7 = ",
+          isUpdateCallAs7
+        );
+        console.log(
+          "chạy vao đay không connected existContact = ",
+          existContact
+        );
+
         if (!isUpdateCallAs7) {
           if (existContact) {
             createTicket();
@@ -1098,6 +1102,7 @@ agent.on("call", (event) => {
       break;
     case "hold":
       console.log(`holding call to ${call.number}`);
+      isUpdateCallAs7 = true;
       break;
     case "null":
       console.log(`call to ${call.number} is gone. Cancel`);
@@ -1687,9 +1692,15 @@ function onAppActivate() {
         .getElementById("btnCloseHistoryCall")
         .addEventListener("fwClick", closeApp);
 
-      if (!isMainActive) {
-        showMain();
-      }
+      // showMain();
+      // if (!isMainActive) {
+      showMain();
+      // }
+      // if (isMainContactActive) {
+      //   showContact();
+      // }
+
+      console.log("is man nao ", isMainActive);
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       document
@@ -2169,13 +2180,14 @@ function clickContactCall(elem) {
 
 function redirectContactInfo(elem) {
   let contactId = $(elem).attr("attr-id-contact");
-
+  isMainContactActive = true;
+  console.log("isMainContactActive", isMainContactActive);
   console.log(contactId);
-  isMainActive = true;
+  // isMainActive = true;
   client.interface
     .trigger("click", { id: "contact", value: contactId })
     .then(function (data) {
-      document.getElementById("mainListContacts").style.display = "block";
+      // document.getElementById("mainListContacts").style.display = "block";
       console.log("goToContact:", data);
       console.info("successfully navigated to contact");
     })
@@ -2221,6 +2233,7 @@ function showHistoryCall() {
 }
 
 function showMain() {
+  console.log("goi vao show main");
   $("#callEnter").attr("disabled", true);
   $("#callEnter").css({ backgroundColor: "darkgray" });
   document.getElementById("appTextPhone1").innerText = "Correct";
@@ -2234,11 +2247,18 @@ function showMain() {
   document.getElementById("timerInboundListen").textContent = "";
   document.getElementById("timerInboundListenCollapse").textContent = "";
 
-  document.getElementById("mainContent").style.display = "block";
+  if (isMainContactActive) {
+    document.getElementById("mainListContacts").style.display = "block";
+    document.getElementById("mainContent").style.display = "none";
+  } else if (!isMainContactActive) {
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
+  }
+
   document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
+
   document.getElementById("mainListHistoryCall").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
@@ -2616,3 +2636,41 @@ async function insertIdTicketAs7(idTicket) {
 //   var detail = data?.response ? JSON.parse(data?.response) : [];
 //   console.log("data insertIdTicketAs7", detail);
 // }
+
+function showMainDialpad() {
+  console.log("goi vao show main");
+  $("#callEnter").attr("disabled", true);
+  $("#callEnter").css({ backgroundColor: "darkgray" });
+  document.getElementById("appTextPhone1").innerText = "Correct";
+  document.getElementById("appTextPhone1").className = "correct__number__phone";
+  ret.innerHTML = "";
+  retCollapse.innerHTML = "";
+  retTimerInbound.innerHTML = "";
+  retTimerInboundListen.innerHTML = "";
+  retTimerInboundListenCollapse.innerHTML = "";
+
+  document.getElementById("timerInboundListen").textContent = "";
+  document.getElementById("timerInboundListenCollapse").textContent = "";
+
+  document.getElementById("mainContent").style.display = "block";
+  document.getElementById("mainListContacts").style.display = "none";
+
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
+
+  idContact = "";
+  nameContact = "";
+  phoneNumberReceiver = "";
+  isInboundCall = false;
+  existContact = false;
+  isMainActive = false;
+  isMainContactActive = false;
+  emailContact = "";
+}
