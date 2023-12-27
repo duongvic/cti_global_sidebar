@@ -887,12 +887,20 @@ function mic(x) {
     call.updateCall({
       audio: "muted",
     });
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
   } else {
     input.value = "false";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "true",
     });
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
   }
   isUpdateCallAs7 = true;
 }
@@ -905,12 +913,20 @@ function change(x) {
     call.updateCall({
       audio: "muted",
     });
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
   } else {
     input.value = "false";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "true",
     });
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
   }
   isUpdateCallAs7 = true;
 }
@@ -1671,7 +1687,9 @@ function onAppActivate() {
         .getElementById("btnCloseHistoryCall")
         .addEventListener("fwClick", closeApp);
 
-      showMain();
+      if (!isMainActive) {
+        showMain();
+      }
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       document
@@ -2154,61 +2172,24 @@ function redirectContactInfo(elem) {
 
   console.log(contactId);
   isMainActive = true;
+  client.interface
+    .trigger("click", { id: "contact", value: contactId })
+    .then(function (data) {
+      document.getElementById("mainListContacts").style.display = "block";
+      console.log("goToContact:", data);
+      console.info("successfully navigated to contact");
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to navigate to contact");
+      console.error(error);
+    });
 
-  // client.data.get("loggedInUser").then(function (data) {
-  //   let agent_ref = data?.loggedInUser?.availability?.agent_ref
-  //     ? data?.loggedInUser?.availability?.agent_ref
-  //     : undefined;
-  //   const phone = data.loggedInUser.contact.phone
-  //     ? data.loggedInUser.contact.phone
-  //     : data.loggedInUser.contact.mobile
-  //     ? data.loggedInUser.contact.mobile
-  //     : null;
-  //   window.userPhone = phone;
-
-  //   // let str = agent_ref;
-  //   let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
-  //   console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-  //   let a = str?.slice(0, sindex);
-  //   const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
-  //   window.open(urlParams, "_blank");
-  // });
-
-  let str = agent_ref;
-  let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
-  console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-  let a = str?.slice(0, sindex);
-  const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
-  window.open(urlParams, "_blank");
-
-  // client.interface
-  //   .trigger("click", { id: "contact", value: contactId })
-  //   .then(function (data) {
-  //     showContact();
-  //     // document.getElementById("mainListContacts").style.display = "block";
-  //     // document.getElementById("mainContent").style.display = "none";
-  //     // document.getElementById("mainCollapseClickToCall").style.display =
-  //     //   "none";
-  //     // document.getElementById("mainOutbound").style.display = "none";
-  //     console.info("successfully navigated to contact", data);
-  //   })
-  //   .catch(function (error) {
-  //     console.error("Error: Failed to navigate to contact");
-  //     console.error(error);
-  //   });
-
-  // client.interface
-  //   .trigger("show", { id: "softphone" })
-  //   .then(function () {
-  //     resizeAppDefault();
-  //     document.getElementById("mainListContacts").style.display = "block";
-
-  //     console.log(`Success: Opened the app`);
-  //   })
-  //   .catch(function (error) {
-  //     console.error("Error: Failed to open the app");
-  //     console.error(error);
-  //   });
+  // let str = agent_ref;
+  // let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
+  // console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
+  // let a = str?.slice(0, sindex);
+  // const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
+  // window.open(urlParams, "_blank");
 }
 
 $(document).ready(function () {
