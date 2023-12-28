@@ -1,3 +1,5 @@
+let idTicket = "";
+
 // let client;
 
 // (async function init() {
@@ -49,8 +51,43 @@
 //   renderPayload(contacts);
 // }
 
+// app.initialized().then(function (_client) {
+//   client = _client;
+//   client.events.on("app.activated", function () {
+//     client.data
+//       .get("ticket")
+//       .then(function (data) {
+//         console.log("Ticket Data", data);
+//       })
+
+//       .catch(function (e) {
+//         console.log("Exception - ", e);
+//       });
+//   });
+// });
+
+// window.frsh_init().then(function (client) {
+//   window.client = client;
+// });
+
 window.frsh_init().then(function (client) {
+  // sample code for DataApi
   window.client = client;
+  client.data.get("ticket").then(
+    function (data) {
+      idTicket = data?.ticket?.id;
+      showNotify("info", `Child:DataApi: ${idTicket}`);
+      console.log("Child:DataApi", data);
+
+      // B1. call api lấy file csv
+      // B2. map file với idTicket
+      // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
+      // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
+    },
+    function (error) {
+      console.log("Child:DataApi", error);
+    }
+  );
 });
 
 function showModal() {
@@ -61,7 +98,7 @@ function showModal() {
     })
     .then(
       function (data) {
-        console.log("Parent:InterfaceAPI:showModal", data);
+        console.log("Parent:InterfaceAPI:showModal", data.message - idTicket);
       },
       function (error) {
         console.log("Parent:InterfaceAPI:showModal", error);
@@ -156,4 +193,11 @@ function insertContent(element) {
 
   // position end
   // client.interface.trigger("setValue", {id: "editor", text: "insert content at the end", replace: false, position: 'end'} );
+}
+
+function showNotify(type, message) {
+  return client.interface.trigger("showNotify", {
+    type: type,
+    message: message,
+  });
 }

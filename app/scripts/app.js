@@ -1706,7 +1706,7 @@ function viewScreenCollapseClickInBound() {
     nameContact != "" ? nameContact : phoneNumberReceiver;
 }
 
-viewScreeInboundListenCollapse;
+// viewScreeInboundListenCollapse;
 
 let client;
 init();
@@ -1782,7 +1782,7 @@ function onAppActivate() {
       document
         .getElementById("toggleEndCall")
         .addEventListener("click", async () => {
-          await updateTicket(idTicket);
+          // await updateTicket(idTicket);
           await insertIdTicketAs7(idTicket);
           client.interface
             .trigger("hide", { id: "softphone" })
