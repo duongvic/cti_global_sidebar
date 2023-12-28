@@ -900,7 +900,59 @@ function mic(x) {
   }
 }
 var input = document.testHold_Unhold.savereportHold_Unhold;
+function change(x) {
+  x.classList.toggle("change");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.holdCall();
 
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.retrieveCall();
+
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
+  }
+}
+
+var input = document.testMicInbound.savereportMicInbound;
+function mic(x) {
+  x.classList.toggle("mic");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "false",
+    });
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+    clearInterval(interval);
+    clearInterval(intervalOutCollapse),
+      clearInterval(intervalInbound),
+      clearInterval(intervalInboundListenCollapse);
+    isUpdateCallAs7 = true;
+  }
+}
+var input = document.testInboundHold_Unhold.savereportInbound_Hold_Unhold;
 function change(x) {
   x.classList.toggle("change");
   if (input.value === String(false)) {
