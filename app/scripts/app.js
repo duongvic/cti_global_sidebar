@@ -11,6 +11,8 @@ let isInboundCall = false;
 let existContact = false;
 let isUpdateCallAs7 = false;
 
+let isMainOutbound = false;
+
 let current_page = 1;
 let listContacts = [];
 let listContactsExample = [
@@ -1332,6 +1334,8 @@ function resetText() {
   idContact = "";
   isInboundCall = false;
   emailContact = "";
+  isMainOutbound = false;
+  isMainContactActive = false;
 }
 /**
  * To close the CTI app
@@ -1525,6 +1529,7 @@ async function filteredContactSearch(term) {
 
       nameContact = filteredDataMobile[0].name;
       getContactById(filteredDataMobile[0].id);
+      // goToContact(filteredDataMobile[0].id);
       return renderListContact(detail);
     } else if (filteredDataPhone.length > 0) {
       existContact = true;
@@ -1544,6 +1549,7 @@ async function filteredContactSearch(term) {
       document.getElementById("appTextPhoneInbound").style.padding = "0px 0px";
       nameContact = filteredDataPhone[0].name;
       getContactById(filteredDataPhone[0].id);
+      // goToContact(filteredDataMobile[0].id);
       return renderListContact(detail);
     } else if (
       filteredDataMobile.length <= 0 ||
@@ -2013,6 +2019,7 @@ function checkPhone() {
 }
 
 function toggleCall() {
+  isMainOutbound = true;
   eventHandlecallDialpad();
 }
 
@@ -2069,6 +2076,10 @@ function eventHandlecallDialpad() {
   document.getElementById("appTextPhoneBusyCall").innerText =
     phoneNumberReceiver;
   //filter contacts
+
+  if (existContact) {
+    goToContact(idContact);
+  }
 
   /**click to call as7*/
   let call = webphone.calls[0];
@@ -2284,30 +2295,51 @@ function showHistoryCall() {
   document.getElementById("mainInboundListen").style.display = "none";
 }
 
+console.log("isMainOutbound", isMainOutbound);
+
 function showMain() {
   console.log("goi vao show main");
-  $("#callEnter").attr("disabled", true);
-  $("#callEnter").css({ backgroundColor: "darkgray" });
-  document.getElementById("appTextPhone1").innerText = "Correct";
-  document.getElementById("appTextPhone1").className = "correct__number__phone";
-  ret.innerHTML = "";
-  retCollapse.innerHTML = "";
-  retTimerInbound.innerHTML = "";
-  retTimerInboundListen.innerHTML = "";
-  retTimerInboundListenCollapse.innerHTML = "";
 
-  document.getElementById("timerInboundListen").textContent = "";
-  document.getElementById("timerInboundListenCollapse").textContent = "";
-
-  if (isMainContactActive) {
+  if (isMainContactActive == true && isMainOutbound == false) {
     document.getElementById("mainListContacts").style.display = "block";
     document.getElementById("mainContent").style.display = "none";
-  } else if (!isMainContactActive) {
-    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+  }
+  if (isMainContactActive == false && isMainOutbound == false) {
     document.getElementById("mainContent").style.display = "block";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+
+    $("#callEnter").attr("disabled", true);
+    $("#callEnter").css({ backgroundColor: "darkgray" });
+    document.getElementById("appTextPhone1").innerText = "Correct";
+    document.getElementById("appTextPhone1").className =
+      "correct__number__phone";
+    ret.innerHTML = "";
+    retCollapse.innerHTML = "";
+    retTimerInbound.innerHTML = "";
+    retTimerInboundListen.innerHTML = "";
+    retTimerInboundListenCollapse.innerHTML = "";
+
+    document.getElementById("timerInboundListen").textContent = "";
+    document.getElementById("timerInboundListenCollapse").textContent = "";
+
+    idContact = "";
+    nameContact = "";
+    phoneNumberReceiver = "";
+    isInboundCall = false;
+    existContact = false;
+    isMainActive = false;
+  } else if (
+    isMainOutbound == true &&
+    isMainContactActive == false &&
+    isMainContactActive == false
+  ) {
+    document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
   }
 
-  document.getElementById("mainOutbound").style.display = "none";
   document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
 
@@ -2316,13 +2348,6 @@ function showMain() {
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInboundListenCollapse").style.display = "none";
-
-  idContact = "";
-  nameContact = "";
-  phoneNumberReceiver = "";
-  isInboundCall = false;
-  existContact = false;
-  isMainActive = false;
 }
 
 $("#search_contact").keypress(function (event) {
@@ -2690,7 +2715,7 @@ async function insertIdTicketAs7(idTicket) {
 // }
 
 function showMainDialpad() {
-  console.log("goi vao show main");
+  console.log("goi vao show main dialpad");
   $("#callEnter").attr("disabled", true);
   $("#callEnter").css({ backgroundColor: "darkgray" });
   document.getElementById("appTextPhone1").innerText = "Correct";
