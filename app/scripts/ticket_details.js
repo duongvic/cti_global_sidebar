@@ -1,8 +1,9 @@
 let client;
 let idTicket = "";
 let idContact = "";
+let descriptionText = "";
 let url_record =
-  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231229-083422_b8396163b0761bbf_cc1ftistg-521a128a9fcee486.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=F7HiWZhfsZO5z1I35YS2iVkPHFI%3D&Expires=1703817713";
+  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231231-111816_f29fb1ad24ff9c6e_cc1ftistg-3543d78acdfa0a39.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=o%2F3Xx2bUkJj9RIRwFMdbYHtYZtc%3D&Expires=1704162426";
 
 app.initialized().then(function (_client) {
   client = _client;
@@ -16,8 +17,13 @@ app.initialized().then(function (_client) {
         // B2. map file với idTicket
         // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
         // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
-        updateTicket(idTicket, idContact);
+        descriptionText = data?.ticket?.description_text;
         console.log("Ticket Data", data);
+        if (descriptionText == "file record") {
+          return;
+        } else {
+          updateTicket(idTicket, idContact);
+        }
       })
       .catch(function (e) {
         console.log("Exception - ", e);
@@ -63,6 +69,7 @@ async function updateTicket(idTicket, idContact) {
       "success",
       `Successfully upload recored ticket for: ${idTicket}.Reload page!`
     );
+    // location.reload(true);
   } catch (error) {
     console.error(
       `Error: Failed to update a ticket ${phoneNumberReceiver}-${idTicket}`

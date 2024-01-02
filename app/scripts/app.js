@@ -2104,6 +2104,7 @@ function eventHandlecallDialpad() {
 }
 
 function showContact() {
+  isMainContactActive = true;
   document.getElementById("mainListContacts").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -2296,6 +2297,8 @@ function showHistoryCall() {
 }
 
 console.log("isMainOutbound", isMainOutbound);
+
+console.log("isMainContactActive", isMainContactActive);
 
 function showMain() {
   console.log("goi vao show main");
