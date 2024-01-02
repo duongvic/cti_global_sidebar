@@ -161,15 +161,15 @@
           </div>
         </div>
         <div class="call-action">
-          <button class="btn-call" id="callEnter" onclick="toggleCall()" type=" button"><span
-              style="margin-right: 9px;"><img class="icon__call" src="./images/call.png" /></span><span
-              style="font-size: large;">Call</span></button>
+          <button class="btn-call" id="callEnter" onclick="toggleCall()" disabled="disabled"
+            style="background-color: darkgray;" type=" button"><span style="margin-right: 9px;"><img class="icon__call"
+                src="./images/call.png" /></span><span style="font-size: large;">Call</span></button>
         </div>
       </div>
     </div>
 
     <!-- màn hình đang gọi -->
-    <div id="mainOutbound">
+    <div id="mainOutbound" style="display: none;">
       <div style="background: #12344D;">
         <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
         <fw-button class="action-buttons flr" id="btnCollapseClickToCall" size="small" color="primary">__
@@ -224,7 +224,7 @@
     <!-- màn hình đang gọi -->
 
     <!-- màn hình bận -->
-    <div id="mainBusyCall">
+    <div id="mainBusyCall" style="display: none;">
       <div style="background: #12344D;">
         <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
         <fw-button class="action-buttons flr" id="btnCollapseClickToCall" size="small" color="primary">__
@@ -263,7 +263,7 @@
     </div>
     <!-- màn hình bận -->
 
-    <div id="mainCollapseClickToCall">
+    <div id="mainCollapseClickToCall" style="display: none;">
       <div class="waiting__screen">
         <div class="col-6">
           <div class="timer-group">
@@ -280,7 +280,7 @@
 
     <!-- Contact -->
 
-    <div id="mainListContacts">
+    <div id="mainListContacts" style="display: none;">
       <div id="menubar" class="menubar">
         <div style="background: #12344d">
           <span style="color: aliceblue; line-height: 2%">SST-CQ05 1100</span>
@@ -428,7 +428,7 @@
     <!-- Contact -->
 
     <!-- History Call -->
-    <div id="mainListHistoryCall">
+    <div id="mainListHistoryCall" style="display: none;">
       <div id="menubar" class="menubar">
         <div style="background: #12344d">
           <span style="color: aliceblue; line-height: 2%">SST-CQ05 1100</span>
@@ -716,7 +716,7 @@
     </div>
 
     <!-- Inbound -->
-    <div id="mainInbound">
+    <div id="mainInbound" style="display: none;">
       <div style="background: #12344D;">
         <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
         <fw-button class="action-buttons flr" id="btnCollapseClickInBound" size="small" color="primary">__
@@ -747,7 +747,7 @@
     </div>
 
     <!-- thu gon màn hình agent call chưa bắt máy -->
-    <div id="mainInboundCollapse">
+    <div id="mainInboundCollapse" style="display: none;">
       <div class="waiting__screen">
         <div class="col-6" onclick="btnShowMainInbound()">
           <div class="timer-group">
@@ -767,7 +767,7 @@
     </div>
 
     <!-- màn agent bắt máy  -->
-    <div id="mainInboundListen">
+    <div id="mainInboundListen" style="display: none;">
       <div style="background: #12344D;">
         <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
         <fw-button class="action-buttons flr" id="btnCollapseInboundListen" size="small" color="primary">__
@@ -823,7 +823,7 @@
     </div>
 
     <!--thu gọn màn agent bắt máy  -->
-    <div id="mainInboundListenCollapse" onclick="btShowMainInboundListen()">
+    <div id="mainInboundListenCollapse" onclick="btShowMainInboundListen()" style="display: none;">
       <div class="waiting__screen">
         <div class="col-6">
           <div class="timer-group">

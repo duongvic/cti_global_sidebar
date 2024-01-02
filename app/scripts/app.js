@@ -12,6 +12,7 @@ let existContact = false;
 let isUpdateCallAs7 = false;
 
 let isMainOutbound = false;
+let isMainInbound = false;
 
 let current_page = 1;
 let listContacts = [];
@@ -1163,46 +1164,50 @@ agent.on("call", (event) => {
       // let call = webphone.calls[0];
       // call.clearConnection();
 
-      document.getElementById("mainContent").style.display = "block";
-      document.getElementById("mainOutbound").style.display = "none";
-      document.getElementById("mainBusyCall").style.display = "none";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
+      // document.getElementById("mainContent").style.display = "block";
+      // document.getElementById("mainOutbound").style.display = "none";
+      // document.getElementById("mainBusyCall").style.display = "none";
+      // document.getElementById("mainCollapseClickToCall").style.display = "none";
 
-      document.getElementById("mainListContacts").style.display = "none";
-      document.getElementById("mainListHistoryCall").style.display = "none";
+      // document.getElementById("mainListContacts").style.display = "none";
+      // document.getElementById("mainListHistoryCall").style.display = "none";
 
-      document.getElementById("mainInbound").style.display = "none";
-      document.getElementById("mainInboundCollapse").style.display = "none";
-      document.getElementById("mainInboundListen").style.display = "none";
-      document.getElementById("mainInboundListenCollapse").style.display =
-        "none";
+      // document.getElementById("mainInbound").style.display = "none";
+      // document.getElementById("mainInboundCollapse").style.display = "none";
+      // document.getElementById("mainInboundListen").style.display = "none";
+      // document.getElementById("mainInboundListenCollapse").style.display =
+      //   "none";
 
-      document.getElementById("appTextPhone").value = "";
-      document.getElementById("appTextPhone").innerText = "";
-      document.getElementById("appTextPhoneBusyCall").value = "";
-      document.getElementById("appTextPhoneBusyCall").innerText = "";
+      // document.getElementById("appTextPhone").value = "";
+      // document.getElementById("appTextPhone").innerText = "";
+      // document.getElementById("appTextPhoneBusyCall").value = "";
+      // document.getElementById("appTextPhoneBusyCall").innerText = "";
 
-      document.getElementById("output").value = "";
-      document.getElementById("output").innerText = "";
-      $("#callEnter").attr("disabled", true);
-      $("#callEnter").css({ backgroundColor: "darkgray" });
+      // document.getElementById("output").value = "";
+      // document.getElementById("output").innerText = "";
+      // $("#callEnter").attr("disabled", true);
+      // $("#callEnter").css({ backgroundColor: "darkgray" });
 
-      document.getElementById("timer").value = "";
-      document.getElementById("timer").innerText = "";
+      // document.getElementById("timer").value = "";
+      // document.getElementById("timer").innerText = "";
 
-      ret.innerHTML = "";
-      retCollapse.innerHTML = "";
-      retTimerInboundListen.innerHTML = "";
-      nameNotListen.textContent = "";
-      retTimerInboundListenCollapse.innerHTML = "";
+      // ret.innerHTML = "";
+      // retCollapse.innerHTML = "";
+      // retTimerInboundListen.innerHTML = "";
+      // nameNotListen.textContent = "";
+      // retTimerInboundListenCollapse.innerHTML = "";
 
-      isInboundCall = false;
-      isMainActive = false;
-      existContact = false;
-      idContact = "";
-      nameContact = "";
-      phoneNumberReceiver = "";
-      emailContact = "";
+      // isInboundCall = false;
+      // isMainActive = false;
+      // isMainContactActive = false;
+      // isMainInbound = false;
+      // isMainOutbound = false;
+      // existContact = false;
+
+      // idContact = "";
+      // nameContact = "";
+      // phoneNumberReceiver = "";
+      // emailContact = "";
 
       stop();
       onAppDeactive();
@@ -1332,10 +1337,13 @@ function resetText() {
   phoneNumberReceiver = "";
   nameContact = "";
   idContact = "";
-  isInboundCall = false;
   emailContact = "";
+
+  isInboundCall = false;
   isMainOutbound = false;
+  isMainInbound = false;
   isMainContactActive = false;
+  isMainActive = false;
 }
 /**
  * To close the CTI app
@@ -1610,10 +1618,10 @@ async function getContactById(id_contact) {
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
 function clickToCall() {
-  client.instance.resize({ height: "560px" });
+  // client.instance.resize({ height: "560px" });
   let textElementPhone = document.getElementById("appTextPhone");
   // let textElementDialpad = document.getElementById("output").value;
-
+  isMainOutbound = true;
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
     document.getElementById("mainContent").style.display = "none";
@@ -1666,6 +1674,24 @@ function goToContact(contactId) {
     .trigger("click", { id: "contact", value: contactId })
     .then(function (data) {
       console.log("goToContact:", data);
+      console.info("successfully navigated to contact");
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to navigate to contact");
+      console.error(error);
+    });
+}
+
+/**
+ * It opens the contact details page for the give contact id
+ *
+ * @param {number} ticketId - Contact to open
+ */
+function goToTicket(ticketId) {
+  client.interface
+    .trigger("click", { id: "ticket", value: ticketId })
+    .then(function (data) {
+      console.log("goToTicket:", data);
       console.info("successfully navigated to contact");
     })
     .catch(function (error) {
@@ -1738,6 +1764,7 @@ function onAppActivate() {
       window.userPhone = phone;
       console.log("data loggedInUser", data);
 
+      // isMainOutbound = false;
       current_page = 1;
 
       // addEventListeners();
@@ -1752,13 +1779,16 @@ function onAppActivate() {
 
       // showMain();
       // if (!isMainActive) {
-      showMain();
+      // showMain();
       // }
       // if (isMainContactActive) {
       //   showContact();
       // }
 
-      console.log("is man nao ", isMainActive);
+      console.log("isMainOutbound", isMainOutbound);
+      console.log("isMainInbound", isMainInbound);
+      console.log("isMainActive", isMainActive);
+      console.log("isMainContactActive", isMainContactActive);
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       document
@@ -1789,33 +1819,35 @@ function onAppActivate() {
         .getElementById("toggleEndCall")
         .addEventListener("click", async () => {
           // await updateTicket(idTicket);
+          isMainOutbound = false;
           await insertIdTicketAs7(idTicket);
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(async function () {
-              document.getElementById("mainContent").style.display = "block";
-              document.getElementById("mainOutbound").style.display = "none";
-              document.getElementById("mainBusyCall").style.display = "none";
-              document.getElementById("mainCollapseClickToCall").style.display =
-                "none";
-              document.getElementById("mainListContacts").style.display =
-                "none";
-              document.getElementById("mainListHistoryCall").style.display =
-                "none";
-              document.getElementById("mainInbound").style.display = "none";
-              document.getElementById("mainInboundCollapse").style.display =
-                "none";
-              document.getElementById("mainInboundListen").style.display =
-                "none";
-              document.getElementById(
-                "mainInboundListenCollapse"
-              ).style.display = "none";
+              // document.getElementById("mainContent").style.display = "block";
+              // document.getElementById("mainOutbound").style.display = "none";
+              // document.getElementById("mainBusyCall").style.display = "none";
+              // document.getElementById("mainCollapseClickToCall").style.display =
+              //   "none";
+              // document.getElementById("mainListContacts").style.display =
+              //   "none";
+              // document.getElementById("mainListHistoryCall").style.display =
+              //   "none";
+              // document.getElementById("mainInbound").style.display = "none";
+              // document.getElementById("mainInboundCollapse").style.display =
+              //   "none";
+              // document.getElementById("mainInboundListen").style.display =
+              //   "none";
+              // document.getElementById(
+              //   "mainInboundListenCollapse"
+              // ).style.display = "none";
 
-              document.getElementById("output").innerText = "";
-              phoneNumberReceiver = document.getElementById("output").value =
-                "";
-              document.getElementById("appTextPhone").value = "";
-              document.getElementById("appTextPhone").innerText = "";
+              // document.getElementById("output").innerText = "";
+              // phoneNumberReceiver = document.getElementById("output").value =
+              //   "";
+              // document.getElementById("appTextPhone").value = "";
+              // document.getElementById("appTextPhone").innerText = "";
+              resetText();
               /**as7 backend **/
 
               let call = webphone.calls[0];
@@ -1841,6 +1873,7 @@ function onAppActivate() {
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(function () {
+              isMainOutbound = false;
               document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
               document.getElementById("mainBusyCall").style.display = "none";
@@ -1886,6 +1919,7 @@ function onAppActivate() {
       document
         .getElementById("toggleEndCallCollapse")
         .addEventListener("click", () => {
+          isMainOutbound = false;
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(function () {
@@ -2105,6 +2139,12 @@ function eventHandlecallDialpad() {
 
 function showContact() {
   isMainContactActive = true;
+  isMainInbound = false;
+  isMainOutbound = false;
+  isMainActive = false;
+
+  document.getElementById("output").innerText = "";
+
   document.getElementById("mainListContacts").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -2284,6 +2324,8 @@ $(document).ready(function () {
 });
 
 function showHistoryCall() {
+  document.getElementById("output").innerText = "";
+
   document.getElementById("mainListHistoryCall").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -2296,22 +2338,35 @@ function showHistoryCall() {
   document.getElementById("mainInboundListen").style.display = "none";
 }
 
-console.log("isMainOutbound", isMainOutbound);
-
-console.log("isMainContactActive", isMainContactActive);
-
 function showMain() {
   console.log("goi vao show main");
-
-  if (isMainContactActive == true && isMainOutbound == false) {
+  console.log("isMainOutbound", isMainOutbound);
+  console.log("isMainInbound", isMainInbound);
+  console.log("isMainActive", isMainActive);
+  console.log("isMainContactActive", isMainContactActive);
+  if (
+    isMainContactActive == true &&
+    isMainOutbound == false &&
+    isMainInbound == false &&
+    isMainActive == false
+  ) {
     document.getElementById("mainListContacts").style.display = "block";
     document.getElementById("mainContent").style.display = "none";
     document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
   }
-  if (isMainContactActive == false && isMainOutbound == false) {
+  if (
+    isMainContactActive == false &&
+    isMainOutbound == false &&
+    isMainInbound == false &&
+    isMainActive == false
+  ) {
     document.getElementById("mainContent").style.display = "block";
     document.getElementById("mainListContacts").style.display = "none";
     document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
 
     $("#callEnter").attr("disabled", true);
     $("#callEnter").css({ backgroundColor: "darkgray" });
@@ -2336,20 +2391,42 @@ function showMain() {
   } else if (
     isMainOutbound == true &&
     isMainContactActive == false &&
-    isMainContactActive == false
+    isMainInbound == false &&
+    isMainActive == false
   ) {
     document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("mainInbound").style.display = "none";
     document.getElementById("mainContent").style.display = "none";
     document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+  } else if (
+    isMainInbound == true &&
+    isMainContactActive == false &&
+    isMainOutbound == false &&
+    isMainActive == false
+  ) {
+    document.getElementById("mainInbound").style.display = "block";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+  } else if (
+    isMainInbound == false &&
+    isMainContactActive == false &&
+    isMainOutbound == false &&
+    isMainActive == true
+  ) {
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "block";
   }
 
   document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
-
   document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInboundListenCollapse").style.display = "none";
 }
 
@@ -2490,6 +2567,10 @@ function viewScreeInboundListenCollapse() {
 }
 
 function viewMainInbound() {
+  isMainInbound = true;
+  isMainOutbound = false;
+  isMainContactActive = false;
+
   document.getElementById("mainInbound").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -2585,7 +2666,10 @@ async function createTicket() {
     var detail = dataTicket?.response ? JSON.parse(dataTicket?.response) : [];
     idTicket = detail?.id;
     console.info("Successfully created ticket in Freshdesk", detail);
-    showNotify("success", `Successfully created a ticket for: ${nameContact}`);
+    showNotify(
+      "success",
+      `Successfully created a ticket: ${idTicket} for: ${nameContact}`
+    );
 
     // client.data.get("loggedInUser").then(function (data) {
     //   let agent_ref = data?.loggedInUser?.availability?.agent_ref
@@ -2607,12 +2691,15 @@ async function createTicket() {
     //   const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
     //   window.open(urlParams, "_blank");
     // });
-    let str = agent_ref;
-    let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
-    console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-    let a = str?.slice(0, sindex);
-    const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
-    window.open(urlParams, "_blank");
+
+    // let str = agent_ref;
+    // let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
+    // console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
+    // let a = str?.slice(0, sindex);
+    // const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
+    // window.open(urlParams, "_blank");
+    // goToTicket(idTicket);
+    goToContact(idContact);
   } catch (error) {
     idContact = "";
     console.error("Error: Failed to create a ticket");
@@ -2748,9 +2835,11 @@ function showMainDialpad() {
   idContact = "";
   nameContact = "";
   phoneNumberReceiver = "";
+  emailContact = "";
+
   isInboundCall = false;
   existContact = false;
   isMainActive = false;
   isMainContactActive = false;
-  emailContact = "";
+  isMainOutbound = false;
 }
