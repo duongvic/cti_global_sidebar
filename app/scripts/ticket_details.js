@@ -3,7 +3,7 @@ let idTicket = "";
 let idContact = "";
 let descriptionText = "";
 let url_record =
-  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231231-111816_f29fb1ad24ff9c6e_cc1ftistg-3543d78acdfa0a39.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=o%2F3Xx2bUkJj9RIRwFMdbYHtYZtc%3D&Expires=1704162426";
+  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231227-093134_a8af567859d796ca_cc2ftistg-2b0cbc25338675bd.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=bhZ3mjeTs%2BOygvZp5VTb%2FBB%2B21U%3D&Expires=1704270512";
 
 app.initialized().then(function (_client) {
   client = _client;
@@ -67,9 +67,8 @@ async function updateTicket(idTicket, idContact) {
     console.log("upload recored ticket thanh cong", detail);
     showNotify(
       "success",
-      `Successfully upload recored ticket for: ${idTicket}.Reload page!`
+      `Successfully upload recored ticket for: ${idTicket}.Reload page after endCall!`
     );
-    // location.reload(true);
   } catch (error) {
     console.error(
       `Error: Failed to update a ticket ${phoneNumberReceiver}-${idTicket}`

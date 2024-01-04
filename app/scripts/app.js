@@ -14,8 +14,11 @@ let isUpdateCallAs7 = false;
 let isMainOutbound = false;
 let isMainInbound = false;
 
+let isMainCollapse = "";
+
 let current_page = 1;
 let listContacts = [];
+let listHisCall = [];
 let listContactsExample = [
   {
     active: false,
@@ -850,6 +853,10 @@ let webphone;
 let audio = new Audio();
 audio.autoplay = true;
 
+const options = {
+  avatars: true,
+};
+
 agent.startApplicationSession({
   // username: "duongnh4@fpt.com",
   // password: "DuongNH4!!!",
@@ -1090,7 +1097,7 @@ agent.on("call", (event) => {
             viewMainInbound();
             console.log("existContact trươc khi check", existContact);
             //check contact
-            await filterContactDataInbound(call?.number);
+            // await filterContactDataInbound(call?.number);
             await filteredContactSearch(call?.number);
             console.log("existContact sau khi check", existContact);
             document.getElementById("appTextPhoneInbound").value = call?.number;
@@ -1101,6 +1108,9 @@ agent.on("call", (event) => {
             document.getElementById("appTextPhoneInboundListen").innerText =
               call?.number;
             phoneNumberReceiver = call?.number;
+            if (existContact) {
+              goToContact(idContact);
+            }
           });
         })
         .catch(function (error) {
@@ -1518,8 +1528,7 @@ async function filteredContactSearch(term) {
 
     if (filteredDataMobile.length > 0) {
       existContact = true;
-      // document.getElementById("appTxtNameContact").innerText = detail[i].name;
-      // document.getElementById("appTxtNameContact").value = detail[i].name;
+      idContact = filteredDataMobile[0].id;
       document.getElementById("appTxtNameContactInbound").textContent =
         filteredDataMobile[0].name;
       document.getElementById("appTxtNameContactInboundListen").textContent =
@@ -1541,6 +1550,7 @@ async function filteredContactSearch(term) {
       return renderListContact(detail);
     } else if (filteredDataPhone.length > 0) {
       existContact = true;
+      idContact = filteredDataPhone[0].id;
       document.getElementById("appTxtNameContactInbound").textContent =
         filteredDataPhone[0].name;
       document.getElementById("appTxtNameContactInboundListen").textContent =
@@ -1708,6 +1718,7 @@ function resizeAppDefault() {
 }
 
 function viewScreenCollapseClickToCall() {
+  isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
   document.getElementById("mainContent").style.display = "none";
   document.getElementById("mainOutbound").style.display = "none";
@@ -1719,6 +1730,28 @@ function viewScreenCollapseClickToCall() {
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInboundListenCollapse").style.display = "none";
+
+  // client.interface
+  //   .trigger("show", { id: "softphone" })
+  //   .then(function () {
+  //     client.instance.resize({ height: "48px" });
+  //     document.getElementById("mainCollapseClickToCall").style.display =
+  //       "block";
+  //     document.getElementById("mainContent").style.display = "none";
+  //     document.getElementById("mainOutbound").style.display = "none";
+  //     document.getElementById("mainBusyCall").style.display = "none";
+  //     document.getElementById("mainListContacts").style.display = "none";
+  //     document.getElementById("mainListHistoryCall").style.display = "none";
+  //     document.getElementById("mainInbound").style.display = "none";
+  //     document.getElementById("mainInboundCollapse").style.display = "none";
+  //     document.getElementById("mainInboundListen").style.display = "none";
+  //     document.getElementById("mainInboundListenCollapse").style.display =
+  //       "none";
+  //   })
+  //   .catch(function (error) {
+  //     console.error("Error: Failed to open the app");
+  //     console.error(error);
+  //   });
 }
 
 function viewScreenCollapseClickInBound() {
@@ -1764,6 +1797,13 @@ function onAppActivate() {
       window.userPhone = phone;
       console.log("data loggedInUser", data);
 
+      //Getting all iparams
+      // client.iparams.get().then(logData).catch(logError);
+
+      client.iparams.get().then(function (data) {
+        console.log("iparams:", data);
+      });
+
       // isMainOutbound = false;
       current_page = 1;
 
@@ -1777,6 +1817,9 @@ function onAppActivate() {
         .getElementById("btnCloseHistoryCall")
         .addEventListener("fwClick", closeApp);
 
+      if (isMainCollapse == "mainCollapse") {
+        client.instance.resize({ height: "48px" });
+      }
       // showMain();
       // if (!isMainActive) {
       // showMain();
@@ -1784,11 +1827,14 @@ function onAppActivate() {
       // if (isMainContactActive) {
       //   showContact();
       // }
+      document.getElementById("appTextPhone1").innerText = "Correct";
+      document.getElementById("appTextPhone1").className =
+        "correct__number__phone";
 
-      console.log("isMainOutbound", isMainOutbound);
-      console.log("isMainInbound", isMainInbound);
-      console.log("isMainActive", isMainActive);
-      console.log("isMainContactActive", isMainContactActive);
+      // console.log("isMainOutbound", isMainOutbound);
+      // console.log("isMainInbound", isMainInbound);
+      // console.log("isMainActive", isMainActive);
+      // console.log("isMainContactActive", isMainContactActive);
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       document
@@ -2333,17 +2379,27 @@ function showHistoryCall() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("calling__inbound").style.display = "none";
+  // document.getElementById("calling__inbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
+
+  // lấy data historycall
+  setTimeout(async () => {
+    let readCall = await webphone.readCallDetails(options);
+    listHisCall = readCall.reverse();
+    renderListHistoryCall(listHisCall);
+    console.log("listHisCall", listHisCall);
+  });
 }
+
+// async function readCallDetailsResponse() {}
 
 function showMain() {
   console.log("goi vao show main");
-  console.log("isMainOutbound", isMainOutbound);
-  console.log("isMainInbound", isMainInbound);
-  console.log("isMainActive", isMainActive);
-  console.log("isMainContactActive", isMainContactActive);
+  // console.log("isMainOutbound", isMainOutbound);
+  // console.log("isMainInbound", isMainInbound);
+  // console.log("isMainActive", isMainActive);
+  // console.log("isMainContactActive", isMainContactActive);
   if (
     isMainContactActive == true &&
     isMainOutbound == false &&
@@ -2516,10 +2572,10 @@ function endCall() {
 function endCallInboundListen() {
   let call = webphone.calls[0];
   call.clearConnection();
+  location.reload(true);
   stop();
   document.getElementById("mainInboundListen").style.display = "none";
   onAppDeactive();
-  location.reload();
 }
 function showMainInboundListen() {
   client.interface
@@ -2553,6 +2609,7 @@ function showMainInboundListen() {
 }
 
 function viewScreeInboundListenCollapse() {
+  isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
   document.getElementById("mainInboundListenCollapse").style.display = "block";
   document.getElementById("mainInboundCollapse").style.display = "none";
@@ -2699,7 +2756,15 @@ async function createTicket() {
     // const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
     // window.open(urlParams, "_blank");
     // goToTicket(idTicket);
-    goToContact(idContact);
+
+    //thu nhỏ màn hình call
+    if (!isInboundCall) {
+      viewScreenCollapseClickToCall();
+    } else {
+      viewScreeInboundListenCollapse();
+    }
+    // goToContact(idContact);
+    goToTicket(idTicket);
   } catch (error) {
     idContact = "";
     console.error("Error: Failed to create a ticket");
@@ -2808,8 +2873,10 @@ function showMainDialpad() {
   console.log("goi vao show main dialpad");
   $("#callEnter").attr("disabled", true);
   $("#callEnter").css({ backgroundColor: "darkgray" });
+  document.getElementById("output").textContent = "";
   document.getElementById("appTextPhone1").innerText = "Correct";
   document.getElementById("appTextPhone1").className = "correct__number__phone";
+
   ret.innerHTML = "";
   retCollapse.innerHTML = "";
   retTimerInbound.innerHTML = "";
@@ -2842,4 +2909,61 @@ function showMainDialpad() {
   isMainActive = false;
   isMainContactActive = false;
   isMainOutbound = false;
+}
+
+function renderListHistoryCall(listHisCall) {
+  document.getElementById("listHistoryCall").innerHTML = listHisCall
+    .map((item) => {
+      return `<li>
+      <div class="comments-list">
+            <div class="media flex-his">
+              <div class="flex-his">
+                <div class="media-left" href="#">
+                  <img src="./images/call_in.png">
+                </div>
+                <div class="pull-right">
+                  <h4 class="text-title"><a class="text-title" href="#">${
+                    item?.calling ? item?.calling : item?.called
+                  }</a></h4>
+                  <p>${dateFormat(item?.time)}</p>
+                </div>
+              </div>
+              <div class="his-body" style="text-align: right;">
+                <a class="media-heading user_name" onclick=""><img src="./images/icon-info.png"></a>
+                <p><small>${
+                  item?.duration ? durationFormat(item?.duration) : "--:--"
+                } </small></p>
+              </div>
+            </div>
+          </div>
+    </li>`;
+    })
+    .join("");
+}
+
+function dateFormat(timeStamp) {
+  let dateFormat = new Date(timeStamp);
+  return (dateFormat =
+    dateFormat.getDate() +
+    "/" +
+    (dateFormat.getMonth() + 1) +
+    "/" +
+    dateFormat.getFullYear() +
+    " " +
+    dateFormat.getHours() +
+    ":" +
+    dateFormat.getMinutes() +
+    ":" +
+    dateFormat.getSeconds());
+}
+
+function durationFormat(duration) {
+  const timestamp = duration * 1000;
+  let dateFormat = new Date(timestamp);
+  return (dateFormat =
+    dateFormat.getHours() +
+    ":" +
+    dateFormat.getMinutes() +
+    ":" +
+    dateFormat.getSeconds());
 }
