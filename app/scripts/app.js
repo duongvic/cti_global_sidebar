@@ -1093,8 +1093,6 @@ agent.on("call", (event) => {
             window.userPhone = phone;
             console.log("data loggedInUser Inbound", data);
 
-            resizeAppDefault();
-            viewMainInbound();
             console.log("existContact trươc khi check", existContact);
             //check contact
             // await filterContactDataInbound(call?.number);
@@ -1111,6 +1109,8 @@ agent.on("call", (event) => {
             if (existContact) {
               goToContact(idContact);
             }
+            resizeAppDefault();
+            viewMainInbound();
           });
         })
         .catch(function (error) {
@@ -2915,17 +2915,23 @@ function renderListHistoryCall(listHisCall) {
   document.getElementById("listHistoryCall").innerHTML = listHisCall
     .map((item) => {
       return `<li>
-      <div class="comments-list">
+      <div class="histrory">
+        <div class="comments-list">
             <div class="media flex-his">
               <div class="flex-his">
                 <div class="media-left" href="#">
-                  <img src="./images/call_in.png">
+                  <img src="./images/icon_profile.png" class="">
                 </div>
                 <div class="pull-right">
                   <h4 class="text-title"><a class="text-title" href="#">${
                     item?.calling ? item?.calling : item?.called
                   }</a></h4>
-                  <p>${dateFormat(item?.time)}</p>
+                  <p>
+                    <span>${renderIconHistoryCall(item)}</span>
+                    <span style="margin-left: 6px;">${dateFormat(
+                      item?.time
+                    )}</span>
+                  </p>
                 </div>
               </div>
               <div class="his-body" style="text-align: right;">
@@ -2936,6 +2942,7 @@ function renderListHistoryCall(listHisCall) {
               </div>
             </div>
           </div>
+        </div>
     </li>`;
     })
     .join("");
@@ -2958,7 +2965,7 @@ function dateFormat(timeStamp) {
 }
 
 function durationFormat(duration) {
-  const timestamp = duration * 1000;
+  const timestamp = duration;
   let dateFormat = new Date(timestamp);
   return (dateFormat =
     dateFormat.getHours() +
@@ -2966,4 +2973,19 @@ function durationFormat(duration) {
     dateFormat.getMinutes() +
     ":" +
     dateFormat.getSeconds());
+}
+
+function renderIconHistoryCall(item) {
+  if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
+    return '<img src="./images/icon_call_out.png">';
+  }
+  if (item.hasOwnProperty("called")) {
+    return '<img src="./images/icon_call_out.png">';
+  }
+  if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
+    return '<img src="./images/icon_call_in.png">';
+  }
+  if (item.hasOwnProperty("calling")) {
+    return '<img src="./images/icon_miss_call.png">';
+  }
 }
