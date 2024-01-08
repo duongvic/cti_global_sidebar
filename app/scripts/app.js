@@ -19,6 +19,7 @@ let isMainCollapse = "";
 let current_page = 1;
 let listContacts = [];
 let listHisCall = [];
+let listMissCall = [];
 let listContactsExample = [
   {
     active: false,
@@ -1587,6 +1588,7 @@ async function filteredContactSearch(term) {
     console.log("existContact", existContact);
     console.log("filteredContactSearch contact:", detail);
   } catch (error) {
+    existContact = false;
     console.log(error);
   }
 }
@@ -1763,6 +1765,7 @@ function viewScreenCollapseClickInBound() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInboundListenCollapse").style.display = "none";
@@ -1810,13 +1813,18 @@ function onAppActivate() {
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
       document.getElementById("btnClose").addEventListener("fwClick", closeApp);
+
       document
         .getElementById("btnClose1")
         .addEventListener("fwClick", closeApp);
+
       document
         .getElementById("btnCloseHistoryCall")
         .addEventListener("fwClick", closeApp);
 
+      document
+        .getElementById("btnCloseHisMissCall")
+        .addEventListener("fwClick", closeApp);
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
       }
@@ -1852,6 +1860,7 @@ function onAppActivate() {
           document.getElementById("mainContent").style.display = "none";
           document.getElementById("mainBusyCall").style.display = "none";
           document.getElementById("mainListContacts").style.display = "none";
+          document.getElementById("mainListMissCall").style.display = "none";
           document.getElementById("mainListHistoryCall").style.display = "none";
           document.getElementById("mainInbound").style.display = "none";
           document.getElementById("mainInboundCollapse").style.display = "none";
@@ -1930,6 +1939,8 @@ function onAppActivate() {
                 "none";
               document.getElementById("mainListHistoryCall").style.display =
                 "none";
+              document.getElementById("mainListMissCall").style.display =
+                "none";
               document.getElementById("mainInbound").style.display = "none";
               document.getElementById("mainInboundCollapse").style.display =
                 "none";
@@ -1977,6 +1988,8 @@ function onAppActivate() {
               document.getElementById("mainListContacts").style.display =
                 "none";
               document.getElementById("mainListHistoryCall").style.display =
+                "none";
+              document.getElementById("mainListMissCall").style.display =
                 "none";
               document.getElementById("mainInbound").style.display = "none";
               document.getElementById("mainInboundCollapse").style.display =
@@ -2303,6 +2316,9 @@ function clickContactCall(elem) {
 
         phoneNumberReceiver = phone_contact;
         nameContact = name_contact;
+        if (existContact) {
+          goToContact(idContact);
+        }
         let call = webphone.calls[0];
         if (!call) {
           // click without an active call -> start a video call to number 23
@@ -2379,7 +2395,6 @@ function showHistoryCall() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
-  // document.getElementById("calling__inbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
 
@@ -2387,19 +2402,44 @@ function showHistoryCall() {
   setTimeout(async () => {
     let readCall = await webphone.readCallDetails(options);
     listHisCall = readCall.reverse();
+    // filteredContactSearch(x.value);
     renderListHistoryCall(listHisCall);
     console.log("listHisCall", listHisCall);
   });
 }
 
-// async function readCallDetailsResponse() {}
+function showMissCall() {
+  document.getElementById("output").innerText = "";
+  document.getElementById("mainListMissCall").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+
+  setTimeout(async () => {
+    let readCall = await webphone.readCallDetails(options);
+    const arr = readCall.reverse();
+    // filteredContactSearch(x.value);
+    for (let i = 0; i < arr.length; i++) {
+      if (
+        arr[i].hasOwnProperty("calling") &&
+        arr[i].hasOwnProperty("duration") == false
+      ) {
+        listMissCall.push(arr[i]);
+      }
+    }
+    renderListMissCall(listMissCall);
+    console.log("renderListMissCall", listMissCall);
+  });
+}
 
 function showMain() {
   console.log("goi vao show main");
-  // console.log("isMainOutbound", isMainOutbound);
-  // console.log("isMainInbound", isMainInbound);
-  // console.log("isMainActive", isMainActive);
-  // console.log("isMainContactActive", isMainContactActive);
   if (
     isMainContactActive == true &&
     isMainOutbound == false &&
@@ -2555,6 +2595,7 @@ function acceptCall() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   isMainActive = true;
@@ -2591,6 +2632,7 @@ function showMainInboundListen() {
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
       document.getElementById("mainListHistoryCall").style.display = "none";
+      document.getElementById("mainListMissCall").style.display = "none";
       document.getElementById("mainInbound").style.display = "none";
       document.getElementById("mainInboundCollapse").style.display = "none";
       isMainActive = true;
@@ -2619,6 +2661,7 @@ function viewScreeInboundListenCollapse() {
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
 }
@@ -2635,6 +2678,7 @@ function viewMainInbound() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListContacts").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
   document.getElementById("mainInboundListenCollapse").style.display = "none";
@@ -2667,6 +2711,7 @@ function btShowMainInboundListen() {
       document.getElementById("mainCollapseClickToCall").style.display = "none";
       document.getElementById("mainListContacts").style.display = "none";
       document.getElementById("mainListHistoryCall").style.display = "none";
+      document.getElementById("mainListMissCall").style.display = "none";
       document.getElementById("mainInbound").style.display = "none";
       document.getElementById("mainInboundCollapse").style.display = "none";
     })
@@ -2894,6 +2939,7 @@ function showMainDialpad() {
   document.getElementById("mainCollapseClickToCall").style.display = "none";
 
   document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
@@ -2923,9 +2969,7 @@ function renderListHistoryCall(listHisCall) {
                   <img src="./images/icon_profile.png" class="">
                 </div>
                 <div class="pull-right">
-                  <h4 class="text-title"><a class="text-title" href="#">${
-                    item?.calling ? item?.calling : item?.called
-                  }</a></h4>
+                  ${renderTextHistoryCall(item)}
                   <p>
                     <span>${renderIconHistoryCall(item)}</span>
                     <span style="margin-left: 6px;">${dateFormat(
@@ -2966,26 +3010,145 @@ function dateFormat(timeStamp) {
 
 function durationFormat(duration) {
   const timestamp = duration;
-  let dateFormat = new Date(timestamp);
-  return (dateFormat =
-    dateFormat.getHours() +
-    ":" +
-    dateFormat.getMinutes() +
-    ":" +
-    dateFormat.getSeconds());
+  let timeFormat = Math.floor(timestamp / 1000);
+  return timeFormat;
 }
 
 function renderIconHistoryCall(item) {
   if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
     return '<img src="./images/icon_call_out.png">';
   }
-  if (item.hasOwnProperty("called")) {
+  if (
+    item.hasOwnProperty("called") &&
+    item.hasOwnProperty("duration") == false
+  ) {
     return '<img src="./images/icon_call_out.png">';
   }
   if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
     return '<img src="./images/icon_call_in.png">';
   }
-  if (item.hasOwnProperty("calling")) {
+  if (
+    item.hasOwnProperty("calling") &&
+    item.hasOwnProperty("duration") == false
+  ) {
     return '<img src="./images/icon_miss_call.png">';
   }
+}
+
+function renderTextHistoryCall(item) {
+  if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
+    return `<h4 class="text-title"><a class="text-title" href="#" >${item.called}</a></h4>`;
+  }
+  if (
+    item.hasOwnProperty("called") &&
+    item.hasOwnProperty("duration") == false
+  ) {
+    return `<h4 class="text-title"><a class="text-title" href="#" >${item.called}</a></h4>`;
+  }
+  if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
+    return `<h4 class="text-title"><a class="text-title" href="#" >${item.calling}</a></h4>`;
+  }
+  if (
+    item.hasOwnProperty("calling") &&
+    item.hasOwnProperty("duration") == false
+  ) {
+    return `<h4 class="text-title"><a class="text-title" href="#" style="color: red;">${item.calling}</a></h4>`;
+  }
+}
+
+function renderListMissCall(listMissCall) {
+  document.getElementById("listHisMissCall").innerHTML = listMissCall
+    .map((item) => {
+      return `<li>
+      <div class="histrory">
+        <div class="comments-list">
+            <div class="media flex-his">
+              <div class="flex-his">
+                <div class="media-left" href="#">
+                  <img src="./images/icon_profile.png" class="">
+                </div>
+                <div class="pull-right">
+                  <h4 class="text-title">
+                    <a class="text-title" href="#" style="color: red;"   
+                      attr-sdt="${item?.calling}"
+                      onclick="clickToMissCall(this)">
+                        ${item.calling}
+                    </a>
+                  </h4>
+                  <p>
+                    <span><img src="./images/icon_miss_call.png"></span>
+                    <span style="margin-left: 6px;">
+                      ${dateFormat(item?.time)}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="his-body" style="text-align: right;">
+                <a class="media-heading user_name" onclick=""><img src="./images/icon-info.png"></a>
+                <p><small>--:--</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </li>`;
+    })
+    .join("");
+}
+
+function clickToMissCall(elem) {
+  let sdt = $(elem).attr("attr-sdt");
+  filteredContactSearch(sdt);
+  isInboundCall = false;
+  if (sdt !== "null") {
+    //show app
+    client.interface
+      .trigger("show", { id: "softphone" })
+      .then(function () {
+        resizeAppDefault();
+        if (existContact) {
+          goToContact(idContact);
+        }
+        document.getElementById("mainOutbound").style.display = "block";
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("mainListContacts").style.display = "none";
+        document.getElementById("mainBusyCall").style.display = "none";
+        document.getElementById("mainCollapseClickToCall").style.display =
+          "none";
+        document.getElementById("mainListHistoryCall").style.display = "none";
+        document.getElementById("mainListMissCall").style.display = "none";
+        document.getElementById("mainInbound").style.display = "none";
+        document.getElementById("mainInboundCollapse").style.display = "none";
+        document.getElementById("mainInboundListen").style.display = "none";
+        document.getElementById("mainInboundListenCollapse").style.display =
+          "none";
+
+        document.getElementById("appTxtNameContact").value = nameContact;
+        document.getElementById("appTxtNameContact").innerText = nameContact;
+
+        document.getElementById("appTextPhone").value = sdt;
+        document.getElementById("appTextPhone").innerText = sdt;
+
+        phoneNumberReceiver = sdt;
+        let call = webphone.calls[0];
+        if (!call) {
+          // click without an active call -> start a video call to number 23
+          webphone.makeCall(phoneNumberReceiver, {
+            autoOriginate: "doNotPrompt",
+            audio: true,
+            video: false,
+          });
+        } else if (call.localConnectionInfo == "alerting") {
+          // click while we have an alerting call -> accept it
+          call.answerCall({ audio: true, video: true });
+        } else {
+          // otherwise we release the call
+          call.clearConnection();
+          onAppDeactive();
+        }
+        /**Call tu man hinh dialpad **/
+      })
+      .catch(function (error) {
+        console.error("Error: Failed to open the app");
+        console.error(error);
+      });
+  } else return null;
 }
