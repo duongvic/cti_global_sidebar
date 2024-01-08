@@ -45,9 +45,11 @@ html {
   justify-content: space-between;
 }
 
-text-title {
+.text-title-his-call {
   color: #0c0c0c;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
 }
 .pull-right h4 a,
 .pull-right h4 {
@@ -60,7 +62,7 @@ text-title {
 .pull-right p {
   margin: 0;
   color: #575757;
-  font-size: 13px;
+  font-size: 14px;
 }
 .his-body {
   text-align: center;
@@ -70,4 +72,10 @@ text-title {
 }
 .miss-color {
   color: red !important;
+}
+.his-call-txt-time {
+  margin-left: 6px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
 }
