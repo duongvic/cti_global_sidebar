@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .tooltip {
+            display: none;
+            background-color: yellow;
+            color: black;
+            position: absolute;
+            border-radius: 6px;
+            padding: 5px 0;
+            text-align: center;
+            width: 120px;
+        }
+    </style>
+    <title>Tooltip to a div</title>
+</head>
+
+<body>
+    <div id="myDiv" style="padding: 30px;">
+        This is my div
+        <span class="tooltip">This is my tooltip</span>
+    </div>
+
+
+    <div class="tooltip">Hover over me
+        <span class="tooltiptext">Tooltip text</span>
+      </div>
+      
+    <script>
+        const myDiv = document.getElementById("myDiv");
+        myDiv.addEventListener("mouseover", showTooltip);
+        myDiv.addEventListener("mouseout", hideTooltip);
+        function showTooltip() {
+            const tooltip = document.querySelector(".tooltip");
+            tooltip.style.display = "block";
+        }
+        function hideTooltip() {
+            const tooltip = document.querySelector(".tooltip");
+            tooltip.style.display = "none";
+        }  
+    </script>
+</body>
+
+</html>

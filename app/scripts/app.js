@@ -2965,7 +2965,12 @@ function renderListHistoryCall(listHisCall) {
                 attr-sdt-inf="${item?.calling ? item.calling : item?.called}"
                 onclick="redirectContactInfoMissCall(this)"
               >
-                <a class="media-heading user_name" ><img src="./images/icon-info.png"></a>
+              <fw-tooltip>
+                <img src="./images/icon-info.png">
+                <div slot="tooltip-content">
+                  Chi tiết liên hệ
+                </div>
+              </fw-tooltip>
                 <p class="his-call-txt-time" style="margin-top: 10px; line-height: 24px;">${
                   item?.duration ? durationFormat(item?.duration) : "--:--"
                 }</p>
@@ -3017,24 +3022,6 @@ function durationFormat(duration) {
   }
 
   return `00:${secondString}`;
-
-  // const hourString = hours > 0 ? `${hours} hour${hours > 1 ? "s" : ""}` : "";
-  // const minuteString =
-  //   minutes > 0 ? `${minutes} minute${minutes > 1 ? "s" : ""}` : "";
-  // const secondString =
-  //   remainingSeconds > 0
-  //     ? `${remainingSeconds} second${remainingSeconds > 1 ? "s" : ""}`
-  //     : "";
-
-  // if (hours > 0) {
-  //   return `${hourString} : ${minuteString || ""} ${
-  //     secondString && `: ${secondString}`
-  //   }`;
-  // } else if (!hours && minutes > 0) {
-  //   return `${minuteString} ${secondString && `: ${secondString}`}`;
-  // }
-
-  // return secondString;
 }
 
 function renderIconHistoryCall(item) {
@@ -3060,22 +3047,42 @@ function renderIconHistoryCall(item) {
 
 function renderTextHistoryCall(item) {
   if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
-    return `<a class="text-title-his-call" href="#" attr-sdt="${item.called}" onclick="clickToMissCall(this)" >${item.called}</a>`;
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" attr-sdt="${item.called}" onclick="clickToMissCall(this)" >${item.called}</a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
   }
   if (
     item.hasOwnProperty("called") &&
     item.hasOwnProperty("duration") == false
   ) {
-    return `<a class="text-title-his-call" href="#" attr-sdt="${item.called}" onclick="clickToMissCall(this)" >${item.called}</a>`;
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" attr-sdt="${item.called}" onclick="clickToMissCall(this)" >${item.called}</a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
   }
   if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
-    return `<a class="text-title-his-call" href="#" attr-sdt="${item.calling}" onclick="clickToMissCall(this)" >${item.calling}</a>`;
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" attr-sdt="${item.calling}" onclick="clickToMissCall(this)" >${item.calling}</a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
   }
   if (
     item.hasOwnProperty("calling") &&
     item.hasOwnProperty("duration") == false
   ) {
-    return `<a class="text-title-his-call" href="#" style="color: red;" attr-sdt="${item.calling}" onclick="clickToMissCall(this)">${item.calling}</a>`;
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" style="color: red;" attr-sdt="${item.calling}" onclick="clickToMissCall(this)">${item.calling}</a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
   }
 }
 
@@ -3092,11 +3099,16 @@ function renderListMissCall(listMissCall) {
                 </div>
                 <div class="pull-right">
                   <h4 class="text-title-his-call">
+                  <fw-tooltip>
                     <a class="" href="#" style="color: red;"   
                       attr-sdt="${item?.calling}"
                       onclick="clickToMissCall(this)">
                         ${item.calling}
                     </a>
+                    <div slot="tooltip-content">
+                      Click to call
+                  </div>
+                  </fw-tooltip>
                   </h4>
                   <p style="margin-top: 10px;">
                     <span><img src="./images/icon_miss_call.png"></span>
@@ -3109,9 +3121,15 @@ function renderListMissCall(listMissCall) {
                 attr-sdt-inf="${item?.calling}"
                 onclick="redirectContactInfoMissCall(this)"
               >
-                <a class="media-heading user_name">
-                  <img src="./images/icon-info.png">
-                </a>
+              <fw-tooltip>
+                <img src="./images/icon-info.png">
+                <div slot="tooltip-content">
+                  Chi tiết liên hệ
+                </div>
+              </fw-tooltip>
+              <div class="tooltip-his-call">Hover over me
+                <span class="tooltiptext">Tooltip text</span>
+              </div>
                 <p style="margin-top: 10px; line-height: 24px;">--:--</p>
               </div>
             </div>

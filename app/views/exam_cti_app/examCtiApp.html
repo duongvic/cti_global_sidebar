@@ -3,9 +3,14 @@
 <head>
     <title>Video-Phone</title>
     <script src="https://pbx-stg.oncallcx.vn/cti/ancti/ancti.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css" />
 </head>
 
 <body>
+    <button id="myButton">My button</button>
+    
     <button style="float: right;" id="call" onclick="clickCall()" type="button"><span id="status"></span><i id="hook"
             class="material-icons">Call</i></button>
     <video id="localView" playsInline autoPlay muted></video>
@@ -87,6 +92,11 @@
             }
         }
 
+    </script>
+    <script>
+        tippy('#myButton', {
+            content: 'My tooltip!',
+        });
     </script>
 </body>
 
