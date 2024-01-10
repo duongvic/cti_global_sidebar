@@ -3127,9 +3127,6 @@ function renderListMissCall(listMissCall) {
                   Chi tiết liên hệ
                 </div>
               </fw-tooltip>
-              <div class="tooltip-his-call">Hover over me
-                <span class="tooltiptext">Tooltip text</span>
-              </div>
                 <p style="margin-top: 10px; line-height: 24px;">--:--</p>
               </div>
             </div>
