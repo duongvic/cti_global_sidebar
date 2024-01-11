@@ -20,6 +20,7 @@ let current_page = 1;
 let listContacts = [];
 let listHisCall = [];
 let listMissCall = [];
+
 let listContactsExample = [
   {
     active: false,
@@ -1449,7 +1450,6 @@ async function fetchContactData(page) {
       var newData = [...arr];
       let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...oldData, ...newData];
-      // console.log("newData", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       renderListContact(listContacts);
       current_page = current_page + 1;
@@ -1457,14 +1457,11 @@ async function fetchContactData(page) {
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...newData];
-      // console.log("newData rõng []", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       current_page = page;
-      // console.log("current_page rỗng ", current_page);
       renderListContact(listContacts);
     }
   } catch (error) {
-    // Failure operation
     console.log(error);
   }
 }
@@ -1507,7 +1504,6 @@ async function filterContactDataInbound(phone) {
       emailContact = "";
     }
     console.log("filterContactDataInbound ton tai:", existContact);
-    // return detail;
   } catch (error) {
     existContact = false;
     console.log(error);
@@ -1522,7 +1518,6 @@ async function filteredContactSearch(term) {
       },
     });
     let detail = data?.response ? JSON.parse(data?.response) : [];
-
     let filteredDataMobile = detail.filter((item) => item.mobile === term);
     let filteredDataPhone = detail.filter((item) => item.phone === term);
     console.log("filteredDataMobile", filteredDataMobile);
@@ -1548,7 +1543,9 @@ async function filteredContactSearch(term) {
 
       nameContact = filteredDataMobile[0].name;
       getContactById(filteredDataMobile[0].id);
+
       goToContact(idContact);
+
       return renderListContact(detail);
     } else if (filteredDataPhone.length > 0) {
       existContact = true;
@@ -1569,7 +1566,9 @@ async function filteredContactSearch(term) {
       document.getElementById("appTextPhoneInbound").style.padding = "0px 0px";
       nameContact = filteredDataPhone[0].name;
       getContactById(filteredDataPhone[0].id);
+
       goToContact(idContact);
+
       return renderListContact(detail);
     } else if (
       filteredDataMobile.length <= 0 ||
@@ -1654,6 +1653,8 @@ function clickToCall() {
     phoneNumberReceiver = data.number;
     isInboundCall = false;
     getContactById(data?.id);
+
+    goToContact(data?.id);
 
     /**click to call as7*/
     let call = webphone.calls[0];
@@ -2356,6 +2357,7 @@ $(document).ready(function () {
     $(".scrollpane").scroll(function () {
       var $this = $(this);
       var $results = $("#listContact"); // 1050
+
       if (
         Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
         Math.ceil($results.height())
@@ -2363,6 +2365,18 @@ $(document).ready(function () {
         fetchContactData(current_page);
       }
     });
+
+    // $(".scrollpane-his-call").scroll(function () {
+    //   var $this = $(this);
+    //   var $resultsMisCall = $("#listHisMissCall");
+
+    //   if (
+    //     Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
+    //     Math.ceil($resultsMisCall.height())
+    //   ) {
+    //     loadMoreItems();
+    //   }
+    // });
   });
 });
 
@@ -2405,9 +2419,9 @@ function showMissCall() {
 
   setTimeout(async () => {
     listMissCall = [];
+    listHisCall = [];
     let readCall = await webphone.readCallDetails(options);
     const arr = readCall.reverse();
-    // filteredContactSearch(x.value);
     for (let i = 0; i < arr.length; i++) {
       if (
         arr[i].hasOwnProperty("calling") &&
@@ -2416,9 +2430,43 @@ function showMissCall() {
         listMissCall.push(arr[i]);
       }
     }
-    renderListMissCall(listMissCall);
+    // Khởi tạo trang với dữ liệu ban đầu
+    displayItems(getItemsForCurrentPage());
     console.log("renderListMissCall", listMissCall);
   });
+}
+
+const ITEMS_PER_PAGE = 6;
+let currentPage = 1;
+
+// Hàm lấy phần tử cho trang hiện tại
+function getItemsForCurrentPage() {
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  return listMissCall.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+}
+
+// Hàm xử lý sự kiện khi nhấn "Load More"
+function loadMoreItems() {
+  currentPage++;
+  const newItems = getItemsForCurrentPage();
+  // Hiển thị các phần tử mới này trên giao diện
+  displayItems(newItems);
+}
+
+// Hàm để hiển thị các phần tử lên giao diện
+async function displayItems(items) {
+  console.log("items", items);
+
+  const response = await Promise.all(
+    items.map(async function (itm) {
+      const { calling } = itm;
+      const profiles = await getDetailContact(calling);
+      return { ...itm, profiles };
+    })
+  );
+  localStorage.setItem("cacheDataMissCall", JSON.stringify(response));
+  console.log("response", response);
+  renderListMissCall(response);
 }
 
 function showMain() {
@@ -3086,8 +3134,8 @@ function renderTextHistoryCall(item) {
   }
 }
 
-function renderListMissCall(listMissCall) {
-  document.getElementById("listHisMissCall").innerHTML = listMissCall
+function renderListMissCall(arrListCall) {
+  document.getElementById("listHisMissCall").innerHTML = arrListCall
     .map((item) => {
       return `<li>
       <div class="histrory" style="padding-left: 10px;padding-right: 10px;">
@@ -3095,22 +3143,31 @@ function renderListMissCall(listMissCall) {
             <div class="media flex-his">
               <div class="flex-his">
                 <div class="media-left" href="#">
-                <img src="./images/icon_profile.png" class="" style="width: 46px; height: 46px;">
+                <img src="${
+                  item?.profiles != undefined
+                    ? item?.profiles.avatar
+                    : "./images/icon_profile.png"
+                }" 
+                  class="avatar-his-call" style="">
                 </div>
                 <div class="pull-right">
                   <h4 class="text-title-his-call">
                   <fw-tooltip>
-                    <a class="" href="#" style="color: red;"   
+                    <a class="" href="#" style="color: red;"
                       attr-sdt="${item?.calling}"
                       onclick="clickToMissCall(this)">
-                        ${item.calling}
+                        ${
+                          item?.profiles != undefined
+                            ? item?.profiles?.name
+                            : item.calling
+                        }
                     </a>
                     <div slot="tooltip-content">
                       Click to call
                   </div>
                   </fw-tooltip>
                   </h4>
-                  <p style="margin-top: 10px;">
+                  <p style="margin-top: px;">
                     <span><img src="./images/icon_miss_call.png"></span>
                     <span style="margin-left: 6px;">
                       ${dateFormat(item?.time)}</span>
@@ -3187,4 +3244,36 @@ function redirectContactInfoMissCall(elem) {
   let sdt = $(elem).attr("attr-sdt-inf");
   isMainShow = "miss_call";
   filteredContactSearch(sdt);
+}
+
+// function renderTextName(item) {
+//   setTimeout(async () => {
+//     const ab = await getDetailContact(item);
+//     console.log("datâMp", ab);
+//     return `<a class="" href="#" style="color: red;" attr-sdt="${item}"
+//               onclick="clickToMissCall(this)">
+//               ${ab && ab !== undefined ? ab : item}
+//             </a>`;
+//   });
+// }
+
+async function getDetailContact(term) {
+  try {
+    const result = await client.request.invokeTemplate(
+      "filteredContactSearch",
+      {
+        context: {
+          term: term,
+        },
+      }
+    );
+    if (result?.status == 200) {
+      let detail = result?.response ? JSON.parse(result?.response) : [];
+      if (detail.length > 0) {
+        console.log(detail[0]?.name);
+        return detail[0];
+      }
+      return undefined;
+    }
+  } catch (error) {}
 }

@@ -132,7 +132,6 @@ html {
   margin: 100px;
 }
 
-
 .tooltipD {
   display: none;
   background-color: yellow;
@@ -142,4 +141,14 @@ html {
   padding: 5px 0;
   text-align: center;
   width: 120px;
+}
+.scrollpane-his-call {
+  height: 428px;
+  overflow: auto;
+}
+
+.avatar-his-call {
+  width: 46px;
+  height: 46px;
+  border-radius: 24px;
 }
