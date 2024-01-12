@@ -1312,6 +1312,9 @@ function resetText() {
 
   listMissCall = [];
   listHisCall = [];
+
+  localStorage.removeItem("cacheDataHisCall");
+  localStorage.removeItem("cacheDataMissCall");
 }
 /**
  * To close the CTI app
@@ -2290,9 +2293,9 @@ async function showHistoryCall() {
   // setTimeout(async () => {
   let readCall = await webphone.readCallDetails(options);
   listHisCall = readCall.reverse();
-  if(dataCached.length > 0){
+  if (dataCached != null && dataCached.length > 0) {
     renderListHistoryCall(dataCached);
-  }else{
+  } else {
     await displayItemsHisCall(getItemsForCurrentPageHisCall());
   }
   document.getElementById("output").innerText = "";
@@ -2326,7 +2329,7 @@ async function showMissCall() {
       listMissCall.push(arr[i]);
     }
   }
-  if (dataCached.length > 0) {
+  if (dataCached != null && dataCached.length > 0) {
     renderListMissCall(dataCached);
   } else {
     // Khởi tạo trang với dữ liệu ban đầu
