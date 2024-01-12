@@ -2380,8 +2380,9 @@ $(document).ready(function () {
   });
 });
 
-function showHistoryCall() {
+async function showHistoryCall() {
   listMissCall = [];
+  listHisCall = [];
   document.getElementById("output").innerText = "";
   document.getElementById("mainListHistoryCall").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
@@ -2395,16 +2396,19 @@ function showHistoryCall() {
   document.getElementById("mainInboundListen").style.display = "none";
 
   // lấy data historycall
-  setTimeout(async () => {
-    let readCall = await webphone.readCallDetails(options);
-    listHisCall = readCall.reverse();
-    // filteredContactSearch(x.value);
-    renderListHistoryCall(listHisCall);
-    console.log("listHisCall", listHisCall);
-  });
+  // setTimeout(async () => {
+  let readCall = await webphone.readCallDetails(options);
+  listHisCall = readCall.reverse();
+  // renderListHistoryCall(listHisCall);
+  displayItemsHisCall(getItemsForCurrentPageHisCall());
+
+  console.log("listHisCall", listHisCall);
+  // });
 }
 
-function showMissCall() {
+async function showMissCall() {
+  listMissCall = [];
+  listHisCall = [];
   document.getElementById("output").innerText = "";
   document.getElementById("mainListMissCall").style.display = "block";
   document.getElementById("mainListHistoryCall").style.display = "none";
@@ -2417,26 +2421,24 @@ function showMissCall() {
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
 
-  setTimeout(async () => {
-    listMissCall = [];
-    listHisCall = [];
-    let readCall = await webphone.readCallDetails(options);
-    const arr = readCall.reverse();
-    for (let i = 0; i < arr.length; i++) {
-      if (
-        arr[i].hasOwnProperty("calling") &&
-        arr[i].hasOwnProperty("duration") == false
-      ) {
-        listMissCall.push(arr[i]);
-      }
+  // setTimeout(async () => {
+  let readCall = await webphone.readCallDetails(options);
+  const arr = readCall.reverse();
+  for (let i = 0; i < arr.length; i++) {
+    if (
+      arr[i].hasOwnProperty("calling") &&
+      arr[i].hasOwnProperty("duration") == false
+    ) {
+      listMissCall.push(arr[i]);
     }
-    // Khởi tạo trang với dữ liệu ban đầu
-    displayItems(getItemsForCurrentPage());
-    console.log("renderListMissCall", listMissCall);
-  });
+  }
+  // Khởi tạo trang với dữ liệu ban đầu
+  await displayItems(getItemsForCurrentPage());
+  console.log("renderListMissCall", listMissCall);
+  // });
 }
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 let currentPage = 1;
 
 // Hàm lấy phần tử cho trang hiện tại
@@ -2997,7 +2999,12 @@ function renderListHistoryCall(listHisCall) {
             <div class="media flex-his">
               <div class="flex-his">
                 <div class="media-left" href="#">
-                  <img src="./images/icon_profile.png" class="" style="width: 46px;height: 46px;">
+                  <img src="${
+                    item?.profiles != undefined && item?.profiles.avatar != null
+                      ? item?.profiles.avatar
+                      : "./images/icon_profile.png"
+                  }" 
+                    class="avatar-his-call" style="">
                 </div>
                 <div class="pull-right">
                   ${renderTextHistoryCall(item)}
@@ -3096,7 +3103,15 @@ function renderIconHistoryCall(item) {
 function renderTextHistoryCall(item) {
   if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
     return `<fw-tooltip>
-              <a class="text-title-his-call" href="#" attr-sdt="${item.called}" onclick="clickToMissCall(this)" >${item.called}</a>
+              <a class="text-title-his-call" href="#" attr-sdt="${
+                item.called
+              }" onclick="clickToMissCall(this)" >
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.called
+                }
+              </a>
               <div slot="tooltip-content">
                 Click to call
               </div>
@@ -3107,7 +3122,15 @@ function renderTextHistoryCall(item) {
     item.hasOwnProperty("duration") == false
   ) {
     return `<fw-tooltip>
-              <a class="text-title-his-call" href="#" attr-sdt="${item.called}" onclick="clickToMissCall(this)" >${item.called}</a>
+              <a class="text-title-his-call" href="#" attr-sdt="${
+                item.called
+              }" onclick="clickToMissCall(this)" >
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.called
+                }
+              </a>
               <div slot="tooltip-content">
                 Click to call
               </div>
@@ -3115,7 +3138,15 @@ function renderTextHistoryCall(item) {
   }
   if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
     return `<fw-tooltip>
-              <a class="text-title-his-call" href="#" attr-sdt="${item.calling}" onclick="clickToMissCall(this)" >${item.calling}</a>
+              <a class="text-title-his-call" href="#" attr-sdt="${
+                item.calling
+              }" onclick="clickToMissCall(this)" >
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.calling
+                }
+              </a>
               <div slot="tooltip-content">
                 Click to call
               </div>
@@ -3126,7 +3157,15 @@ function renderTextHistoryCall(item) {
     item.hasOwnProperty("duration") == false
   ) {
     return `<fw-tooltip>
-              <a class="text-title-his-call" href="#" style="color: red;" attr-sdt="${item.calling}" onclick="clickToMissCall(this)">${item.calling}</a>
+              <a class="text-title-his-call" href="#" style="color: red;" attr-sdt="${
+                item.calling
+              }" onclick="clickToMissCall(this)">
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.calling
+                }
+              </a>
               <div slot="tooltip-content">
                 Click to call
               </div>
@@ -3143,12 +3182,12 @@ function renderListMissCall(arrListCall) {
             <div class="media flex-his">
               <div class="flex-his">
                 <div class="media-left" href="#">
-                <img src="${
-                  item?.profiles != undefined
-                    ? item?.profiles.avatar
-                    : "./images/icon_profile.png"
-                }" 
-                  class="avatar-his-call" style="">
+                  <img src="${
+                    item?.profiles != undefined && item?.profiles.avatar != null
+                      ? item?.profiles.avatar
+                      : "./images/icon_profile.png"
+                  }" 
+                    class="avatar-his-call" style="">
                 </div>
                 <div class="pull-right">
                   <h4 class="text-title-his-call">
@@ -3246,17 +3285,6 @@ function redirectContactInfoMissCall(elem) {
   filteredContactSearch(sdt);
 }
 
-// function renderTextName(item) {
-//   setTimeout(async () => {
-//     const ab = await getDetailContact(item);
-//     console.log("datâMp", ab);
-//     return `<a class="" href="#" style="color: red;" attr-sdt="${item}"
-//               onclick="clickToMissCall(this)">
-//               ${ab && ab !== undefined ? ab : item}
-//             </a>`;
-//   });
-// }
-
 async function getDetailContact(term) {
   try {
     const result = await client.request.invokeTemplate(
@@ -3276,4 +3304,37 @@ async function getDetailContact(term) {
       return undefined;
     }
   } catch (error) {}
+}
+
+const ITEMS_PER_PAGE_HIS_CALL = 10;
+let currentPageHisCall = 1;
+
+// Hàm lấy phần tử cho trang hiện tại
+function getItemsForCurrentPageHisCall() {
+  const startIndex = (currentPageHisCall - 1) * ITEMS_PER_PAGE_HIS_CALL;
+  return listHisCall.slice(startIndex, startIndex + ITEMS_PER_PAGE_HIS_CALL);
+}
+
+// Hàm xử lý sự kiện khi nhấn "Load More"
+function loadMoreItemsHisCall() {
+  currentPageHisCall++;
+  const newItems = getItemsForCurrentPageHisCall();
+  // Hiển thị các phần tử mới này trên giao diện
+  displayItemsHisCall(newItems);
+}
+
+// Hàm để hiển thị các phần tử lên giao diện
+async function displayItemsHisCall(items) {
+  console.log("itemsHisCall", items);
+
+  const response = await Promise.all(
+    items.map(async function (itm) {
+      const { calling, called } = itm;
+      const profiles = await getDetailContact(calling ? calling : called);
+      return { ...itm, profiles };
+    })
+  );
+  localStorage.setItem("cacheDataHisCall", JSON.stringify(response));
+  console.log("responseHisCall", response);
+  renderListHistoryCall(response);
 }
