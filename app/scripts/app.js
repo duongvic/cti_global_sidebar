@@ -1357,6 +1357,9 @@ function resetText() {
   isMainInbound = false;
   isMainContactActive = false;
   isMainActive = false;
+
+  listMissCall = [];
+  listHisCall = [];
 }
 /**
  * To close the CTI app
@@ -2383,6 +2386,14 @@ $(document).ready(function () {
 async function showHistoryCall() {
   listMissCall = [];
   listHisCall = [];
+
+  // lấy data historycall
+  // setTimeout(async () => {
+  let readCall = await webphone.readCallDetails(options);
+  listHisCall = readCall.reverse();
+  // renderListHistoryCall(listHisCall);
+  await displayItemsHisCall(getItemsForCurrentPageHisCall());
+
   document.getElementById("output").innerText = "";
   document.getElementById("mainListHistoryCall").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
@@ -2394,14 +2405,6 @@ async function showHistoryCall() {
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInboundListen").style.display = "none";
-
-  // lấy data historycall
-  // setTimeout(async () => {
-  let readCall = await webphone.readCallDetails(options);
-  listHisCall = readCall.reverse();
-  // renderListHistoryCall(listHisCall);
-  displayItemsHisCall(getItemsForCurrentPageHisCall());
-
   console.log("listHisCall", listHisCall);
   // });
 }
@@ -2409,17 +2412,6 @@ async function showHistoryCall() {
 async function showMissCall() {
   listMissCall = [];
   listHisCall = [];
-  document.getElementById("output").innerText = "";
-  document.getElementById("mainListMissCall").style.display = "block";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
 
   // setTimeout(async () => {
   let readCall = await webphone.readCallDetails(options);
@@ -2434,6 +2426,18 @@ async function showMissCall() {
   }
   // Khởi tạo trang với dữ liệu ban đầu
   await displayItems(getItemsForCurrentPage());
+
+  document.getElementById("output").innerText = "";
+  document.getElementById("mainListMissCall").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
   console.log("renderListMissCall", listMissCall);
   // });
 }
