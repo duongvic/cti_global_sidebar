@@ -29,11 +29,11 @@ html {
   overflow-y: auto;
 }
 
-.histrory {
-  padding: 10px 0;
+.histrory-call {
+  padding: 4px 0;
   border-bottom: 1px dotted #ccc;
 }
-.histrory:hover {
+.histrory-call:hover {
   background: #cccccc38;
 }
 .user_name {
@@ -51,8 +51,8 @@ html {
   font-size: 16px;
   line-height: 22px;
 }
-.pull-right h4 a,
-.pull-right h4 {
+.histrory-call .pull-right h4 a,
+.histrory-call .pull-right h4 {
   padding: 0px 0px 3px;
   margin: 0;
 }
@@ -60,7 +60,7 @@ html {
   margin-right: 10px;
 }
 .pull-right p {
-  margin: 0;
+  margin: 6px 0 0 0;
   color: #575757;
   font-size: 14px;
 }
@@ -74,7 +74,7 @@ html {
   color: red !important;
 }
 .his-call-txt-time {
-  margin-left: 6px;
+  /* margin-left: 6px; */
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;

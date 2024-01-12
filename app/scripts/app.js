@@ -2998,7 +2998,7 @@ function renderListHistoryCall(listHisCall) {
   document.getElementById("listHistoryCall").innerHTML = listHisCall
     .map((item) => {
       return `<li>
-      <div class="histrory" style="padding-left: 10px;padding-right: 10px;">
+      <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
         <div class="comments-list">
             <div class="media flex-his">
               <div class="flex-his">
@@ -3012,7 +3012,7 @@ function renderListHistoryCall(listHisCall) {
                 </div>
                 <div class="pull-right">
                   ${renderTextHistoryCall(item)}
-                  <p style="margin-top: 10px;">
+                  <p>
                     <span>${renderIconHistoryCall(item)}</span>
                     <span class="his-call-txt-time">${dateFormat(
                       item?.time
@@ -3030,7 +3030,7 @@ function renderListHistoryCall(listHisCall) {
                   Chi tiết liên hệ
                 </div>
               </fw-tooltip>
-                <p class="his-call-txt-time" style="margin-top: 10px; line-height: 24px;">${
+                <p class="his-call-txt-time" style="margin-top: 14px; line-height: 13px;">${
                   item?.duration ? durationFormat(item?.duration) : "--:--"
                 }</p>
               </div>
@@ -3181,7 +3181,7 @@ function renderListMissCall(arrListCall) {
   document.getElementById("listHisMissCall").innerHTML = arrListCall
     .map((item) => {
       return `<li>
-      <div class="histrory" style="padding-left: 10px;padding-right: 10px;">
+      <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
         <div class="comments-list">
             <div class="media flex-his">
               <div class="flex-his">
@@ -3210,9 +3210,9 @@ function renderListMissCall(arrListCall) {
                   </div>
                   </fw-tooltip>
                   </h4>
-                  <p style="margin-top: px;">
+                  <p>
                     <span><img src="./images/icon_miss_call.png"></span>
-                    <span style="margin-left: 6px;">
+                    <span>
                       ${dateFormat(item?.time)}</span>
                   </p>
                 </div>
@@ -3227,7 +3227,7 @@ function renderListMissCall(arrListCall) {
                   Chi tiết liên hệ
                 </div>
               </fw-tooltip>
-                <p style="margin-top: 10px; line-height: 24px;">--:--</p>
+                <p style="margin-top: 14px; line-height: 13px;">--:--</p>
               </div>
             </div>
           </div>
