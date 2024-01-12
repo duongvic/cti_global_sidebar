@@ -1174,54 +1174,6 @@ agent.on("call", (event) => {
       break;
     case "null":
       console.log(`call to ${call.number} is gone. Cancel`);
-      // let call = webphone.calls[0];
-      // call.clearConnection();
-
-      // document.getElementById("mainContent").style.display = "block";
-      // document.getElementById("mainOutbound").style.display = "none";
-      // document.getElementById("mainBusyCall").style.display = "none";
-      // document.getElementById("mainCollapseClickToCall").style.display = "none";
-
-      // document.getElementById("mainListContacts").style.display = "none";
-      // document.getElementById("mainListHistoryCall").style.display = "none";
-
-      // document.getElementById("mainInbound").style.display = "none";
-      // document.getElementById("mainInboundCollapse").style.display = "none";
-      // document.getElementById("mainInboundListen").style.display = "none";
-      // document.getElementById("mainInboundListenCollapse").style.display =
-      //   "none";
-
-      // document.getElementById("appTextPhone").value = "";
-      // document.getElementById("appTextPhone").innerText = "";
-      // document.getElementById("appTextPhoneBusyCall").value = "";
-      // document.getElementById("appTextPhoneBusyCall").innerText = "";
-
-      // document.getElementById("output").value = "";
-      // document.getElementById("output").innerText = "";
-      // $("#callEnter").attr("disabled", true);
-      // $("#callEnter").css({ backgroundColor: "darkgray" });
-
-      // document.getElementById("timer").value = "";
-      // document.getElementById("timer").innerText = "";
-
-      // ret.innerHTML = "";
-      // retCollapse.innerHTML = "";
-      // retTimerInboundListen.innerHTML = "";
-      // nameNotListen.textContent = "";
-      // retTimerInboundListenCollapse.innerHTML = "";
-
-      // isInboundCall = false;
-      // isMainActive = false;
-      // isMainContactActive = false;
-      // isMainInbound = false;
-      // isMainOutbound = false;
-      // existContact = false;
-
-      // idContact = "";
-      // nameContact = "";
-      // phoneNumberReceiver = "";
-      // emailContact = "";
-
       stop();
       onAppDeactive();
       // location.reload();
@@ -1370,9 +1322,6 @@ function closeApp() {
     .then(function () {
       resizeAppDefault();
       resetText();
-      // ret.innerHTML = "00:00:00";
-      // console.info("successfully closed the CTI app");
-      // showNotify("success", "Successfully closed the CTI app.");
       location.reload();
     })
     .catch(function (error) {
@@ -1581,10 +1530,6 @@ async function filteredContactSearch(term) {
       document.getElementById("appTextPhone").style.fontSize = "20px";
       document.getElementById("appTextPhone").style.padding = "10px 0px";
       nameContact = "";
-      // document.getElementById("appTxtNameContact").innerText =
-      //   "contact not exist";
-      // document.getElementById("appTxtNameContact").value = "contact not exist";
-      // document.getElementById("appTxtNameContact").style.color = "#3b3b3b";
       current_page = 1;
       renderListContactEmpty;
     }
@@ -1610,8 +1555,6 @@ async function getContactById(id_contact) {
       idContact = id_contact;
       emailContact = detail.email;
       nameContact = detail.name;
-      // document.getElementById("appTxtNameContact").value = name_contact;
-      // document.getElementById("appTxtNameContact").innerText = name_contact;
       document.getElementById("appTxtNameContact").textContent = nameContact;
       avtarContact = detail?.avatar?.avatar_url;
       document.getElementById("avatarContact").src = avtarContact;
@@ -1785,8 +1728,6 @@ function onAppActivate() {
       console.log("data loggedInUser", data);
 
       //Getting all iparams
-      // client.iparams.get().then(logData).catch(logError);
-
       client.iparams.get().then(function (data) {
         console.log("iparams:", data);
       });
@@ -1823,11 +1764,6 @@ function onAppActivate() {
       document.getElementById("appTextPhone1").className =
         "correct__number__phone";
 
-      // console.log("isMainOutbound", isMainOutbound);
-      // console.log("isMainInbound", isMainInbound);
-      // console.log("isMainActive", isMainActive);
-      // console.log("isMainContactActive", isMainContactActive);
-
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       document
         .getElementById("btnCollapseClickToCall")
@@ -1863,29 +1799,6 @@ function onAppActivate() {
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(async function () {
-              // document.getElementById("mainContent").style.display = "block";
-              // document.getElementById("mainOutbound").style.display = "none";
-              // document.getElementById("mainBusyCall").style.display = "none";
-              // document.getElementById("mainCollapseClickToCall").style.display =
-              //   "none";
-              // document.getElementById("mainListContacts").style.display =
-              //   "none";
-              // document.getElementById("mainListHistoryCall").style.display =
-              //   "none";
-              // document.getElementById("mainInbound").style.display = "none";
-              // document.getElementById("mainInboundCollapse").style.display =
-              //   "none";
-              // document.getElementById("mainInboundListen").style.display =
-              //   "none";
-              // document.getElementById(
-              //   "mainInboundListenCollapse"
-              // ).style.display = "none";
-
-              // document.getElementById("output").innerText = "";
-              // phoneNumberReceiver = document.getElementById("output").value =
-              //   "";
-              // document.getElementById("appTextPhone").value = "";
-              // document.getElementById("appTextPhone").innerText = "";
               resetText();
               /**as7 backend **/
 
@@ -1895,10 +1808,6 @@ function onAppActivate() {
               console.log("đã gọi vào end call as7");
               /**as7 backend **/
               onAppDeactive();
-              // location.reload();
-              // ret.innerHTML = "00:00:00";
-              // resizeAppDefault();
-              // console.info("successfully closed the CTI app");
             })
             .catch(function (error) {
               console.error("Error: Failed to close the CTI app");
@@ -1943,13 +1852,9 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-              // ret.innerHTML = "00:00:00";
               resizeAppDefault();
               resetText();
               location.reload();
-              // onAppDeactive();
-
-              // console.info("successfully closed the CTI app");
             })
             .catch(function (error) {
               console.error("Error: Failed to close the CTI app");
@@ -1992,7 +1897,7 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-              // ret.innerHTML = "00:00:00";
+           
               onAppDeactive();
               location.reload();
               // console.info("successfully closed the CTI app");
@@ -2106,7 +2011,6 @@ function toggleCall() {
 var count = 0;
 $(".digit").on("click", function () {
   var num = $(this).clone().children().remove().end().text();
-  // $("#output1").append("<span>" + num.trim() + "</span>");
   var prevOutput = document.getElementById("output").value;
   document.getElementById("output").value = prevOutput + num;
   count++;
@@ -2127,10 +2031,6 @@ function eventHandlecallDialpad() {
   // $("#callEnter").css({ backgroundColor: "green" });
   document.getElementById("appTextPhone1").innerText = "Correct";
   document.getElementById("appTextPhone1").className = "correct__number__phone";
-  /**Call tu man hinh dialpad **/
-  //   document.getElementById("callEnter").addEventListener("click", () => {
-  //  });
-  /**Call tu man hinh dialpad **/
 
   openApp();
   let textElementDialpad = document.getElementById("output").value;
@@ -2152,7 +2052,6 @@ function eventHandlecallDialpad() {
   document.getElementById("appTextPhoneBusyCall").value = phoneNumberReceiver;
   document.getElementById("appTextPhoneBusyCall").innerText =
     phoneNumberReceiver;
-  //filter contacts
 
   if (existContact) {
     goToContact(idContact);
@@ -2242,7 +2141,6 @@ function renderListContact(listContacts) {
         </div>
       </div>
     </li>`;
-      //  <li>${contact.name}</li>`;
     })
     .join("");
 }
@@ -2601,18 +2499,6 @@ async function listenCall() {
       console.log("recording started:", recordedMessage);
     });
   } else if (call.localConnectionInfo == "alerting") {
-    // //tạo ticket khi tồn tại khách hàng trong hệ thống
-
-    // console.log("isMainActive khi accpet", isMainActive);
-    // if (isMainActive) {
-    //   console.log("vào đây trước 1 listenCall");
-    //   await filterContactDataInbound(phoneNumberReceiver);
-    //   if (existContact) {
-    //     createTicket();
-    //   } else {
-    //     createContact();
-    //   }
-    // }
     // click while we have an alerting call -> accept it
     call.answerCall({ audio: true, video: false });
   } else {
@@ -2809,35 +2695,6 @@ async function createTicket() {
       "success",
       `Successfully created a ticket: ${idTicket} for: ${nameContact}`
     );
-
-    // client.data.get("loggedInUser").then(function (data) {
-    //   let agent_ref = data?.loggedInUser?.availability?.agent_ref
-    //     ? data?.loggedInUser?.availability?.agent_ref
-    //     : undefined;
-    //   const phone = data.loggedInUser.contact.phone
-    //     ? data.loggedInUser.contact.phone
-    //     : data.loggedInUser.contact.mobile
-    //     ? data.loggedInUser.contact.mobile
-    //     : null;
-    //   window.userPhone = phone;
-
-    //   // let str = agent_ref;
-    //   let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
-    //   console.log(
-    //     "Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex
-    //   );
-    //   let a = str?.slice(0, sindex);
-    //   const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
-    //   window.open(urlParams, "_blank");
-    // });
-
-    // let str = agent_ref;
-    // let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
-    // console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-    // let a = str?.slice(0, sindex);
-    // const urlParams = a + ".freshdesk.com/a/contacts/" + idContact;
-    // window.open(urlParams, "_blank");
-    // goToTicket(idTicket);
 
     //thu nhỏ màn hình call
     if (!isInboundCall) {
