@@ -2285,13 +2285,16 @@ async function showHistoryCall() {
   listMissCall = [];
   listHisCall = [];
 
+  const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
   // lấy data historycall
   // setTimeout(async () => {
   let readCall = await webphone.readCallDetails(options);
   listHisCall = readCall.reverse();
-  // renderListHistoryCall(listHisCall);
-  await displayItemsHisCall(getItemsForCurrentPageHisCall());
-
+  if(dataCached.length > 0){
+    renderListHistoryCall(dataCached);
+  }else{
+    await displayItemsHisCall(getItemsForCurrentPageHisCall());
+  }
   document.getElementById("output").innerText = "";
   document.getElementById("mainListHistoryCall").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
@@ -2311,6 +2314,7 @@ async function showMissCall() {
   listMissCall = [];
   listHisCall = [];
 
+  const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
   // setTimeout(async () => {
   let readCall = await webphone.readCallDetails(options);
   const arr = readCall.reverse();
@@ -2322,8 +2326,12 @@ async function showMissCall() {
       listMissCall.push(arr[i]);
     }
   }
-  // Khởi tạo trang với dữ liệu ban đầu
-  await displayItems(getItemsForCurrentPage());
+  if (dataCached.length > 0) {
+    renderListMissCall(dataCached);
+  } else {
+    // Khởi tạo trang với dữ liệu ban đầu
+    await displayItems(getItemsForCurrentPage());
+  }
 
   document.getElementById("output").innerText = "";
   document.getElementById("mainListMissCall").style.display = "block";
