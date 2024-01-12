@@ -1897,7 +1897,7 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-           
+
               onAppDeactive();
               location.reload();
               // console.info("successfully closed the CTI app");
@@ -2350,11 +2350,24 @@ function getItemsForCurrentPage() {
 }
 
 // Hàm xử lý sự kiện khi nhấn "Load More"
-function loadMoreItems() {
+async function loadMoreItems() {
   currentPage++;
   const newItems = getItemsForCurrentPage();
+
   // Hiển thị các phần tử mới này trên giao diện
-  displayItems(newItems);
+  // displayItems(newItems);
+  const response = await Promise.all(
+    newItems.map(async function (itm) {
+      const { calling } = itm;
+      const profiles = await getDetailContact(calling);
+      return { ...itm, profiles };
+    })
+  );
+  let itemsOld = JSON.parse(localStorage.getItem("cacheDataMissCall"));
+  let arrayOfArrays = [...itemsOld, response];
+  const flattenedArray = [].concat(...arrayOfArrays);
+  localStorage.setItem("cacheDataMissCall", JSON.stringify(flattenedArray));
+  renderListMissCall(flattenedArray);
 }
 
 // Hàm để hiển thị các phần tử lên giao diện
@@ -2369,7 +2382,6 @@ async function displayItems(items) {
     })
   );
   localStorage.setItem("cacheDataMissCall", JSON.stringify(response));
-  console.log("response", response);
   renderListMissCall(response);
 }
 
@@ -3177,11 +3189,23 @@ function getItemsForCurrentPageHisCall() {
 }
 
 // Hàm xử lý sự kiện khi nhấn "Load More"
-function loadMoreItemsHisCall() {
+async function loadMoreItemsHisCall() {
   currentPageHisCall++;
   const newItems = getItemsForCurrentPageHisCall();
   // Hiển thị các phần tử mới này trên giao diện
-  displayItemsHisCall(newItems);
+  // displayItemsHisCall(newItems);
+  const response = await Promise.all(
+    newItems.map(async function (itm) {
+      const { calling, called } = itm;
+      const profiles = await getDetailContact(calling ? calling : called);
+      return { ...itm, profiles };
+    })
+  );
+  let itemsOld = JSON.parse(localStorage.getItem("cacheDataHisCall"));
+  let arrayOfArrays = [...itemsOld, response];
+  const flattenedArray = [].concat(...arrayOfArrays);
+  localStorage.setItem("cacheDataHisCall", JSON.stringify(flattenedArray));
+  renderListHistoryCall(flattenedArray);
 }
 
 // Hàm để hiển thị các phần tử lên giao diện
@@ -3196,6 +3220,5 @@ async function displayItemsHisCall(items) {
     })
   );
   localStorage.setItem("cacheDataHisCall", JSON.stringify(response));
-  console.log("responseHisCall", response);
   renderListHistoryCall(response);
 }
