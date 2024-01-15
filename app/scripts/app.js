@@ -1333,6 +1333,50 @@ function closeApp() {
     });
 }
 
+function transformerItems(listItem) {
+  const items = {
+    data: listItem,
+  };
+  const transformedItems = {
+    data: items.data.reduce((result, currentItem) => {
+      const firstLetter = currentItem.name.charAt(0).toUpperCase();
+      const existingGroup = result.find(
+        (group) => group.letter === firstLetter
+      );
+
+      if (existingGroup) {
+        existingGroup.group.push(currentItem);
+      } else {
+        result.push({
+          letter: firstLetter,
+          group: [currentItem],
+        });
+      }
+
+      return result;
+    }, []),
+  };
+
+  const resultData = { data: [] };
+  const letterMap = {};
+
+  // Iterate through the input array
+  transformedItems.data.forEach((item) => {
+    const letter = item.letter;
+    const group = item.group;
+
+    if (letterMap[letter]) {
+      // If the letter already exists, merge the groups
+      letterMap[letter].group = letterMap[letter].group.concat(group);
+    } else {
+      // If the letter doesn't exist, add a new entry to the result array and the map
+      letterMap[letter] = { letter, group };
+      resultData.data.push(letterMap[letter]);
+    }
+  });
+  return resultData;
+}
+
 async function getContactData(page) {
   try {
     var data = await client.request.invokeTemplate("getContacts", {
@@ -1356,16 +1400,45 @@ async function getContactData(page) {
         return 0;
       });
       listContacts = [...arr];
+
+      // const items = {
+      //   data: listContacts,
+      // };
+
+      // const transformedItems = {
+      //   data: items.data.reduce((result, currentItem) => {
+      //     const firstLetter = currentItem.name.charAt(0).toUpperCase();
+      //     const existingGroup = result.find(
+      //       (group) => group.letter === firstLetter
+      //     );
+
+      //     if (existingGroup) {
+      //       existingGroup.group.push(currentItem);
+      //     } else {
+      //       result.push({
+      //         letter: firstLetter,
+      //         group: [currentItem],
+      //       });
+      //     }
+
+      //     return result;
+      //   }, []),
+      // };
+
+      const transformedItems = transformerItems(listContacts);
+
+      console.log(transformedItems?.data);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
 
-      renderListContact(listContacts);
+      renderListContact(transformedItems?.data ? transformedItems?.data : []);
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...newData, ...arr];
-      // console.log("newew dâttaa", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       current_page = page;
-      renderListContact(listContacts);
+      const transformedItems = transformerItems(listContacts);
+      renderListContact(transformedItems?.data ? transformedItems?.data : []);
+      // renderListContact(listContacts);
     }
   } catch (error) {
     // Failure operation
@@ -1403,10 +1476,13 @@ async function fetchContactData(page) {
         return 0;
       });
       var newData = [...arr];
+
       let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...oldData, ...newData];
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
-      renderListContact(listContacts);
+      const transformedItems = transformerItems(listContacts);
+
+      renderListContact(transformedItems?.data ? transformedItems?.data : []);
       current_page = current_page + 1;
       console.log("after curteent page", current_page);
     } else {
@@ -1414,7 +1490,9 @@ async function fetchContactData(page) {
       listContacts = [...newData];
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       current_page = page;
-      renderListContact(listContacts);
+      const transformedItems = transformerItems(listContacts);
+      renderListContact(transformedItems?.data ? transformedItems?.data : []);
+      // renderListContact(listContacts);
     }
   } catch (error) {
     console.log(error);
@@ -1501,7 +1579,10 @@ async function filteredContactSearch(term) {
 
       goToContact(idContact);
 
-      return renderListContact(detail);
+      const transformedItems = transformerItems(detail);
+      return renderListContact(
+        transformedItems?.data ? transformedItems?.data : []
+      );
     } else if (filteredDataPhone.length > 0) {
       existContact = true;
       idContact = filteredDataPhone[0].id;
@@ -1524,7 +1605,10 @@ async function filteredContactSearch(term) {
 
       goToContact(idContact);
 
-      return renderListContact(detail);
+      const transformedItems = transformerItems(detail);
+      return renderListContact(
+        transformedItems?.data ? transformedItems?.data : []
+      );
     } else if (
       filteredDataMobile.length <= 0 ||
       filteredDataPhone.length <= 0
@@ -2114,35 +2198,36 @@ function renderListContact(listContacts) {
   document.getElementById("listContact").innerHTML = listContacts
     .map((contact) => {
       return `<li>
-      <div class="relative">
-        <div class="avt">
-          <img src="./images/avatar.png" class="img-circle list-user-avatar">
-        </div>
-        <div class="absolute user-info">
-          <p class="user-name">
-            <b>${contact.name}</b>
-          </p>
-          <p class="user__phone"
-            attr-user-phone="${
-              contact?.mobile ? contact?.mobile : contact?.phone
-            }" 
-            attr-user-contact="${contact?.name ? contact?.name : "unknown"}"
-            attr-user-email = "${contact?.email ? contact?.email : ""}"
-            attr-user-id = "${contact?.id ? contact?.id : ""}"
-            onclick="clickContactCall(this)" >
-            <span class="" id="userPhoneContact">${
-              contact?.mobile ? contact?.mobile : contact?.phone
-            }</span>
-          </p>
-        </div>
-        <div class="absolute-info action">
-          <span id="customer-link" attr-id-contact="${
-            contact?.id
-          }" onclick="redirectContactInfo(this)">
-            <img src="./images/icon-info.png">
-          </span>
-        </div>
-      </div>
+      <div><p class="lb__character">${contact?.letter}</p></div>
+        ${contact?.group?.map((itm) => {
+          return ` <div class="relative">
+          <div class="avt">
+            <img src="./images/avatar.png" class="img-circle list-user-avatar">
+          </div>
+          <div class="absolute user-info">
+            <p class="user-name">
+              <b>${itm?.name}</b>
+            </p>
+            <p class="user__phone"
+              attr-user-phone="${itm?.mobile ? itm?.mobile : itm?.phone}" 
+              attr-user-contact="${itm?.name ? itm?.name : "unknown"}"
+              attr-user-email = "${itm?.email ? itm?.email : ""}"
+              attr-user-id = "${itm?.id ? itm?.id : ""}"
+              onclick="clickContactCall(this)" >
+              <span class="" id="userPhoneContact">${
+                itm?.mobile ? itm?.mobile : itm?.phone
+              }</span>
+            </p>
+          </div>
+          <div class="absolute-info action">
+            <span id="customer-link" attr-id-contact="${
+              itm?.group?.id
+            }" onclick="redirectContactInfo(this)">
+              <img src="./images/icon-info.png">
+            </span>
+          </div>
+        </div>`;
+        })}
     </li>`;
     })
     .join("");
@@ -2153,16 +2238,23 @@ function enableCharacterContact(elem) {
   let id = $(elem).attr("id");
 
   if (def === "default" || (def !== id && def !== "")) {
-    document.getElementById("showCharacter").innerText = id;
+    // document.getElementById("showCharacter").innerText = id;
     document.getElementById("valueShowCharacter").value = id;
-    let filteredNames = listContacts.filter((item) =>
-      item.name.startsWith(id, 0)
+    // let filteredNames = listContacts.filter((item) =>
+    //   item.name.startsWith(id, 0)
+    // );
+    const transformedItems = transformerItems(listContacts);
+    const filteredNames = transformedItems?.data?.filter(
+      (item) => item?.letter == id
     );
+    document.getElementById("showCharacter").innerText =
+      filteredNames.length > 0 ? "" : id;
+
     renderListContact(filteredNames);
-    console.log("filteredNames", filteredNames);
   } else if (def === id) {
     document.getElementById("showCharacter").innerText = "";
-    renderListContact(listContacts);
+    const transformedItems = transformerItems(listContacts);
+    renderListContact(transformedItems?.data);
   }
 }
 
