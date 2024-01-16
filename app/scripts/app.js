@@ -2238,7 +2238,6 @@ function enableCharacterContact(elem) {
   let id = $(elem).attr("id");
 
   if (def === "default" || (def !== id && def !== "")) {
-    // document.getElementById("showCharacter").innerText = id;
     document.getElementById("valueShowCharacter").value = id;
     // let filteredNames = listContacts.filter((item) =>
     //   item.name.startsWith(id, 0)
@@ -2250,9 +2249,13 @@ function enableCharacterContact(elem) {
     document.getElementById("showCharacter").innerText =
       filteredNames.length > 0 ? "" : id;
 
+    document.getElementById("showCharacter").style.display =
+      filteredNames.length > 0 ? "none" : "block";
+
     renderListContact(filteredNames);
   } else if (def === id) {
     document.getElementById("showCharacter").innerText = "";
+    document.getElementById("showCharacter").style.display = "none";
     const transformedItems = transformerItems(listContacts);
     renderListContact(transformedItems?.data);
   }
