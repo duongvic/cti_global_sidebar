@@ -2582,17 +2582,45 @@ function showMain() {
 $("#search_contact").keypress(function (event) {
   const val = document.querySelector('input[name="search_contact"]').value;
   let keycode = event.keyCode ? event.keyCode : event.which;
-
+  const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
+  const phone = /^\d{10}$/;
   if (keycode == "13" && (val != "" || val != null)) {
-    filteredContactSearch(val);
-  }
-  if (keycode == "13" && (val == "" || val == null)) {
+    if (val.match(phone) || val.match(phone12)) {
+      filteredContactSearch(val);
+    } else {
+      searchContactKeyword(val);
+    }
+  } else if (keycode == "13" && (val == "" || val == null)) {
     current_page = 1;
     getContactData(current_page);
   }
-  event.stop();
 });
 
+async function searchContactKeyword(term) {
+  try {
+    const data = await client.request.invokeTemplate("filteredContactSearch", {
+      context: {
+        term: term,
+      },
+    });
+    let detail = data?.response ? JSON.parse(data?.response) : [];
+    if (detail?.length > 0) {
+      existContact = true;
+      const transformedItems = transformerItems(detail);
+      return renderListContact(
+        transformedItems?.data ? transformedItems?.data : []
+      );
+    } else {
+      existContact = false;
+      nameContact = "";
+      current_page = 1;
+      renderListContactEmpty;
+    }
+  } catch (error) {
+    existContact = false;
+    console.log(error);
+  }
+}
 //Inbound
 function endCallDecline() {
   endCall();
