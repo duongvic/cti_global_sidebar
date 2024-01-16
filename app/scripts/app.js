@@ -2221,7 +2221,7 @@ function renderListContact(listContacts) {
           </div>
           <div class="absolute-info action">
             <span id="customer-link" attr-id-contact="${
-              itm?.group?.id
+              itm?.id
             }" onclick="redirectContactInfo(this)">
               <img src="./images/icon-info.png">
             </span>
