@@ -1030,7 +1030,6 @@ function convertSec(cnt) {
 function start() {
   interval = setInterval(function () {
     document.getElementById("timer").textContent = convertSec(counter++);
-    // console.log("goi start time Outbound");
   }, 1000);
 }
 
@@ -1039,7 +1038,6 @@ function startTimeCollapse() {
     document.getElementById("timerCollapse").textContent = convertSec(
       counter_time_collapse++
     );
-    // console.log("goi start time Outbound Collapse");
   }, 1000);
 }
 
@@ -1048,7 +1046,6 @@ function startTimeInbound() {
     document.getElementById("timerInboundListen").textContent = convertSec(
       counter_time_inbound++
     );
-    // console.log("goi start time Inbound Listen");
   }, 1000);
 }
 
@@ -1056,7 +1053,6 @@ function startTimeInboundListenCollapse() {
   intervalInboundListenCollapse = setInterval(function () {
     document.getElementById("timerInboundListenCollapse").textContent =
       convertSec(counter_time_inbound_listen_collapse++);
-    // console.log("goi start time InboundListenCollapse");
   }, 1000);
 }
 
@@ -1080,7 +1076,6 @@ agent.on("call", (event) => {
       console.log(`incomming call from ${call.number} ${call.name}`);
       console.log("chạy 1 alerting");
       isInboundCall = true;
-      console.log("isMainActive", isMainActive);
       client.interface
         .trigger("show", { id: "softphone" })
         .then(function () {
@@ -1094,8 +1089,6 @@ agent.on("call", (event) => {
               ? data?.loggedInUser?.contact?.mobile
               : null;
             window.userPhone = phone;
-            console.log("data loggedInUser Inbound", data);
-
             console.log("existContact trươc khi check", existContact);
             //check contact
             // await filterContactDataInbound(call?.number);
@@ -1544,8 +1537,6 @@ async function filteredContactSearch(term) {
     let detail = data?.response ? JSON.parse(data?.response) : [];
     let filteredDataMobile = detail.filter((item) => item.mobile === term);
     let filteredDataPhone = detail.filter((item) => item.phone === term);
-    console.log("filteredDataMobile", filteredDataMobile);
-    console.log("filteredDataPhone", filteredDataPhone);
 
     if (filteredDataMobile.length > 0) {
       existContact = true;
@@ -1611,8 +1602,6 @@ async function filteredContactSearch(term) {
       current_page = 1;
       renderListContactEmpty;
     }
-    console.log("existContact", existContact);
-    console.log("filteredContactSearch contact:", detail);
   } catch (error) {
     existContact = false;
     console.log(error);
@@ -1643,8 +1632,6 @@ async function getContactById(id_contact) {
       document.getElementById("appTextPhone").style.fontSize = "20px";
       document.getElementById("appTextPhone").style.padding = "10px 0px";
     }
-    console.log("existContact:", existContact);
-    console.log("detail getContactById:", detail);
   } catch (error) {
     console.log(error);
   }
@@ -1978,7 +1965,6 @@ function onAppActivate() {
 
               onAppDeactive();
               location.reload();
-              // console.info("successfully closed the CTI app");
             })
             .catch(function (error) {
               console.error("Error: Failed to close the CTI app");
@@ -2022,11 +2008,9 @@ function onAppDeactive() {
 }
 
 function checkPhone() {
-  console.log("da vao checkphone");
   var x = document.getElementById("output");
   // var phoneNumber = /^\d{10}$/;
   if (x.value.includes("+")) {
-    console.log("vao co dau + ");
     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     if (x.value.match(phone) && x.value.length == 12) {
       filteredContactSearch(x.value);
@@ -2053,7 +2037,6 @@ function checkPhone() {
   } else {
     var phone = /^\d{10}$/;
     if (x.value.match(phone)) {
-      console.log("không co dấu + ");
       filteredContactSearch(x.value);
       // eventHandlecallDialpad();
       $("#callEnter").attr("disabled", false);
@@ -2330,7 +2313,6 @@ function redirectContactInfo(elem) {
   client.interface
     .trigger("click", { id: "contact", value: contactId })
     .then(function (data) {
-      // document.getElementById("mainListContacts").style.display = "block";
       console.log("goToContact:", data);
       console.info("successfully navigated to contact");
     })
@@ -2478,8 +2460,6 @@ async function loadMoreItems() {
 
 // Hàm để hiển thị các phần tử lên giao diện
 async function displayItems(items) {
-  console.log("items", items);
-
   const response = await Promise.all(
     items.map(async function (itm) {
       const { calling } = itm;
@@ -2492,7 +2472,6 @@ async function displayItems(items) {
 }
 
 function showMain() {
-  console.log("goi vao show main");
   if (
     isMainContactActive == true &&
     isMainOutbound == false &&
@@ -3303,7 +3282,6 @@ async function getDetailContact(term) {
     if (result?.status == 200) {
       let detail = result?.response ? JSON.parse(result?.response) : [];
       if (detail.length > 0) {
-        console.log(detail[0]?.name);
         return detail[0];
       }
       return undefined;
