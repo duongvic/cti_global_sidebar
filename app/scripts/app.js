@@ -1385,7 +1385,6 @@ async function getContactData(page) {
       },
     });
     var arr = data?.response ? JSON.parse(data?.response) : [];
-    console.log("data contact:", JSON.parse(data?.response));
     if (arr.length > 0) {
       arr.sort((a, b) => {
         const nameA = a.name.toUpperCase(); // ignore upper and lowercase
@@ -1399,35 +1398,20 @@ async function getContactData(page) {
         // names must be equal
         return 0;
       });
-      listContacts = [...arr];
+      // listContacts = [...arr];
 
-      // const items = {
-      //   data: listContacts,
-      // };
+      const response = await Promise.all(
+        arr.map(async function (itm) {
+          const { mobile, phone } = itm;
+          const profiles = await getDetailContact(
+            mobile != null ? mobile : phone
+          );
+          return { ...itm, profiles };
+        })
+      );
 
-      // const transformedItems = {
-      //   data: items.data.reduce((result, currentItem) => {
-      //     const firstLetter = currentItem.name.charAt(0).toUpperCase();
-      //     const existingGroup = result.find(
-      //       (group) => group.letter === firstLetter
-      //     );
-
-      //     if (existingGroup) {
-      //       existingGroup.group.push(currentItem);
-      //     } else {
-      //       result.push({
-      //         letter: firstLetter,
-      //         group: [currentItem],
-      //       });
-      //     }
-
-      //     return result;
-      //   }, []),
-      // };
-
+      listContacts = [...response];
       const transformedItems = transformerItems(listContacts);
-
-      console.log(transformedItems?.data);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
 
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
@@ -1453,7 +1437,6 @@ async function fetchContactData(page) {
   } else if (page > 1) {
     current_page = page;
   }
-  console.log("current_page", current_page);
   try {
     var data = await client.request.invokeTemplate("getContacts", {
       context: {
@@ -1461,7 +1444,6 @@ async function fetchContactData(page) {
       },
     });
     var arr = data?.response ? JSON.parse(data?.response) : [];
-    console.log("data contact:", JSON.parse(data?.response));
     if (arr.length > 0) {
       arr.sort((a, b) => {
         const nameA = a.name.toUpperCase(); // ignore upper and lowercase
@@ -1475,16 +1457,25 @@ async function fetchContactData(page) {
         // names must be equal
         return 0;
       });
-      var newData = [...arr];
+      // var newData = [...arr];
+
+      const response = await Promise.all(
+        arr.map(async function (itm) {
+          const { mobile, phone } = itm;
+          const profiles = await getDetailContact(
+            mobile != null ? mobile : phone
+          );
+          return { ...itm, profiles };
+        })
+      );
+      var newData = [...response];
 
       let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...oldData, ...newData];
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       const transformedItems = transformerItems(listContacts);
-
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
       current_page = current_page + 1;
-      console.log("after curteent page", current_page);
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...newData];
@@ -2202,7 +2193,12 @@ function renderListContact(listContacts) {
         ${contact?.group?.map((itm) => {
           return ` <div class="relative">
           <div class="avt">
-            <img src="./images/avatar.png" class="img-circle list-user-avatar">
+            <img src="${
+              itm?.profiles != undefined && itm?.profiles?.avatar != null
+                ? itm?.profiles?.avatar
+                : "./images/icon_profile.png"
+            }" 
+              class="avatar-his-call" style="">
           </div>
           <div class="absolute user-info">
             <p class="user-name">
@@ -2388,7 +2384,11 @@ async function showHistoryCall() {
   // setTimeout(async () => {
   let readCall = await webphone.readCallDetails(options);
   listHisCall = readCall.reverse();
-  if (dataCached != null && dataCached.length > 0) {
+  if (
+    dataCached != null &&
+    dataCached.length > 0 &&
+    listHisCall.length == dataCached.length
+  ) {
     renderListHistoryCall(dataCached);
   } else {
     await displayItemsHisCall(getItemsForCurrentPageHisCall());
@@ -3007,8 +3007,9 @@ function renderListHistoryCall(listHisCall) {
               <div class="flex-his">
                 <div class="media-left" href="#">
                   <img src="${
-                    item?.profiles != undefined && item?.profiles.avatar != null
-                      ? item?.profiles.avatar
+                    item?.profiles != undefined &&
+                    item?.profiles?.avatar != null
+                      ? item?.profiles?.avatar
                       : "./images/icon_profile.png"
                   }" 
                     class="avatar-his-call" style="">
@@ -3265,9 +3266,6 @@ function clickToMissCall(elem) {
   document.getElementById("appTextPhone").innerText = sdt;
   phoneNumberReceiver = sdt;
 
-  // if (existContact) {
-  //   goToContact(idContact);
-  // }
   let call = webphone.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -3344,8 +3342,6 @@ async function loadMoreItemsHisCall() {
 
 // Hàm để hiển thị các phần tử lên giao diện
 async function displayItemsHisCall(items) {
-  console.log("itemsHisCall", items);
-
   const response = await Promise.all(
     items.map(async function (itm) {
       const { calling, called } = itm;

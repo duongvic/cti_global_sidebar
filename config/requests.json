@@ -4,7 +4,7 @@
       "method": "GET",
       "protocol": "https",
       "host": "<%= iparam.subdomain %>.freshdesk.com",
-      "path": "/api/v2/contacts?per_page=30&page=<%= context.page %>",
+      "path": "/api/v2/contacts?per_page=10&page=<%= context.page %>",
       "headers": {
         "Authorization": "Basic <%= encode(iparam.apiKey) %>",
         "Content-Type": "application/json"
