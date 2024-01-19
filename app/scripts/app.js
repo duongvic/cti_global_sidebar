@@ -1308,6 +1308,7 @@ function resetText() {
 
   localStorage.removeItem("cacheDataHisCall");
   localStorage.removeItem("cacheDataMissCall");
+  localStorage.removeItem("cacheDataContact");
 }
 /**
  * To close the CTI app
@@ -1395,10 +1396,8 @@ async function getContactData(page) {
 
       const response = await Promise.all(
         arr.map(async function (itm) {
-          const { mobile, phone } = itm;
-          const profiles = await getDetailContact(
-            mobile != null ? mobile : phone
-          );
+          const { id } = itm;
+          const profiles = await getContactById(id);
           return { ...itm, profiles };
         })
       );
@@ -1424,12 +1423,12 @@ async function getContactData(page) {
 }
 
 async function fetchContactData(page) {
-  // console.log("page", page);
   if (page == 1) {
     current_page = 2;
   } else if (page > 1) {
     current_page = page;
   }
+  console.log("page", page);
   try {
     var data = await client.request.invokeTemplate("getContacts", {
       context: {
@@ -1451,20 +1450,21 @@ async function fetchContactData(page) {
         return 0;
       });
       // var newData = [...arr];
-
       const response = await Promise.all(
         arr.map(async function (itm) {
-          const { mobile, phone } = itm;
-          const profiles = await getDetailContact(
-            mobile != null ? mobile : phone
-          );
+          const { id } = itm;
+          const profiles = await getContactById(id);
           return { ...itm, profiles };
         })
       );
+
       var newData = [...response];
 
+      console.log("newData", newData);
       let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...oldData, ...newData];
+
+      console.log("listContacts", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       const transformedItems = transformerItems(listContacts);
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
@@ -1616,7 +1616,6 @@ async function getContactById(id_contact) {
       },
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
-
     if (Object.keys(detail).length > 0) {
       existContact = true;
       idContact = id_contact;
@@ -1632,6 +1631,7 @@ async function getContactById(id_contact) {
       document.getElementById("appTextPhone").style.fontSize = "20px";
       document.getElementById("appTextPhone").style.padding = "10px 0px";
     }
+    return detail;
   } catch (error) {
     console.log(error);
   }
@@ -2173,44 +2173,113 @@ function renderListContact(listContacts) {
     .map((contact) => {
       return `<li>
       <div><p class="lb__character">${contact?.letter}</p></div>
-        ${contact?.group?.map((itm) => {
-          return ` <div class="relative">
-          <div class="avt">
-            <img src="${
-              itm?.profiles != undefined && itm?.profiles?.avatar != null
-                ? itm?.profiles?.avatar
-                : "./images/icon_profile.png"
-            }" 
-              class="avatar-his-call" style="">
+        ${contact?.group?.map((item) => {
+          return ` 
+          <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
+          <div class="comments-list">
+            <div class="media flex-his">
+              <div class="flex-his">
+                <div class="media-left" href="#">
+                  <img src="${
+                    item?.profiles != undefined &&
+                    item?.profiles?.avatar?.avatar_url != null
+                      ? item?.profiles?.avatar?.avatar_url
+                      : "./images/icon_profile.png"
+                  }" 
+                    class="avatar-his-call" style="">
+                </div>
+                <div class="pull-right">
+                  <fw-tooltip>
+                    <a class="text-title-his-call" href="#" 
+                      attr-user-phone="${
+                        item?.mobile ? item?.mobile : item?.phone
+                      }" 
+                      attr-user-contact="${item?.name ? item?.name : "unknown"}"
+                      attr-user-email = "${item?.email ? item?.email : ""}"
+                      attr-user-id ="${item?.id ? item?.id : ""}" 
+                      onclick="clickContactCall(this)" >
+                        ${item?.name}
+                    </a>
+                    <div slot="tooltip-content">
+                      Click to call
+                    </div>
+                  </fw-tooltip>
+                  <p>
+                  <span class="" id="userPhoneContact">
+                    ${item?.mobile ? item?.mobile : item?.phone}
+                  </span>
+                  </p>
+                </div>
+              </div>
+              <div class="his-body" style="text-align: right;" 
+                attr-id-contact="${item?.id}"
+                onclick="redirectContactInfo(this)"
+              >
+                <fw-tooltip>
+                  <img src="./images/icon-info.png">
+                  <div slot="tooltip-content">
+                    Chi tiết liên hệ
+                  </div>
+                </fw-tooltip>
+              </div>
+            </div>
           </div>
-          <div class="absolute user-info">
-            <p class="user-name">
-              <b>${itm?.name}</b>
-            </p>
-            <p class="user__phone"
-              attr-user-phone="${itm?.mobile ? itm?.mobile : itm?.phone}" 
-              attr-user-contact="${itm?.name ? itm?.name : "unknown"}"
-              attr-user-email = "${itm?.email ? itm?.email : ""}"
-              attr-user-id = "${itm?.id ? itm?.id : ""}"
-              onclick="clickContactCall(this)" >
-              <span class="" id="userPhoneContact">${
-                itm?.mobile ? itm?.mobile : itm?.phone
-              }</span>
-            </p>
-          </div>
-          <div class="absolute-info action">
-            <span id="customer-link" attr-id-contact="${
-              itm?.id
-            }" onclick="redirectContactInfo(this)">
-              <img src="./images/icon-info.png">
-            </span>
-          </div>
-        </div>`;
+        </div>
+        `;
         })}
     </li>`;
     })
     .join("");
 }
+
+// function renderListContact(listContacts) {
+//   document.getElementById("listContact").innerHTML = listContacts
+//     .map((contact) => {
+//       return `<li>
+//       <div><p class="lb__character">${contact?.letter}</p></div>
+//         ${contact?.group?.map((itm) => {
+//           return ` <div class="relative">
+//           <div>
+//             <img src="${
+//               itm?.profiles != undefined && itm?.profiles?.avatar != null
+//                 ? itm?.profiles?.avatar
+//                 : "./images/icon_profile.png"
+//             }"
+//               class="avatar-his-call" style="">
+//           </div>
+//           <div class="absolute user-info">
+//             <fw-tooltip>
+//               <p class="user-name">
+//                 <b>${itm?.name}</b>
+//               </p>
+//               <p class="user__phone"
+//                 attr-user-phone="${itm?.mobile ? itm?.mobile : itm?.phone}"
+//                 attr-user-contact="${itm?.name ? itm?.name : "unknown"}"
+//                 attr-user-email = "${itm?.email ? itm?.email : ""}"
+//                 attr-user-id = "${itm?.id ? itm?.id : ""}"
+//                 onclick="clickContactCall(this)" >
+//                 <span class="" id="userPhoneContact">${
+//                   itm?.mobile ? itm?.mobile : itm?.phone
+//                 }</span>
+//               </p>
+//             <div slot="tooltip-content">Click to call</div>
+//             </fw-tooltip>
+//           </div>
+
+//           <div class="absolute-info action" id="customer-link" attr-id-contact="${
+//             itm?.id
+//           }" onclick="redirectContactInfo(this)">
+//             <fw-tooltip>
+//               <img src="./images/icon-info.png">
+//               <div slot="tooltip-content">Chi tiết liên hệ</div>
+//             </fw-tooltip>
+//           </div>
+//         </div>`;
+//         })}
+//     </li>`;
+//     })
+//     .join("");
+// }
 
 function enableCharacterContact(elem) {
   let def = document.getElementById("valueShowCharacter").value;
@@ -2335,12 +2404,22 @@ $(document).ready(function () {
       var $this = $(this);
       var $results = $("#listContact"); // 1050
 
-      if (
-        Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
-        Math.ceil($results.height())
-      ) {
+      // console.log("$this.scrollTop()", $this.scrollTop());
+      // console.log("$this.height()", $this.height());
+      // console.log("$results.height()", $results.height());
+
+      const halfwayPoint = Math.ceil($results.height() / 2);
+
+      if (Math.ceil($this.scrollTop()) > halfwayPoint) {
         fetchContactData(current_page);
       }
+      // if (
+      //   Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
+      //   Math.ceil($results.height())
+      // ) {
+      //   currentPage++;
+      //   fetchContactData(current_page);
+      // }
     });
 
     // $(".scrollpane-his-call").scroll(function () {
@@ -2361,6 +2440,18 @@ async function showHistoryCall() {
   listMissCall = [];
   listHisCall = [];
 
+  document.getElementById("output").innerText = "";
+  document.getElementById("mainListHistoryCall").style.display = "block";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+
   const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
   // lấy data historycall
   // setTimeout(async () => {
@@ -2375,17 +2466,7 @@ async function showHistoryCall() {
   } else {
     await displayItemsHisCall(getItemsForCurrentPageHisCall());
   }
-  document.getElementById("output").innerText = "";
-  document.getElementById("mainListHistoryCall").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
+
   console.log("listHisCall", listHisCall);
   // });
 }
@@ -2393,6 +2474,18 @@ async function showHistoryCall() {
 async function showMissCall() {
   listMissCall = [];
   listHisCall = [];
+
+  document.getElementById("output").innerText = "";
+  document.getElementById("mainListMissCall").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
 
   const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
   // setTimeout(async () => {
@@ -2413,17 +2506,6 @@ async function showMissCall() {
     await displayItems(getItemsForCurrentPage());
   }
 
-  document.getElementById("output").innerText = "";
-  document.getElementById("mainListMissCall").style.display = "block";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
   console.log("renderListMissCall", listMissCall);
   // });
 }
