@@ -21,6 +21,8 @@ let listContacts = [];
 let listHisCall = [];
 let listMissCall = [];
 
+let isLoading = false;
+
 let listContactsExample = [
   {
     active: false,
@@ -1372,6 +1374,8 @@ function transformerItems(listItem) {
 }
 
 async function getContactData(page) {
+  document.getElementById("loadingImg").style.display = "block";
+  document.getElementById("loadMoreTxt").style.display = "none";
   try {
     var data = await client.request.invokeTemplate("getContacts", {
       context: {
@@ -1416,6 +1420,8 @@ async function getContactData(page) {
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
       // renderListContact(listContacts);
     }
+    document.getElementById("loadingImg").style.display = "none";
+    document.getElementById("loadMoreTxt").style.display = "block";
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1429,6 +1435,8 @@ async function fetchContactData(page) {
     current_page = page;
   }
   console.log("page", page);
+  document.getElementById("loadingImg").style.display = "block";
+  document.getElementById("loadMoreTxt").style.display = "none";
   try {
     var data = await client.request.invokeTemplate("getContacts", {
       context: {
@@ -1461,25 +1469,39 @@ async function fetchContactData(page) {
       var newData = [...response];
 
       console.log("newData", newData);
-      let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
-      listContacts = [...oldData, ...newData];
 
+      let oldData = JSON.parse(localStorage.getItem("cacheDataContact"));
+
+      if (oldData != null && oldData.length > 0) {
+        listContacts = [...oldData, ...newData];
+      } else {
+        listContacts = [...newData];
+      }
       console.log("listContacts", listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       const transformedItems = transformerItems(listContacts);
-      renderListContact(transformedItems?.data ? transformedItems?.data : []);
       current_page = current_page + 1;
+      isLoading = false;
+      renderListContact(transformedItems?.data ? transformedItems?.data : []);
+      document.getElementById("loadingImg").style.display = "none";
+      document.getElementById("loadMoreTxt").style.display = "block";
     } else {
       let newData = JSON.parse(localStorage.getItem("cacheDataContact"));
       listContacts = [...newData];
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
       current_page = page;
       const transformedItems = transformerItems(listContacts);
+      isLoading = false;
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
+      document.getElementById("loadingImg").style.display = "none";
+      document.getElementById("loadMoreTxt").style.display = "none";
       // renderListContact(listContacts);
     }
   } catch (error) {
     console.log(error);
+    isLoading = false;
+    document.getElementById("loadingImg").style.display = "none";
+    document.getElementById("loadMoreTxt").style.display = "block";
   }
 }
 
@@ -2398,34 +2420,42 @@ function redirectContactInfo(elem) {
   // window.open(urlParams, "_blank");
 }
 
+function loadMoreItemsContact() {
+  if (!isLoading) {
+    isLoading = true;
+
+    fetchContactData(current_page);
+  } else {
+    isLoading = false;
+    let data = JSON.parse(localStorage.getItem("cacheDataContact"));
+    renderListContact(data);
+  }
+}
+
 $(document).ready(function () {
   $(function () {
-    $(".scrollpane").scroll(function () {
-      var $this = $(this);
-      var $results = $("#listContact"); // 1050
-
-      // console.log("$this.scrollTop()", $this.scrollTop());
-      // console.log("$this.height()", $this.height());
-      // console.log("$results.height()", $results.height());
-
-      const halfwayPoint = Math.ceil($results.height() / 2);
-
-      if (Math.ceil($this.scrollTop()) > halfwayPoint) {
-        fetchContactData(current_page);
-      }
-      // if (
-      //   Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
-      //   Math.ceil($results.height())
-      // ) {
-      //   currentPage++;
-      //   fetchContactData(current_page);
-      // }
-    });
-
+    // $(".scrollpane").scroll(function () {
+    //   var $this = $(this);
+    //   var $results = $("#listContact"); // 1050
+    //   // console.log("$this.scrollTop()", $this.scrollTop());
+    //   // console.log("$this.height()", $this.height());
+    //   // console.log("$results.height()", $results.height());
+    //   const halfwayPoint = Math.ceil($results.height() / 2);
+    //   if (!isLoading && Math.ceil($this.scrollTop()) > halfwayPoint) {
+    //     isLoading = true;
+    //     fetchContactData(current_page);
+    //   }
+    //   // if (
+    //   //   Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
+    //   //   Math.ceil($results.height())
+    //   // ) {
+    //   //   currentPage++;
+    //   //   fetchContactData(current_page);
+    //   // }
+    // });
     // $(".scrollpane-his-call").scroll(function () {
     //   var $this = $(this);
     //   var $resultsMisCall = $("#listHisMissCall");
-
     //   if (
     //     Math.ceil($this.scrollTop()) + Math.ceil($this.height()) ==
     //     Math.ceil($resultsMisCall.height())
