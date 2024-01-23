@@ -92,5 +92,27 @@
         "Content-Type": "application/json"
       }
     }
+  },
+  "getFileCsvTicket": {
+    "schema": {
+      "method": "GET",
+      "protocol": "https",
+      "host": "s3stg-crm.oncallcx.vn",
+      "path": "/file/<%= context.id_ticket %>",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  "getFileS3":{
+    "schema": {
+      "method": "GET",
+      "protocol": "https",
+      "host": "s3stg-crm.oncallcx.vn",
+      "path": "/bucket/pbx-stg/PBX-Test%2F<%= context.name_url_s3 %>/link",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
   }
 }

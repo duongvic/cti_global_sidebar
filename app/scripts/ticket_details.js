@@ -2,27 +2,39 @@ let client;
 let idTicket = "";
 let idContact = "";
 let descriptionText = "";
-let url_record =
-  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231227-093134_a8af567859d796ca_cc2ftistg-2b0cbc25338675bd.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=bhZ3mjeTs%2BOygvZp5VTb%2FBB%2B21U%3D&Expires=1704270512";
+let name_file = "";
+let url_record = "";
 
 app.initialized().then(function (_client) {
   client = _client;
   client.events.on("app.activated", function () {
     client.data
       .get("ticket")
-      .then(function (data) {
+      .then(async function (data) {
         idTicket = data?.ticket?.id;
         idContact = data?.ticket?.requester_id;
-        // B1. call api lấy file csv
-        // B2. map file với idTicket
-        // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
-        // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
         descriptionText = data?.ticket?.description_text;
         console.log("Ticket Data", data);
         if (descriptionText == "file record") {
           return;
         } else {
-          updateTicket(idTicket, idContact);
+          // B1. call api lấy file csv
+          const resultDataCsv = await getFileCsvTicket(idTicket);
+          if (resultDataCsv.length > 0) {
+            console.log("chay vao bc 1 getFileCsvTicket", resultDataCsv);
+            var dateTimeStart = dateFormat(resultDataCsv?.TimeStart);
+            var crFileName =
+              "cr_" + dateTimeStart + "_" + resultDataCsv?.CallId + ".wav";
+            // B2. get file từ s3
+            const resultDataS3 = await getFileS3(crFileName);
+
+            url_record = resultDataS3?.name ? resultDataS3?.name : "";
+            if (url_record != "") {
+             await updateTicket(idTicket, idContact);
+            }
+          }
+          // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
+          // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
         }
       })
       .catch(function (e) {
@@ -30,6 +42,39 @@ app.initialized().then(function (_client) {
       });
   });
 });
+
+async function getFileCsvTicket(idTicket) {
+  try {
+    var result = await client.request.invokeTemplate("getFileCsvTicket", {
+      context: {
+        id_ticket: idTicket,
+      },
+    });
+    debugger;
+    var detail = result?.response ? JSON.parse(result?.response) : [];
+
+    return detail;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+async function getFileS3(crFileName) {
+  try {
+    var result = await client.request.invokeTemplate("getFileS3", {
+      context: {
+        name_url_s3: crFileName,
+      },
+    });
+    var detail = result?.response ? JSON.parse(result?.response) : [];
+    console.log("chay vao bc 2 getFileS3", detail);
+    return detail;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
 
 async function updateTicket(idTicket, idContact) {
   console.log("co chay vao update ticket:", idContact);
@@ -83,4 +128,19 @@ function showNotify(type, message) {
     type: type,
     message: message,
   });
+}
+
+function dateFormat(timeStamp) {
+  let dateFormat = new Date(timeStamp);
+  const year = dateFormat.getFullYear();
+  const month =
+    dateFormat.getMonth() + 1 < 10
+      ? `0${dateFormat.getMonth() + 1}`
+      : dateFormat.getMonth() + 1;
+  const date =
+    dateFormat.getDate() < 10
+      ? `0${dateFormat.getDate()}`
+      : dateFormat.getDate();
+  const dateTimeStart = year + month + date;
+  return dateTimeStart;
 }
