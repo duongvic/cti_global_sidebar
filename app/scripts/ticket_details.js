@@ -15,27 +15,28 @@ app.initialized().then(function (_client) {
         idContact = data?.ticket?.requester_id;
         descriptionText = data?.ticket?.description_text;
         console.log("Ticket Data", data);
-        if (descriptionText == "file record") {
-          return;
-        } else {
-          // B1. call api lấy file csv
-          const resultDataCsv = await getFileCsvTicket(idTicket);
-          if (resultDataCsv.length > 0) {
-            console.log("chay vao bc 1 getFileCsvTicket", resultDataCsv);
-            var dateTimeStart = dateFormat(resultDataCsv?.TimeStart);
-            var crFileName =
-              "cr_" + dateTimeStart + "_" + resultDataCsv?.CallId + ".wav";
-            // B2. get file từ s3
-            const resultDataS3 = await getFileS3(crFileName);
+        // if (descriptionText == "file record") {
+        //   return;
+        // } else {
+        // B1. call api lấy file csv
+        const resultDataCsv = await getFileCsvTicket(idTicket);
+        if (resultDataCsv.length > 0) {
+          console.log("chay vao bc 1 getFileCsvTicket", resultDataCsv);
+          var dateTimeConnect = dateFormat(resultDataCsv[0]?.TimeConnect);
+          var crFileName =
+            "cr_" + dateTimeConnect + "_" + resultDataCsv[0]?.CallId + ".wav";
+          // B2. get file từ s3
+          const resultDataS3 = await getFileS3(crFileName);
 
-            url_record = resultDataS3?.name ? resultDataS3?.name : "";
-            if (url_record != "") {
-             await updateTicket(idTicket, idContact);
-            }
+          url_record = resultDataS3;
+          debugger;
+          if (url_record != "") {
+            await updateTicket(idTicket, idContact);
           }
-          // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
-          // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
         }
+        // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
+        // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
+        // }
       })
       .catch(function (e) {
         console.log("Exception - ", e);
@@ -50,12 +51,10 @@ async function getFileCsvTicket(idTicket) {
         id_ticket: idTicket,
       },
     });
-    debugger;
     var detail = result?.response ? JSON.parse(result?.response) : [];
-
     return detail;
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return [];
   }
 }
@@ -67,12 +66,12 @@ async function getFileS3(crFileName) {
         name_url_s3: crFileName,
       },
     });
-    var detail = result?.response ? JSON.parse(result?.response) : [];
-    console.log("chay vao bc 2 getFileS3", detail);
-    return detail;
+    var link_record = result?.response ? result?.response : "";
+    console.log("chay vao bc 2 getFileS3", link_record);
+    return link_record;
   } catch (error) {
-    console.error(error);
-    return [];
+    console.log(error);
+    return "";
   }
 }
 
@@ -131,16 +130,30 @@ function showNotify(type, message) {
 }
 
 function dateFormat(timeStamp) {
-  let dateFormat = new Date(timeStamp);
-  const year = dateFormat.getFullYear();
+  let dateFormat = new Date(parseInt(timeStamp));
+  const year = `${dateFormat.getFullYear()}`;
   const month =
     dateFormat.getMonth() + 1 < 10
       ? `0${dateFormat.getMonth() + 1}`
-      : dateFormat.getMonth() + 1;
+      : `${dateFormat.getMonth() + 1}`;
   const date =
     dateFormat.getDate() < 10
       ? `0${dateFormat.getDate()}`
-      : dateFormat.getDate();
-  const dateTimeStart = year + month + date;
+      : `${dateFormat.getDate()}`;
+  const h =
+    dateFormat.getHours() < 10
+      ? `0${dateFormat.getHours()}`
+      : `${dateFormat.getHours()}`;
+  const min =
+    dateFormat.getMinutes() < 10
+      ? `0${dateFormat.getMinutes()}`
+      : `${dateFormat.getMinutes()}`;
+  const seconds =
+    dateFormat.getSeconds() < 10
+      ? `0${dateFormat.getSeconds()}`
+      : `${dateFormat.getSeconds()}`;
+  const dateTimeStart = `${year + month + date}`
+    .concat("-")
+    .concat(`${h + min + seconds}`);
   return dateTimeStart;
 }

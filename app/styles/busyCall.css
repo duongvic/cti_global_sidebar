@@ -109,5 +109,7 @@
 }
 
 .busy__call .icon__preCall {
-  width: 22px;
+  height: 16px;
+  width: 16px;
+  margin-right: 10px;
 }

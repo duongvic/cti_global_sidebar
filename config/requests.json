@@ -109,7 +109,7 @@
       "method": "GET",
       "protocol": "https",
       "host": "s3stg-crm.oncallcx.vn",
-      "path": "/bucket/pbx-stg/PBX-Test%2F<%= context.name_url_s3 %>/link",
+      "path": "/bucket/pbx-stg/PBX_CRM%2F<%= context.name_url_s3 %>/link",
       "headers": {
         "Content-Type": "application/json"
       }

@@ -1072,6 +1072,44 @@ function stop() {
 }
 
 agent.on("call", (event) => {
+  if (event?.content?.cause == "busy") {
+    console.log("trường hợp máy bận :", event?.content?.cause);
+    ///view màn bận
+    isMainShow = "busycall";
+    // console.log("isMainShow", isMainShow);
+    // client.interface
+    //   .trigger("show", { id: "softphone" })
+    //   .then(function () {
+    //     debugger;
+    //     client.data.get("loggedInUser").then(async function (data) {
+    //       agent_ref = data?.loggedInUser?.availability?.agent_ref
+    //         ? data?.loggedInUser?.availability?.agent_ref
+    //         : undefined;
+    //       const phone = data?.loggedInUser?.contact?.phone
+    //         ? data?.loggedInUser?.contact?.phone
+    //         : data?.loggedInUser?.contact?.mobile
+    //         ? data?.loggedInUser?.contact?.mobile
+    //         : null;
+    //       window.userPhone = phone;
+
+    //     });
+    //   })
+    //   .catch(function (error) {
+    //     console.error("Error: Failed to open the app");
+    //     console.error(error);
+    //   });
+    document.getElementById("appTextPhoneBusyCall").textContent =
+      phoneNumberReceiver;
+    document.getElementById("appTxtNameContactBusyCall").textContent =
+      nameContact ? nameContact : phoneNumberReceiver;
+
+    $("#appTxtNameContactBusyCall").css({ color: "#3b3b3b" });
+    resizeAppDefault();
+    viewMainBusy();
+  }
+});
+
+agent.on("call", (event) => {
   let call = event.call;
   switch (call.localConnectionInfo) {
     case "alerting": // call inbound gọi
@@ -1169,50 +1207,30 @@ agent.on("call", (event) => {
       break;
     case "null":
       console.log(`call to ${call.number} is gone. Cancel`);
+      console.log("isMainShow", isMainShow);
       stop();
-      onAppDeactive();
-      // location.reload();
+      if (isMainShow == "busycall") {
+        return;
+      } else {
+        onAppDeactive();
+        location.reload();
+      }
       break;
   }
 });
 
-agent.on("call", (event) => {
-  if (event?.content?.cause == "busy") {
-    console.log("trường hợp máy bận :", event?.content?.cause);
-    ///view màn bận
-
-    client.interface
-      .trigger("show", { id: "softphone" })
-      .then(function () {
-        resizeAppDefault();
-        document.getElementById("mainBusyCall").style.display = "block";
-        document.getElementById("mainContent").style.display = "none";
-        document.getElementById("mainOutbound").style.display = "none";
-        document.getElementById("mainCollapseClickToCall").style.display =
-          "none";
-        document.getElementById("mainListContacts").style.display = "none";
-        document.getElementById("mainListHistoryCall").style.display = "none";
-        document.getElementById("mainInbound").style.display = "none";
-        document.getElementById("mainInboundCollapse").style.display = "none";
-        document.getElementById("mainInboundListen").style.display = "none";
-        document.getElementById("mainInboundListenCollapse").style.display =
-          "none";
-
-        document.getElementById("appTextPhoneBusyCall").textContent =
-          phoneNumberReceiver;
-
-        document.getElementById("appTxtNameContactBusyCall").textContent =
-          nameContact ? nameContact : phoneNumberReceiver;
-
-        $("#appTxtNameContactBusyCall").css({ color: "#3b3b3b" });
-      })
-      .catch(function (error) {
-        console.error("Error: Failed to open the app");
-        console.error(error);
-      });
-  }
-});
-
+function viewMainBusy() {
+  document.getElementById("mainBusyCall").style.display = "block";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+  document.getElementById("mainInboundListenCollapse").style.display = "none";
+}
 // navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
 //   mediaDevices
 //     .filter(({ kind }) => kind == "audioinput")
@@ -1905,10 +1923,13 @@ function onAppActivate() {
       document
         .getElementById("toggleEndCallBusy")
         .addEventListener("click", () => {
+          resizeAppDefault();
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(function () {
               isMainOutbound = false;
+              $("#callEnter").attr("disabled", true);
+              $("#callEnter").css({ backgroundColor: "darkgray" });
               document.getElementById("mainContent").style.display = "block";
               document.getElementById("mainOutbound").style.display = "none";
               document.getElementById("mainBusyCall").style.display = "none";
@@ -1935,13 +1956,15 @@ function onAppActivate() {
                 "";
               document.getElementById("appTextPhone").value = "";
               document.getElementById("appTextPhone").innerText = "";
+
               /**as7 backend **/
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-              resizeAppDefault();
-              resetText();
-              location.reload();
+              // resizeAppDefault();
+              // resetText();
+              onAppDeactive();
+              // location.reload();
             })
             .catch(function (error) {
               console.error("Error: Failed to close the CTI app");
@@ -1953,6 +1976,7 @@ function onAppActivate() {
         .getElementById("toggleEndCallCollapse")
         .addEventListener("click", () => {
           isMainOutbound = false;
+          resizeAppDefault();
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(function () {
@@ -1984,7 +2008,6 @@ function onAppActivate() {
               let call = webphone.calls[0];
               call.clearConnection();
               /**as7 backend **/
-
               onAppDeactive();
               location.reload();
             })
@@ -3441,4 +3464,36 @@ async function displayItemsHisCall(items) {
   );
   localStorage.setItem("cacheDataHisCall", JSON.stringify(response));
   renderListHistoryCall(response);
+}
+
+function openCity(nameMainView) {
+  var i;
+  var x = document.getElementsByClassName("city");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  document.getElementById(nameMainView).style.display = "block";
+}
+
+function preCall() {
+  const phone_again = document.getElementById("appTextPhoneBusyCall").value;
+  phoneNumberReceiver = phone_again;
+  openCity("mainOutbound");
+
+  let call = webphone.calls[0];
+  if (!call) {
+    // click without an active call -> start a video call to number 23
+    webphone.makeCall(phoneNumberReceiver, {
+      autoOriginate: "doNotPrompt",
+      audio: true,
+      video: false,
+    });
+  } else if (call.localConnectionInfo == "alerting") {
+    // click while we have an alerting call -> accept it
+    call.answerCall({ audio: true, video: true });
+  } else {
+    // otherwise we release the call
+    call.clearConnection();
+    onAppDeactive();
+  }
 }
