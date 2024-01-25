@@ -27,16 +27,11 @@ app.initialized().then(function (_client) {
             "cr_" + dateTimeConnect + "_" + resultDataCsv[0]?.CallId + ".wav";
           // B2. get file từ s3
           const resultDataS3 = await getFileS3(crFileName);
-
           url_record = resultDataS3;
-          debugger;
           if (url_record != "") {
             await updateTicket(idTicket, idContact);
           }
         }
-        // B3. Sau khi có file thì call sang api s3 với tham sô callID để lay url_record
-        // B4 Sau khi lấy record gọi api update ticket trường description để cập nhật reccord
-        // }
       })
       .catch(function (e) {
         console.log("Exception - ", e);
