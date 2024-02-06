@@ -1974,8 +1974,9 @@ function onAppActivate() {
       // ------ ----
       document
         .getElementById("toggleEndCallCollapse")
-        .addEventListener("click", () => {
+        .addEventListener("click", async () => {
           isMainOutbound = false;
+          await insertIdTicketAs7(idTicket);
           resizeAppDefault();
           client.interface
             .trigger("hide", { id: "softphone" })
@@ -2975,7 +2976,7 @@ async function createTicket() {
 async function createContact() {
   try {
     const properties = JSON.stringify({
-      name: `${"Unknown Contact"} - ${phoneNumberReceiver}`,
+      name: `${"Unknown Contact"}-${phoneNumberReceiver}`,
       phone: encodeURIComponent(phoneNumberReceiver),
       email: `unknown_contact${phoneNumberReceiver}@gmail.com`,
     });
@@ -3045,6 +3046,7 @@ async function updateTicket(idTicket) {
 
 async function insertIdTicketAs7(idTicket) {
   console.log("co chay vao insertIdTicketAs7:", idTicket);
+  debugger;
   try {
     var data = await client.request.invokeTemplate("insertIdTicketAs7", {
       context: {

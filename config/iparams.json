@@ -21,8 +21,7 @@
     "display_name": "terminalId",
     "description": "Please enter your terminalId as7",
     "type": "text",
-    "required": true,
-    "secure": true
+    "required": true
   },
   "usernameAs7": {
     "display_name": "Username AS7",

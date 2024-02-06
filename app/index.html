@@ -254,8 +254,8 @@
               src="./images/Attend_Transfer.svg"></button>
         </div>
         <div class="btn-bus">
-          <button id="toggleEndCallBusy" class="hint" type="button"><span><img
-                class="icon__calling" src="./images/end_call.png" /></span> Cancel</button>
+          <button id="toggleEndCallBusy" class="hint" type="button"><span><img class="icon__calling"
+                src="./images/end_call.png" /></span> Cancel</button>
           <button id="togglePreCall" onclick="preCall()" class="hint-green precall" type="button"><span><img
                 class="icon__preCall" src="./images/call.png" /></span>Call again</button>
         </div>
@@ -739,8 +739,8 @@
 
 <script defer src="scripts/app.js"></script>
 <!-- <script defer src="scripts/as7.js"></script> -->
-<script async type="module" src="https://unpkg.com/@freshworks/crayons@3/dist/crayons/crayons.esm.js"></script>
-<script async nomodule src="https://unpkg.com/@freshworks/crayons@3/dist/crayons/crayons.js"></script>
+<script async type="module" src="https://unpkg.com/@freshworks/crayons@4/dist/crayons/crayons.esm.js"></script>
+<script async nomodule src="https://unpkg.com/@freshworks/crayons@4/dist/crayons/crayons.js"></script>
 
 <script>
   // $('input[name="output"]').on('change', function () {
@@ -766,7 +766,17 @@
   //   }
   // })
 
-
+  /**
+ * Hiển thị ra màn hình bảng chữ cái abc.
+ * Ví dụ: String.fromCharCode(97)) sẽ trả về ký tự"a" 
+ */
+  function fromCharCode() {
+    // viết code ở đây.
+    for (i = 97; i < 123; i++) {
+      var s = String.fromCharCode(i);
+      console.log(s.toUpperCase());
+    }
+  }
 </script>
 
 </html>

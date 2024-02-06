@@ -106,7 +106,7 @@ async function updateTicket(idTicket, idContact) {
     console.log("upload recored ticket thanh cong", detail);
     showNotify(
       "success",
-      `Successfully upload recored ticket for: ${idTicket}.Reload page after endCall!`
+      `Successfully upload recored ticket for: ${idTicket}.Reload page!`
     );
   } catch (error) {
     console.error(
