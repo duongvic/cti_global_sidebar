@@ -1208,6 +1208,7 @@ agent.on("call", (event) => {
     case "null":
       console.log(`call to ${call.number} is gone. Cancel`);
       console.log("isMainShow", isMainShow);
+      insertIdTicketAs7(idTicket);
       stop();
       if (isMainShow == "busycall") {
         return;
@@ -3046,7 +3047,6 @@ async function updateTicket(idTicket) {
 
 async function insertIdTicketAs7(idTicket) {
   console.log("co chay vao insertIdTicketAs7:", idTicket);
-  debugger;
   try {
     var data = await client.request.invokeTemplate("insertIdTicketAs7", {
       context: {
@@ -3055,7 +3055,6 @@ async function insertIdTicketAs7(idTicket) {
         accountName: idContact,
       },
     });
-
     var detail = data?.response ? JSON.parse(data?.response) : [];
     console.info("Successfully created insertIdTicketAs7 in Freshdesk", detail);
     console.log("detail insertIdTicketAs7", detail?.pcdr?.id);

@@ -24,7 +24,7 @@ app.initialized().then(function (_client) {
           console.log("chay vao bc 1 getFileCsvTicket", resultDataCsv);
           var dateTimeConnect = dateFormat(resultDataCsv[0]?.TimeConnect);
           var crFileName =
-            "cr_" + dateTimeConnect + "_" + resultDataCsv[0]?.CallId + ".wav";
+            "cr_" + dateTimeConnect + "_" + resultDataCsv[0]?.CallID + ".wav";
           // B2. get file từ s3
           const resultDataS3 = await getFileS3(crFileName);
           url_record = resultDataS3;
