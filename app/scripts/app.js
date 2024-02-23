@@ -1076,28 +1076,6 @@ agent.on("call", (event) => {
     console.log("trường hợp máy bận :", event?.content?.cause);
     ///view màn bận
     isMainShow = "busycall";
-    // console.log("isMainShow", isMainShow);
-    // client.interface
-    //   .trigger("show", { id: "softphone" })
-    //   .then(function () {
-    //     debugger;
-    //     client.data.get("loggedInUser").then(async function (data) {
-    //       agent_ref = data?.loggedInUser?.availability?.agent_ref
-    //         ? data?.loggedInUser?.availability?.agent_ref
-    //         : undefined;
-    //       const phone = data?.loggedInUser?.contact?.phone
-    //         ? data?.loggedInUser?.contact?.phone
-    //         : data?.loggedInUser?.contact?.mobile
-    //         ? data?.loggedInUser?.contact?.mobile
-    //         : null;
-    //       window.userPhone = phone;
-
-    //     });
-    //   })
-    //   .catch(function (error) {
-    //     console.error("Error: Failed to open the app");
-    //     console.error(error);
-    //   });
     document.getElementById("appTextPhoneBusyCall").textContent =
       phoneNumberReceiver;
     document.getElementById("appTxtNameContactBusyCall").textContent =
@@ -2554,7 +2532,11 @@ async function showMissCall() {
       listMissCall.push(arr[i]);
     }
   }
-  if (dataCached != null && dataCached.length > 0) {
+  if (
+    dataCached != null &&
+    dataCached.length > 0 &&
+    listMissCall.length == dataCached.length
+  ) {
     renderListMissCall(dataCached);
   } else {
     // Khởi tạo trang với dữ liệu ban đầu
