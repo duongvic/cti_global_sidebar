@@ -2,6 +2,7 @@ let username = "";
 let password = "";
 let sip = "";
 
+let idTicket = null;
 let idContact = "";
 let nameContact = "";
 let avtarContact = "";
@@ -1185,14 +1186,17 @@ agent.on("call", (event) => {
       break;
     case "null":
       console.log(`call to ${call.number} is gone. Cancel`);
-      console.log("isMainShow", isMainShow);
-      insertIdTicketAs7(idTicket);
+      console.log("isMainShow:", isMainShow);
+      console.log("idTicket sau khi tat:", idTicket);
+      if (idTicket != null) {
+        insertIdTicketAs7(idTicket);
+      }
       stop();
       if (isMainShow == "busycall") {
         return;
       } else {
         onAppDeactive();
-        location.reload();
+        // location.reload();
       }
       break;
   }
@@ -1879,7 +1883,10 @@ function onAppActivate() {
         .addEventListener("click", async () => {
           // await updateTicket(idTicket);
           isMainOutbound = false;
-          await insertIdTicketAs7(idTicket);
+          if (idTicket != null) {
+            await insertIdTicketAs7(idTicket);
+          }
+
           client.interface
             .trigger("hide", { id: "softphone" })
             .then(async function () {
@@ -1887,11 +1894,13 @@ function onAppActivate() {
               /**as7 backend **/
 
               let call = webphone.calls[0];
-              call.clearConnection();
-
+              if (call != undefined) {
+                call.clearConnection();
+              }
               console.log("đã gọi vào end call as7");
               /**as7 backend **/
               onAppDeactive();
+              document.getElementById("mainOutbound").style.display = "none";
             })
             .catch(function (error) {
               console.error("Error: Failed to close the CTI app");
@@ -1938,10 +1947,10 @@ function onAppActivate() {
 
               /**as7 backend **/
               let call = webphone.calls[0];
-              call.clearConnection();
+              if (call != undefined) {
+                call.clearConnection();
+              }
               /**as7 backend **/
-              // resizeAppDefault();
-              // resetText();
               onAppDeactive();
               // location.reload();
             })
@@ -1955,6 +1964,7 @@ function onAppActivate() {
         .getElementById("toggleEndCallCollapse")
         .addEventListener("click", async () => {
           isMainOutbound = false;
+
           await insertIdTicketAs7(idTicket);
           resizeAppDefault();
           client.interface
@@ -1986,7 +1996,9 @@ function onAppActivate() {
               document.getElementById("appTextPhone").innerText = "";
               /**as7 backend **/
               let call = webphone.calls[0];
-              call.clearConnection();
+              if (call != undefined) {
+                call.clearConnection();
+              }
               /**as7 backend **/
               onAppDeactive();
               location.reload();
@@ -2722,6 +2734,7 @@ async function searchContactKeyword(term) {
 //Inbound
 function endCallDecline() {
   endCall();
+  location.reload();
 }
 
 // nghe máy từ ngoài gọi vào
@@ -2771,15 +2784,25 @@ function acceptCall() {
 
 function endCall() {
   let call = webphone.calls[0];
-  call.clearConnection();
+  if (call != undefined) {
+    call.clearConnection();
+  }
+  location.reload(true);
   stop();
+  // onAppDeactive();
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  // location.reload();
   onAppDeactive();
-  location.reload();
 }
 
 function endCallInboundListen() {
   let call = webphone.calls[0];
-  call.clearConnection();
+  if (call != undefined) {
+    call.clearConnection();
+  }
   location.reload(true);
   stop();
   document.getElementById("mainInboundListen").style.display = "none";
