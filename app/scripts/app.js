@@ -848,6 +848,10 @@ let listContactsExample = [
     ],
   },
 ];
+
+let appTxtService = "";
+let email_acct = undefined;
+let role_acct = undefined;
 let agent_ref = undefined;
 let isMainActive = false;
 let isMainContactActive = false;
@@ -1321,8 +1325,8 @@ function closeApp() {
     .trigger("hide", { id: "softphone" })
     .then(function () {
       resizeAppDefault();
-      resetText();
-      location.reload();
+      // resetText();
+      // location.reload(); // thử nhơ mở lại
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
@@ -1795,13 +1799,14 @@ let client;
 init();
 async function init() {
   client = await app.initialized();
+
   client.events.on("app.activated", onAppActivate);
   client.events.on("app.deactivated", onAppDeactive);
 }
 
 function onAppActivate() {
   resizeAppDefault();
-
+  openApp();
   client.data.get("loggedInUser").then(
     function (data) {
       agent_ref = data?.loggedInUser?.availability?.agent_ref
@@ -1815,11 +1820,146 @@ function onAppActivate() {
       window.userPhone = phone;
       console.log("data loggedInUser", data);
 
+      role_acct = data?.loggedInUser?.type
+        ? data?.loggedInUser?.type
+        : undefined;
+      email_acct = data?.loggedInUser?.contact?.email
+        ? data?.loggedInUser?.contact?.email
+        : undefined;
       //Getting all iparams
       client.iparams.get().then(function (data) {
         console.log("iparams:", data);
       });
 
+      var displayEmailLogin = document.getElementById("displayValueEmailLogin");
+      // Thiết lập giá trị cho thẻ <p>
+      displayEmailLogin.textContent = email_acct;
+
+      // lay thong tin extend gọi
+      var displayRoleAcct = document.getElementById("roleAcct");
+      // Thiết lập giá trị cho thẻ <input>
+      displayRoleAcct.value =
+        role_acct === "support_agent" ? "Support Agent" : role_acct;
+      displayRoleAcct.innerText =
+        role_acct === "support_agent" ? "Support Agent" : role_acct;
+
+      // var roleDataSource = [
+      //   {
+      //     value: role_acct,
+      //     text: role_acct === "support_agent" ? "Support Agent" : role_acct,
+      //   },
+      // ];
+
+      // var roleOptionSelect = document.getElementById("roleAcct");
+      // roleOptionSelect.options = iconDataSource;
+      // roleOptionSelect.setSelectedOptions(roleDataSource);
+
+      var extDataSource = [
+        {
+          value: "1100",
+          text: "EXT 1100",
+          // subText: "Pirate King",
+          // graphicsProps: { name: "verified" },
+        },
+        {
+          value: "1991",
+          text: "EXT 1991",
+          // subText: "Best Swordsman",
+          // graphicsProps: { name: "magic-wand" },
+        },
+        {
+          value: "1992",
+          text: "EXT 1992",
+          // subText: "Best Chef",
+          // graphicsProps: { name: "ecommerce" },
+        },
+        {
+          value: "1993",
+          text: "EXT 1993",
+          // subText: "Best Chef",
+          // graphicsProps: { name: "ecommerce" },
+        },
+        {
+          value: "1994",
+          text: "EXT 1994",
+          // subText: "Best Chef",
+          // graphicsProps: { name: "ecommerce" },
+        },
+      ];
+      var iconVariant = document.getElementById("complexSelect");
+      iconVariant.options = extDataSource;
+
+      // lay thong tin extend gọi
+      var displayValueExtension = document.getElementById(
+        "displayValueExtension"
+      );
+
+      var appTxtServiceValue = "SST-QC05";
+
+      iconVariant.addEventListener("fwChange", (e) => {
+        // Thiết lập giá trị cho thẻ <input>
+        displayValueExtension.value = e?.value;
+        displayValueExtension.innerText = e?.value;
+
+        document.getElementById("appTxtService").value =
+          appTxtServiceValue + "." + e?.value;
+        document.getElementById("appTxtService").innerText = appTxtServiceValue;
+        console.log(e.detail);
+      });
+
+      var statusDataSource = [
+        {
+          value: "ready",
+          text: "Status_Ready",
+        },
+        {
+          value: "lunch",
+          text: "Status_Lunch",
+        },
+        {
+          value: "messages",
+          text: "Status_Messages",
+        },
+        {
+          value: "wrapUp",
+          text: "Status_WrapUp",
+        },
+        {
+          value: "pause",
+          text: "Status_Pause",
+        },
+        {
+          value: "logOff",
+          text: "Status_LogOff",
+        },
+      ];
+
+      var statusOptionSelect = document.getElementById("statusAcct");
+      statusOptionSelect.options = statusDataSource;
+      statusOptionSelect.setSelectedOptions([
+        {
+          value: "ready",
+          text: "Status_Ready",
+        },
+      ]);
+
+      var displayValueStatusAcct = document.getElementById(
+        "displayValueStatusAcct"
+      );
+
+      statusOptionSelect.addEventListener("fwChange", (e) => {
+        displayValueStatusAcct.value = e?.value;
+        displayValueStatusAcct.innerText = e?.value;
+        console.log(e.detail);
+      });
+
+      // document
+      //   .getElementById("btnConnect")
+      //   .addEventListener("fwClick", showSoftphoneConnect());
+
+      // document
+      //   .getElementById("btnGoToOncallCX")
+      //   .addEventListener("fwClick", goToOncallCX());
       // isMainOutbound = false;
       current_page = 1;
 
@@ -3502,4 +3642,30 @@ function preCall() {
     call.clearConnection();
     onAppDeactive();
   }
+}
+
+// function showDialogLogin() {
+//   client.interface
+//     .trigger("showDialog", {
+//       title: "Sample Dialog1111",
+//       template: "../views/dialog.html",
+//     })
+//     .then(
+//       function (data) {
+//         console.log("Parent:InterfaceAPI:showDialog", data);
+//       },
+//       function (error) {
+//         console.log("Parent:InterfaceAPI:showDialog", error);
+//       }
+//     );
+// }
+
+async function showSoftphoneConnect() {
+  document.getElementById("viewConnecting").style.display = "none";
+  document.getElementById("displayConnect").style.display = "block";
+}
+
+async function goToOncallCX() {
+  document.getElementById("mainConnect").style.display = "none";
+  document.getElementById("mainContent").style.display = "block";
 }

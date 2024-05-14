@@ -166,3 +166,28 @@ html {
 .correct__number__phone {
   color: white;
 }
+
+.avatar-connect {
+  width: 44px;
+  height: 44px;
+  border-radius: 24px;
+}
+
+.mr {
+  margin-right: 10px;
+}
+.containerConnect {
+  display: flex;
+  /* Kích hoạt tính năng Flexbox cho container */
+  flex-direction: row;
+  /* Sắp xếp các phần tử con theo hàng */
+}
+
+.column {
+  flex: 1;
+  /* Cho mỗi cột chiếm một nửa không gian có sẵn */
+  padding: 10px 0;
+  /* Thêm khoảng cách bên trong cho mỗi cột */
+  /* border: 1px solid #ccc; */
+  /* Thêm đường viền cho mỗi cột */
+}
