@@ -166,3 +166,122 @@ html {
 .correct__number__phone {
   color: white;
 }
+
+.avatar-connect {
+  width: 44px;
+  height: 44px;
+  border-radius: 24px;
+}
+
+.mr {
+  margin-right: 10px;
+}
+.containerConnect {
+  display: flex;
+  /* Kích hoạt tính năng Flexbox cho container */
+  flex-direction: row;
+  /* Sắp xếp các phần tử con theo hàng */
+}
+
+.column {
+  flex: 1;
+  /* Cho mỗi cột chiếm một nửa không gian có sẵn */
+  padding: 10px 0;
+  /* Thêm khoảng cách bên trong cho mỗi cột */
+  /* border: 1px solid #ccc; */
+  /* Thêm đường viền cho mỗi cột */
+}
+
+.btn {
+  display: inline-flex;
+  place-content: center;
+  align-content: center;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 0px;
+  cursor: inherit;
+  letter-spacing: 0px;
+  outline: 0px;
+  border-radius: 4px;
+  --fw-icon-color: currentColor;
+}
+
+.btn--normal {
+  min-width: var(--fw-button-min-width, 80px);
+  height: 32px;
+}
+.btn--primary {
+  background-color: rgb(38, 73, 102);
+  color: rgb(255, 255, 255);
+  border-color: rgb(18, 52, 77);
+  background-image: linear-gradient(rgb(38, 73, 102), rgb(18, 52, 77));
+}
+
+.btn--secondary[disabled] {
+  background: rgb(235, 239, 243);
+  border-color: rgb(207, 215, 223);
+  color: rgb(146, 162, 177);
+}
+.btn.disabled,
+.btn[disabled] {
+  cursor: not-allowed;
+}
+
+.btn--normal {
+  min-width: var(--fw-button-min-width, 80px);
+  height: 32px;
+}
+
+.btn--has-label.btn--normal .btn--label {
+  padding-inline: var(--fw-button-label-vertical-padding, 12px);
+  padding-block: 0px;
+}
+
+.btn .btn--label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  line-height: 20px;
+}
+
+.btn--label,
+.btn--loader {
+  transition: opacity 0.3s ease-out 0s;
+}
+
+.btn--primary:focus:not([disabled]),
+.btn--primary:hover:not([disabled]) {
+  background-color: #12344d;
+  background-image: none;
+  color: rgb(255, 255, 255);
+}
+
+.btn--primary.disabled,
+.btn--primary[disabled] {
+  background-image: linear-gradient(to bottom, #92a2b1, #7b8e9f);
+  border-color: #7b8e9f;
+  color: rgba(255, 255, 255, 0.5);
+}
+.btn.disabled,
+.btn[disabled] {
+  cursor: not-allowed;
+}
+
+.connect--lable {
+  font-size: 16px;
+  font-weight: 700;
+}
+.connect--p {
+  font-size: 15px;
+}
