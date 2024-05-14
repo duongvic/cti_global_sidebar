@@ -1,6 +1,6 @@
 let client;
-let idTicket = null;
-let idContact = "";
+// let idTicket = null;
+// let idContact = "";
 let descriptionText = "";
 let name_file = "";
 let url_record = null;
@@ -79,6 +79,12 @@ app.initialized().then(function (_client) {
             //   location.reload();
             // }
           }
+        } else {
+          console.log(
+            "gọi sang api: s3stg-crm.oncallcx.vn/file/"
+              .concat(idTicket)
+              .concat("chưa trả vê getFileCsvTicket")
+          );
         }
       })
       .catch(function (e) {

@@ -2,6 +2,7 @@ let username = "";
 let password = "";
 let sip = "";
 
+let actionEndCall = false;
 let idTicket = null;
 let idContact = "";
 let nameContact = "";
@@ -1188,7 +1189,9 @@ agent.on("call", (event) => {
       console.log(`call to ${call.number} is gone. Cancel`);
       console.log("isMainShow:", isMainShow);
       console.log("idTicket sau khi tat:", idTicket);
-      if (idTicket != null) {
+      console.log("idContact sau khi tat:", idContact);
+      if (idTicket != null && actionEndCall != true) {
+        debugger;
         insertIdTicketAs7(idTicket);
       }
       stop();
@@ -1270,6 +1273,7 @@ function openApp() {
 }
 
 function resetText() {
+  actionEndCall = false;
   document.getElementById("appTxtNameContact").value = "";
   document.getElementById("appTxtNameContact").innerText = "";
   document.getElementById("appTextPhone").value = "";
@@ -1801,7 +1805,6 @@ async function init() {
 
 function onAppActivate() {
   resizeAppDefault();
-
   client.data.get("loggedInUser").then(
     function (data) {
       agent_ref = data?.loggedInUser?.availability?.agent_ref
@@ -1878,35 +1881,16 @@ function onAppActivate() {
         });
 
       /**End Call **/
-      document
-        .getElementById("toggleEndCall")
-        .addEventListener("click", async () => {
-          // await updateTicket(idTicket);
-          isMainOutbound = false;
-          if (idTicket != null) {
-            await insertIdTicketAs7(idTicket);
-          }
+      // document
+      //   .getElementById("toggleEndCall")
+      //   .addEventListener("click", async () => {
+      //   });
 
-          client.interface
-            .trigger("hide", { id: "softphone" })
-            .then(async function () {
-              resetText();
-              /**as7 backend **/
-
-              let call = webphone.calls[0];
-              if (call != undefined) {
-                call.clearConnection();
-              }
-              console.log("đã gọi vào end call as7");
-              /**as7 backend **/
-              onAppDeactive();
-              document.getElementById("mainOutbound").style.display = "none";
-            })
-            .catch(function (error) {
-              console.error("Error: Failed to close the CTI app");
-              console.error(error);
-            });
-        });
+      // ------ ----
+      // document
+      //   .getElementById("toggleEndCallCollapse")
+      //   .addEventListener("click", async () => {
+      //   });
 
       document
         .getElementById("toggleEndCallBusy")
@@ -1959,55 +1943,7 @@ function onAppActivate() {
               console.error(error);
             });
         });
-      // ------ ----
-      document
-        .getElementById("toggleEndCallCollapse")
-        .addEventListener("click", async () => {
-          isMainOutbound = false;
 
-          await insertIdTicketAs7(idTicket);
-          resizeAppDefault();
-          client.interface
-            .trigger("hide", { id: "softphone" })
-            .then(function () {
-              document.getElementById("mainContent").style.display = "block";
-              document.getElementById("mainOutbound").style.display = "none";
-              document.getElementById("mainBusyCall").style.display = "none";
-              document.getElementById("mainCollapseClickToCall").style.display =
-                "none";
-              document.getElementById("mainListContacts").style.display =
-                "none";
-              document.getElementById("mainListHistoryCall").style.display =
-                "none";
-              document.getElementById("mainListMissCall").style.display =
-                "none";
-              document.getElementById("mainInbound").style.display = "none";
-              document.getElementById("mainInboundCollapse").style.display =
-                "none";
-              document.getElementById("mainInboundListen").style.display =
-                "none";
-              document.getElementById(
-                "mainInboundListenCollapse"
-              ).style.display = "none";
-
-              phoneNumberReceiver = document.getElementById("output").value =
-                "";
-              document.getElementById("appTextPhone").value = "";
-              document.getElementById("appTextPhone").innerText = "";
-              /**as7 backend **/
-              let call = webphone.calls[0];
-              if (call != undefined) {
-                call.clearConnection();
-              }
-              /**as7 backend **/
-              onAppDeactive();
-              location.reload();
-            })
-            .catch(function (error) {
-              console.error("Error: Failed to close the CTI app");
-              console.error(error);
-            });
-        });
       /**End Call **/
 
       // Xử lý sự kiên liên quan đến Inbound
@@ -2268,55 +2204,6 @@ function renderListContact(listContacts) {
     })
     .join("");
 }
-
-// function renderListContact(listContacts) {
-//   document.getElementById("listContact").innerHTML = listContacts
-//     .map((contact) => {
-//       return `<li>
-//       <div><p class="lb__character">${contact?.letter}</p></div>
-//         ${contact?.group?.map((itm) => {
-//           return ` <div class="relative">
-//           <div>
-//             <img src="${
-//               itm?.profiles != undefined && itm?.profiles?.avatar != null
-//                 ? itm?.profiles?.avatar
-//                 : "./images/icon_profile.png"
-//             }"
-//               class="avatar-his-call" style="">
-//           </div>
-//           <div class="absolute user-info">
-//             <fw-tooltip>
-//               <p class="user-name">
-//                 <b>${itm?.name}</b>
-//               </p>
-//               <p class="user__phone"
-//                 attr-user-phone="${itm?.mobile ? itm?.mobile : itm?.phone}"
-//                 attr-user-contact="${itm?.name ? itm?.name : "unknown"}"
-//                 attr-user-email = "${itm?.email ? itm?.email : ""}"
-//                 attr-user-id = "${itm?.id ? itm?.id : ""}"
-//                 onclick="clickContactCall(this)" >
-//                 <span class="" id="userPhoneContact">${
-//                   itm?.mobile ? itm?.mobile : itm?.phone
-//                 }</span>
-//               </p>
-//             <div slot="tooltip-content">Click to call</div>
-//             </fw-tooltip>
-//           </div>
-
-//           <div class="absolute-info action" id="customer-link" attr-id-contact="${
-//             itm?.id
-//           }" onclick="redirectContactInfo(this)">
-//             <fw-tooltip>
-//               <img src="./images/icon-info.png">
-//               <div slot="tooltip-content">Chi tiết liên hệ</div>
-//             </fw-tooltip>
-//           </div>
-//         </div>`;
-//         })}
-//     </li>`;
-//     })
-//     .join("");
-// }
 
 function enableCharacterContact(elem) {
   let def = document.getElementById("valueShowCharacter").value;
@@ -2789,12 +2676,11 @@ function endCall() {
   }
   location.reload(true);
   stop();
-  // onAppDeactive();
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
-  // location.reload();
+  actionEndCall = false;
   onAppDeactive();
 }
 
@@ -3052,6 +2938,7 @@ async function updateTicket(idTicket) {
 
 async function insertIdTicketAs7(idTicket) {
   console.log("co chay vao insertIdTicketAs7:", idTicket);
+  debugger;
   try {
     var data = await client.request.invokeTemplate("insertIdTicketAs7", {
       context: {
@@ -3502,4 +3389,54 @@ function preCall() {
     call.clearConnection();
     onAppDeactive();
   }
+}
+
+async function toggleEndCallCollapse() {
+  actionEndCall = true;
+  isMainOutbound = false;
+  await insertIdTicketAs7(idTicket);
+  resizeAppDefault();
+  client.interface
+    .trigger("hide", { id: "softphone" })
+    .then(function () {
+      document.getElementById("mainContent").style.display = "block";
+      document.getElementById("mainOutbound").style.display = "none";
+      document.getElementById("mainBusyCall").style.display = "none";
+      document.getElementById("mainCollapseClickToCall").style.display = "none";
+      document.getElementById("mainListContacts").style.display = "none";
+      document.getElementById("mainListHistoryCall").style.display = "none";
+      document.getElementById("mainListMissCall").style.display = "none";
+      document.getElementById("mainInbound").style.display = "none";
+      document.getElementById("mainInboundCollapse").style.display = "none";
+      document.getElementById("mainInboundListen").style.display = "none";
+      document.getElementById("mainInboundListenCollapse").style.display =
+        "none";
+      phoneNumberReceiver = document.getElementById("output").value = "";
+      document.getElementById("appTextPhone").value = "";
+      document.getElementById("appTextPhone").innerText = "";
+      endCall();
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to close the CTI app");
+      console.error(error);
+    });
+}
+
+async function toggleEndCall() {
+  // await updateTicket(idTicket);
+  actionEndCall = true;
+  isMainOutbound = false;
+  if (idTicket != null) {
+    await insertIdTicketAs7(idTicket);
+  }
+  client.interface
+    .trigger("hide", { id: "softphone" })
+    .then(async function () {
+      resetText();
+      endCall();
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to close the CTI app");
+      console.error(error);
+    });
 }
