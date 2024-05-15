@@ -3605,8 +3605,31 @@ async function goToOncallCX() {
 
 function capitalizeFirstLetter(string) {
   return string
-    .toLowerCase() // Đảm bảo tất cả các chữ cái đều viết thường trước
-    .split(" ") // Tách chuỗi thành mảng các từ
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Viết hoa chữ cái đầu của mỗi từ
-    .join(" "); // Nối lại thành chuỗi
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
+
+document.getElementById("appTxtService").addEventListener("click", function () {
+  const dropdown = document.getElementById("dropdown");
+  const label = document.getElementById("appTxtService");
+  label.style.display = "none"; // Hide the label when clicked
+  dropdown.style.display = "block"; // Show the dropdown
+});
+
+document.getElementById("dropdown").addEventListener("change", function () {
+  const dropdown = document.getElementById("dropdown");
+  const selectedOption = dropdown.options[dropdown.selectedIndex].text;
+  const label = document.getElementById("appTxtService");
+  label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
+  label.style.display = "inline"; // Show the label with the new text
+  dropdown.style.display = "none"; // Hide the dropdown after selection
+});
+
+// document.getElementById("dropdown").addEventListener("mouseleave", function () {
+//   const dropdown = document.getElementById("dropdown");
+//   const label = document.getElementById("appTxtService");
+//   label.style.display = "inline"; // Show the label with the initial text
+//   dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
+// });

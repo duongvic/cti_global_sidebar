@@ -115,7 +115,7 @@ html {
   margin: 0;
 }
 .call-action {
-  padding-top: 3.2rem;
+  padding-top: 2.2rem;
 }
 .btn-call {
   display: inline-flex;
@@ -284,7 +284,7 @@ html {
   line-height: 18px;
 }
 .connect--p {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 16px;
 }
@@ -328,4 +328,32 @@ html {
   color: rgba(23, 43, 77, 1); /* Màu nội dung */
   font-weight: 400;
   line-height: 20px;
+}
+
+.container-main {
+  display: flex;
+  flex-direction: row;
+  background-color: #12344d;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+.left-content-main {
+  display: flex;
+  flex: 1;
+  padding-right: 10px;
+}
+.left-content-main label {
+  margin-right: 5px;
+  color: #ffffff;
+}
+.right-content-main {
+  padding-left: 10px;
+  line-height: 36px;
+}
+.btn-main button {
+  background-color: #1b3b4f;
+  color: #ffffff;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
 }

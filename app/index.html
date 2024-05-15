@@ -78,14 +78,15 @@
           </fw-select>
         </div>
 
-        <div class="containerConnect" style="padding-top: 15rem;">
+        <div class="containerConnect" style="padding-top: 16rem;">
           <div class="column">
             <img src="./styles/images/icon.svg" style="height: 24px;"><span style="margin-left: 3px;">OncallCX CTI
               Client
               1.0</span>
           </div>
           <div class="column">
-            <div class="flex-his" style="margin: 0 10px;">
+            <!-- <div class="flex-his" style="margin: 0 10px;"> -->
+            <div class="" style="margin: 0 10px;">
               <div class="pull-right">
                 <button class="btn btn--primary btn--normal" id="btnConnect" onclick="showSoftphoneConnect()" disabled>
                   <span class="btn--label">Connect</span>
@@ -154,12 +155,35 @@
   </div>
 
   <div id="mainContent" style="display: none;" class="city">
-    <div style="background: #12344D;">
-      <span id="appTxtService" style="color: aliceblue; line-height: 2%;"></span>
+    <!-- <div style="background: #12344D;">
+      <label id="appTxtService" style="color: aliceblue; line-height: 2%;"></label>
+      <select id="dropdown" style="display: none;">
+        <option value="1991">EXT 1991</option>
+        <option value="1992">EXT 1992</option>
+        <option value="1993">EXT 1993</option>
+      </select>
       <fw-button class="action-buttons flr" id="btnClose" size="small" color="primary">__
       </fw-button><br><br>
       <div class="fw-divider-solid"></div>
+    </div> -->
+
+    <div class="container-main">
+      <div class="left-content-main">
+        <label id="appTxtService"></label>
+        <select id="dropdown" style="display: none;">
+          <option value="1991">EXT 1991</option>
+          <option value="1992">EXT 1992</option>
+          <option value="1993">EXT 1993</option>
+        </select>
+      </div>
+      <div class="right-content-main">
+        <!-- <button class="btn-main">-</button> -->
+        <fw-button class="action-buttons flr" id="btnClose" size="small" color="primary">-</fw-button>
+      </div>
+      <br><br>
     </div>
+    <div class="fw-divider-solid"></div>
+
     <div class="row menu-app" style="background: #12344D;">
       <div class="col-sm-3 muted">
         <span id="btnDialpad" onclick="showMainDialpad()">
