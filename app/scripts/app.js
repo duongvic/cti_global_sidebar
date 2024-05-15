@@ -1909,7 +1909,7 @@ function onAppActivate() {
         appTxtService = appTxtServiceValue + " . " + e?.detail?.value;
 
         $("#btnConnect").attr("disabled", false);
-        console.log(e.detail);
+        console.log(e?.detail);
       });
 
       var statusDataSource = [
@@ -1953,9 +1953,10 @@ function onAppActivate() {
       );
 
       statusOptionSelect.addEventListener("fwChange", (e) => {
-        displayValueStatusAcct.value = e?.detail?.value;
-        displayValueStatusAcct.innerText = e?.detail?.value;
-        console.log(e.detail);
+        displayValueStatusAcct.textContent = capitalizeFirstLetter(
+          e?.detail?.value
+        );
+        console.log(e?.detail);
       });
       // document
       //   .getElementById("btnConnect")
@@ -3600,4 +3601,12 @@ async function goToOncallCX() {
 
   var showValueAppTxtService = document.getElementById("appTxtService");
   showValueAppTxtService.innerText = appTxtService;
+}
+
+function capitalizeFirstLetter(string) {
+  return string
+    .toLowerCase() // Đảm bảo tất cả các chữ cái đều viết thường trước
+    .split(" ") // Tách chuỗi thành mảng các từ
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Viết hoa chữ cái đầu của mỗi từ
+    .join(" "); // Nối lại thành chuỗi
 }
