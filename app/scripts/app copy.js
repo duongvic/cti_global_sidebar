@@ -1003,6 +1003,192 @@ let interval,
 
 //----Refactor 2 ---
 
+// // click start stop action button
+// var input = document.testMic.savereportMic;
+// function mic(x) {
+//   x.classList.toggle("mic");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "false",
+//     });
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   } else {
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "true",
+//     });
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   }
+// }
+// var input = document.testHold_Unhold.savereportHold_Unhold;
+// function change(x) {
+//   x.classList.toggle("change");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.holdCall();
+
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   } else {
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.retrieveCall();
+
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   }
+// }
+
+// var input = document.testMicInbound.savereportMicInbound;
+// function mic(x) {
+//   x.classList.toggle("mic");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "false",
+//     });
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   } else {
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "true",
+//     });
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   }
+// }
+// var input = document.testInboundHold_Unhold.savereportInbound_Hold_Unhold;
+// function change(x) {
+//   x.classList.toggle("change");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.holdCall();
+
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   } else {
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.retrieveCall();
+
+//     clearInterval(interval);
+//     clearInterval(intervalOutCollapse),
+//       clearInterval(intervalInbound),
+//       clearInterval(intervalInboundListenCollapse);
+//     isUpdateCallAs7 = true;
+//   }
+// }
+
+// // timer call
+// let ret = document.getElementById("timer");
+// let retCollapse = document.getElementById("timerCollapse");
+// let retTimerInboundListen = document.getElementById("timerInboundListen");
+// let nameNotListen = document.getElementById("nameNotListen");
+// let retTimerInboundListenCollapse = document.getElementById(
+//   "timerInboundListenCollapse"
+// );
+// let retTimerInbound = document.getElementById("timerInbound");
+
+// let counter = 0;
+// let counter_time_collapse = 0;
+// let counter_time_inbound = 0;
+// let counter_time_inbound_listen_collapse = 0;
+
+// let interval,
+//   intervalOutCollapse,
+//   intervalInbound,
+//   intervalInboundListenCollapse;
+
+// function convertSec(cnt) {
+//   let sec = cnt % 60;
+//   let min = Math.floor(cnt / 60);
+//   if (sec < 10) {
+//     if (min < 10) {
+//       return "0" + min + ":0" + sec;
+//     } else {
+//       return min + ":0" + sec;
+//     }
+//   } else if (min < 10 && sec >= 10) {
+//     return "0" + min + ":" + sec;
+//   } else {
+//     return min + ":" + sec;
+//   }
+// }
+
+// function start() {
+//   interval = setInterval(function () {
+//     document.getElementById("timer").textContent = convertSec(counter++);
+//   }, 1000);
+// }
+
+// function startTimeCollapse() {
+//   intervalOutCollapse = setInterval(function () {
+//     document.getElementById("timerCollapse").textContent = convertSec(
+//       counter_time_collapse++
+//     );
+//   }, 1000);
+// }
+
+// function startTimeInbound() {
+//   intervalInbound = setInterval(function () {
+//     document.getElementById("timerInboundListen").textContent = convertSec(
+//       counter_time_inbound++
+//     );
+//   }, 1000);
+// }
+
+// function startTimeInboundListenCollapse() {
+//   intervalInboundListenCollapse = setInterval(function () {
+//     document.getElementById("timerInboundListenCollapse").textContent =
+//       convertSec(counter_time_inbound_listen_collapse++);
+//   }, 1000);
+// }
+
+// function stop() {
+//   ret.innerHTML = "";
+//   retCollapse.innerHTML = "";
+//   retTimerInboundListen.innerHTML = "";
+//   nameNotListen.textContent = "";
+//   retTimerInboundListenCollapse.innerHTML = "";
+//   retTimerInbound.innerHTML = "";
+//   clearInterval(interval);
+//   clearInterval(intervalOutCollapse);
+//   clearInterval(intervalInbound);
+//   clearInterval(intervalInboundListenCollapse);
+// }
+//----Refactor 2 ---
+
 // Event handler for call events
 agent.on("call", async (event) => {
   try {
@@ -1153,6 +1339,138 @@ async function getUserData() {
   return userData?.loggedInUser || {};
 }
 
+// agent.on("call", (event) => {
+//   if (event?.content?.cause == "busy") {
+//     console.log("trường hợp máy bận :", event?.content?.cause);
+//     ///view màn bận
+//     isMainShow = "busycall";
+//     document.getElementById("appTextPhoneBusyCall").textContent =
+//       phoneNumberReceiver;
+//     document.getElementById("appTxtNameContactBusyCall").textContent =
+//       nameContact ? nameContact : phoneNumberReceiver;
+
+//     $("#appTxtNameContactBusyCall").css({ color: "#3b3b3b" });
+//     resizeAppDefault();
+//     viewMainBusy();
+//   }
+// });
+
+// agent.on("call", (event) => {
+//   let call = event.call;
+//   switch (call.localConnectionInfo) {
+//     case "alerting": // call inbound gọi
+//       console.log(`incomming call from ${call.number} ${call.name}`);
+//       console.log("chạy 1 alerting");
+//       isInboundCall = true;
+//       client.interface
+//         .trigger("show", { id: "softphone" })
+//         .then(function () {
+//           client.data.get("loggedInUser").then(async function (data) {
+//             agent_ref = data?.loggedInUser?.availability?.agent_ref
+//               ? data?.loggedInUser?.availability?.agent_ref
+//               : undefined;
+//             const phone = data?.loggedInUser?.contact?.phone
+//               ? data?.loggedInUser?.contact?.phone
+//               : data?.loggedInUser?.contact?.mobile
+//               ? data?.loggedInUser?.contact?.mobile
+//               : null;
+//             window.userPhone = phone;
+//             console.log("existContact trươc khi check", existContact);
+//             //check contact
+//             // await filterContactDataInbound(call?.number);
+//             await filteredContactSearch(call?.number);
+//             console.log("existContact sau khi check", existContact);
+//             document.getElementById("appTextPhoneInbound").value = call?.number;
+//             document.getElementById("appTextPhoneInbound").innerText =
+//               call?.number;
+//             document.getElementById("appTextPhoneInboundListen").value =
+//               call?.number;
+//             document.getElementById("appTextPhoneInboundListen").innerText =
+//               call?.number;
+//             phoneNumberReceiver = call?.number;
+//             if (existContact) {
+//               goToContact(idContact);
+//             }
+//             resizeAppDefault();
+//             viewMainInbound();
+//           });
+//         })
+//         .catch(function (error) {
+//           isInboundCall = false;
+//           console.error("Error: Failed to open the app");
+//           console.error(error);
+//         });
+
+//       console.log("isInboundCall alerting", isInboundCall);
+//       break;
+//     case "connected":
+//       console.log(` khi người dùng nghe máy : connected to ${call.number}`);
+//       console.log("connected to man hinh:", isMainActive);
+//       if (isInboundCall !== true) {
+//         start();
+//         startTimeCollapse();
+//         //tạo ticket khi tồn tại khách hàng trong hệ thống
+//         console.log(
+//           "chạy vao đay không connected isUpdateCallAs7 = ",
+//           isUpdateCallAs7
+//         );
+//         console.log(
+//           "chạy vao đay không connected existContact = ",
+//           existContact
+//         );
+
+//         if (!isUpdateCallAs7) {
+//           if (existContact) {
+//             createTicket();
+//           } else {
+//             createContact();
+//           }
+//         }
+//       }
+
+//       if (isMainActive && isInboundCall) {
+//         startTimeInbound();
+//         startTimeInboundListenCollapse();
+//         //tạo ticket khi tồn tại khách hàng trong hệ thống
+//         if (!isUpdateCallAs7) {
+//           if (existContact) {
+//             console.log("chạy vao đay không? inbound");
+//             createTicket();
+//           } else {
+//             createContact();
+//           }
+//         }
+//       } else if (!isMainActive && !isInboundCall) {
+//         clearInterval(intervalInbound);
+//       }
+//       break;
+//     case "fail":
+//       console.log(`call failed, cause is ${event.content.cause}`);
+//       break;
+//     case "hold":
+//       console.log(`holding call to ${call.number}`);
+//       isUpdateCallAs7 = true;
+//       break;
+//     case "null":
+//       console.log(`call to ${call.number} is gone. Cancel`);
+//       console.log("isMainShow:", isMainShow);
+//       console.log("idTicket sau khi tat:", idTicket);
+//       console.log("idContact sau khi tat:", idContact);
+//       if (idTicket != null && actionEndCall != true) {
+//         debugger;
+//         insertIdTicketAs7(idTicket);
+//       }
+//       stop();
+//       if (isMainShow == "busycall") {
+//         return;
+//       } else {
+//         onAppDeactive();
+//         // location.reload();
+//       }
+//       break;
+//   }
+// });
+
 function viewMainBusy() {
   document.getElementById("mainBusyCall").style.display = "block";
   document.getElementById("mainContent").style.display = "none";
@@ -1221,47 +1539,31 @@ function openApp() {
 }
 
 function resetText() {
-  // Clear text fields and innerText properties
-  const textFields = [
-    "appTxtNameContact",
-    "appTextPhone",
-    "appTxtNameContactBusyCall",
-    "appTextPhoneBusyCall",
-    "output"
-  ];
-  textFields.forEach(id => {
-    document.getElementById(id).value = "";
-    document.getElementById(id).innerText = "";
-  });
+  actionEndCall = false;
+  document.getElementById("appTxtNameContact").value = "";
+  document.getElementById("appTxtNameContact").innerText = "";
+  document.getElementById("appTextPhone").value = "";
+  document.getElementById("appTextPhone").innerText = "";
 
-  // Reset call button state
-  $("#callEnter").attr("disabled", true).css("background-color", "darkgray");
+  document.getElementById("appTxtNameContactBusyCall").value = "";
+  document.getElementById("appTxtNameContactBusyCall").innerText = "";
+  document.getElementById("appTextPhoneBusyCall").value = "";
+  document.getElementById("appTextPhoneBusyCall").innerText = "";
 
-  // Clear timer and nameNotListen elements
+  document.getElementById("output").value = "";
+  document.getElementById("output").innerText = "";
+
+  $("#callEnter").attr("disabled", true);
+  $("#callEnter").css({ backgroundColor: "darkgray" });
+
   document.getElementById("timer").textContent = "";
   document.getElementById("timerCollapse").textContent = "";
+
   document.getElementById("nameNotListen").textContent = "";
 
-  // Clear inbound listen timers
   document.getElementById("timerInboundListen").textContent = "";
   document.getElementById("timerInboundListenCollapse").textContent = "";
 
-  stop();
-
-  function stop() {
-  [
-    "timer",
-    "timerCollapse",
-    "timerInboundListen",
-    "nameNotListen",
-    "timerInboundListenCollapse",
-    "timerInbound",
-  ].forEach((id) => {
-    document.getElementById(id).textContent = "";
-  });
-  clearAllIntervals();
-}
-  // Reset call and contact variables
   existContact = false;
   phoneNumberReceiver = "";
   nameContact = "";
@@ -1274,11 +1576,9 @@ function resetText() {
   isMainContactActive = false;
   isMainActive = false;
 
-  // Reset call history and missed call lists
   listMissCall = [];
   listHisCall = [];
 
-  // Clear local storage cache
   localStorage.removeItem("cacheDataHisCall");
   localStorage.removeItem("cacheDataMissCall");
   localStorage.removeItem("cacheDataContact");
@@ -1520,70 +1820,86 @@ async function filterContactDataInbound(phone) {
   }
 }
 
-//---- refactor filteredContactSearch---//
 async function filteredContactSearch(term) {
   try {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
-      context: { term },
+      context: {
+        term: term,
+      },
     });
+    let detail = data?.response ? JSON.parse(data?.response) : [];
+    let filteredDataMobile = detail.filter((item) => item.mobile === term);
+    let filteredDataPhone = detail.filter((item) => item.phone === term);
 
-    const detail = data?.response ? JSON.parse(data?.response) : [];
-    const filteredDataMobile = detail.filter((item) => item.mobile === term);
-    const filteredDataPhone = detail.filter((item) => item.phone === term);
-    const matchedContact =
-      filteredDataMobile.length > 0
-        ? filteredDataMobile[0]
-        : filteredDataPhone[0];
+    if (filteredDataMobile.length > 0) {
+      existContact = true;
+      idContact = filteredDataMobile[0].id;
+      document.getElementById("appTxtNameContactInbound").textContent =
+        filteredDataMobile[0].name;
+      document.getElementById("appTxtNameContactInboundListen").textContent =
+        filteredDataMobile[0].name;
+      document.getElementById("appTxtNameContact").textContent =
+        filteredDataMobile[0].name;
 
-    if (matchedContact) {
-      handleContactFound(matchedContact, detail);
-    } else {
-      handleContactNotFound();
+      document.getElementById("appTextPhoneInbound").style.fontSize = "14px";
+      document.getElementById("appTextPhoneInbound").style.padding = "0px 0px";
+
+      document.getElementById("appTextPhoneInboundListen").style.fontSize =
+        "14px";
+      document.getElementById("appTextPhoneInboundListen").style.padding =
+        "0px 0px";
+
+      nameContact = filteredDataMobile[0].name;
+      getContactById(filteredDataMobile[0].id);
+
+      goToContact(idContact);
+
+      const transformedItems = transformerItems(detail);
+      return renderListContact(
+        transformedItems?.data ? transformedItems?.data : []
+      );
+    } else if (filteredDataPhone.length > 0) {
+      existContact = true;
+      idContact = filteredDataPhone[0].id;
+      document.getElementById("appTxtNameContactInbound").textContent =
+        filteredDataPhone[0].name;
+      document.getElementById("appTxtNameContactInboundListen").textContent =
+        filteredDataPhone[0].name;
+      document.getElementById("appTxtNameContact").textContent =
+        filteredDataPhone[0].name;
+
+      document.getElementById("appTextPhoneInboundListen").style.fontSize =
+        "14px";
+      document.getElementById("appTextPhoneInboundListen").style.padding =
+        "0px 0px";
+
+      document.getElementById("appTextPhoneInbound").style.fontSize = "14px";
+      document.getElementById("appTextPhoneInbound").style.padding = "0px 0px";
+      nameContact = filteredDataPhone[0].name;
+      getContactById(filteredDataPhone[0].id);
+
+      goToContact(idContact);
+
+      const transformedItems = transformerItems(detail);
+      return renderListContact(
+        transformedItems?.data ? transformedItems?.data : []
+      );
+    } else if (
+      filteredDataMobile.length <= 0 ||
+      filteredDataPhone.length <= 0
+    ) {
+      existContact = false;
+      document.getElementById("appTextPhone").style.fontSize = "20px";
+      document.getElementById("appTextPhone").style.padding = "10px 0px";
+      nameContact = "";
+      current_page = 1;
+      renderListContactEmpty;
     }
   } catch (error) {
     existContact = false;
     console.log(error);
   }
 }
-
-function handleContactFound(contact, detail) {
-  existContact = true;
-  idContact = contact.id;
-  nameContact = contact.name;
-
-  const contactElements = [
-    "appTxtNameContactInbound",
-    "appTxtNameContactInboundListen",
-    "appTxtNameContact",
-  ];
-
-  contactElements.forEach((elementId) => {
-    document.getElementById(elementId).textContent = contact.name;
-  });
-
-  const phoneElements = ["appTextPhoneInbound", "appTextPhoneInboundListen"];
-
-  phoneElements.forEach((elementId) => {
-    document.getElementById(elementId).style.fontSize = "14px";
-    document.getElementById(elementId).style.padding = "0px 0px";
-  });
-
-  getContactById(contact.id);
-  goToContact(idContact);
-
-  const transformedItems = transformerItems(detail);
-  renderListContact(transformedItems?.data || []);
-}
-
-function handleContactNotFound() {
-  existContact = false;
-  document.getElementById("appTextPhone").style.fontSize = "20px";
-  document.getElementById("appTextPhone").style.padding = "10px 0px";
-  nameContact = "";
-  current_page = 1;
-  renderListContactEmpty();
-}
-//---- refactor filteredContactSearch---//
 
 async function getContactById(id_contact) {
   try {
@@ -2116,10 +2432,65 @@ function updatePhoneStatus(message, className) {
 }
 //---- Handle checkPhone ----//
 
+// function checkPhone() {
+//   var x = document.getElementById("output");
+//   // var phoneNumber = /^\d{10}$/;
+//   if (x.value.includes("+")) {
+//     var phone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
+//     if (x.value.match(phone) && x.value.length == 12) {
+//       filteredContactSearch(x.value);
+//       // eventHandlecallDialpad();
+//       $("#callEnter").attr("disabled", false);
+//       $("#callEnter").css({ backgroundColor: "green" });
+//       document.getElementById("appTextPhone1").innerText = "Correct";
+//       document.getElementById("appTextPhone1").className =
+//         "correct__number__phone";
+//     } else {
+//       $("#callEnter").attr("disabled", true);
+//       $("#callEnter").css({ backgroundColor: "darkgray" });
+//       if (x.value.length === 0) {
+//         document.getElementById("appTextPhone1").innerText = "Correct";
+//         document.getElementById("appTextPhone1").className =
+//           "correct__number__phone";
+//       } else
+//         document.getElementById("appTextPhone1").className =
+//           "error__number__phone";
+//       document.getElementById("appTextPhone1").innerText =
+//         "Incorrect phone number format";
+//       return false;
+//     }
+//   } else {
+//     var phone = /^\d{10}$/;
+//     if (x.value.match(phone)) {
+//       filteredContactSearch(x.value);
+//       // eventHandlecallDialpad();
+//       $("#callEnter").attr("disabled", false);
+//       $("#callEnter").css({ backgroundColor: "green" });
+//       document.getElementById("appTextPhone1").innerText = "Correct";
+//       document.getElementById("appTextPhone1").className =
+//         "correct__number__phone";
+//     } else {
+//       $("#callEnter").attr("disabled", true);
+//       $("#callEnter").css({ backgroundColor: "darkgray" });
+//       if (x.value.length === 0) {
+//         document.getElementById("appTextPhone1").innerText = "Correct";
+//         document.getElementById("appTextPhone1").className =
+//           "correct__number__phone";
+//       } else
+//         document.getElementById("appTextPhone1").className =
+//           "error__number__phone";
+//       document.getElementById("appTextPhone1").innerText =
+//         "Incorrect phone number format";
+//       return false;
+//     }
+//   }
+// }
+
 function toggleCall() {
   isMainOutbound = true;
   eventHandlecallDialpad();
 }
+
 /**
  * Adds dialer events
  **/
@@ -2222,64 +2593,69 @@ function renderListContactEmpty() {
   document.getElementById("listContact").innerHTML = "";
 }
 
-//---refactor renderListContact ---//
 function renderListContact(listContacts) {
-  const listContactElement = document.getElementById("listContact");
-  listContactElement.innerHTML = listContacts.map(renderContact).join("");
-}
-
-function renderContact(contact) {
-  return `
-    <li>
+  document.getElementById("listContact").innerHTML = listContacts
+    .map((contact) => {
+      return `<li>
       <div><p class="lb__character">${contact?.letter}</p></div>
-      ${contact?.group?.map(renderGroupItem).join("")}
-    </li>
-  `;
-}
-
-function renderGroupItem(item) {
-  const avatarUrl =
-    item?.profiles?.avatar?.avatar_url ?? "./images/icon_profile.png";
-  const userPhone = item?.mobile ?? item?.phone;
-  const userName = item?.name ?? "unknown";
-  const userEmail = item?.email ?? "";
-  const userId = item?.id ?? "";
-
-  return `
-    <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
-      <div class="comments-list">
-        <div class="media flex-his">
-          <div class="flex-his">
-            <div class="media-left">
-              <img src="${avatarUrl}" class="avatar-his-call">
+        ${contact?.group?.map((item) => {
+          return ` 
+          <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
+          <div class="comments-list">
+            <div class="media flex-his">
+              <div class="flex-his">
+                <div class="media-left" href="#">
+                  <img src="${
+                    item?.profiles != undefined &&
+                    item?.profiles?.avatar?.avatar_url != null
+                      ? item?.profiles?.avatar?.avatar_url
+                      : "./images/icon_profile.png"
+                  }" 
+                    class="avatar-his-call" style="">
+                </div>
+                <div class="pull-right">
+                  <fw-tooltip>
+                    <a class="text-title-his-call" href="#" 
+                      attr-user-phone="${
+                        item?.mobile ? item?.mobile : item?.phone
+                      }" 
+                      attr-user-contact="${item?.name ? item?.name : "unknown"}"
+                      attr-user-email = "${item?.email ? item?.email : ""}"
+                      attr-user-id ="${item?.id ? item?.id : ""}" 
+                      onclick="clickContactCall(this)" >
+                        ${item?.name}
+                    </a>
+                    <div slot="tooltip-content">
+                      Click to call
+                    </div>
+                  </fw-tooltip>
+                  <p>
+                  <span class="" id="userPhoneContact">
+                    ${item?.mobile ? item?.mobile : item?.phone}
+                  </span>
+                  </p>
+                </div>
+              </div>
+              <div class="his-body" style="text-align: right;" 
+                attr-id-contact="${item?.id}"
+                onclick="redirectContactInfo(this)"
+              >
+                <fw-tooltip>
+                  <img src="./images/icon-info.png">
+                  <div slot="tooltip-content">
+                    Chi tiết liên hệ
+                  </div>
+                </fw-tooltip>
+              </div>
             </div>
-            <div class="pull-right">
-              <fw-tooltip>
-                <a class="text-title-his-call" href="#" 
-                  attr-user-phone="${userPhone}" 
-                  attr-user-contact="${userName}" 
-                  attr-user-email="${userEmail}"
-                  attr-user-id="${userId}"
-                  onclick="clickContactCall(this)">
-                  ${item?.name}
-                </a>
-                <div slot="tooltip-content">Click to call</div>
-              </fw-tooltip>
-              <p><span id="userPhoneContact">${userPhone}</span></p>
-            </div>
-          </div>
-          <div class="his-body" style="text-align: right;" attr-id-contact="${userId}" onclick="redirectContactInfo(this)">
-            <fw-tooltip>
-              <img src="./images/icon-info.png">
-              <div slot="tooltip-content">Chi tiết liên hệ</div>
-            </fw-tooltip>
           </div>
         </div>
-      </div>
-    </div>
-  `;
+        `;
+        })}
+    </li>`;
+    })
+    .join("");
 }
-//---renderListContact---//
 
 function enableCharacterContact(elem) {
   let def = document.getElementById("valueShowCharacter").value;
@@ -2566,34 +2942,40 @@ async function displayItems(items) {
 }
 
 function showMain() {
-  // Hide all elements by default
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-
-  // Show the appropriate element based on the active state
-  if (isMainContactActive) {
+  if (
+    isMainContactActive == true &&
+    isMainOutbound == false &&
+    isMainInbound == false &&
+    isMainActive == false
+  ) {
     document.getElementById("mainListContacts").style.display = "block";
-  } else if (isMainOutbound) {
-    document.getElementById("mainOutbound").style.display = "block";
-  } else if (isMainInbound) {
-    document.getElementById("mainInbound").style.display = "block";
-  } else if (isMainActive) {
-    document.getElementById("mainInboundListen").style.display = "block";
-  } else {
-    // Handle default state
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+  }
+  if (
+    isMainContactActive == false &&
+    isMainOutbound == false &&
+    isMainInbound == false &&
+    isMainActive == false
+  ) {
     document.getElementById("mainContent").style.display = "block";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
 
-    // Update UI elements
     $("#callEnter").attr("disabled", true);
     $("#callEnter").css({ backgroundColor: "darkgray" });
     document.getElementById("appTextPhone1").innerText = "Correct";
     document.getElementById("appTextPhone1").className =
       "correct__number__phone";
-
-    stop();
+    ret.innerHTML = "";
+    retCollapse.innerHTML = "";
+    retTimerInbound.innerHTML = "";
+    retTimerInboundListen.innerHTML = "";
+    retTimerInboundListenCollapse.innerHTML = "";
 
     document.getElementById("timerInboundListen").textContent = "";
     document.getElementById("timerInboundListenCollapse").textContent = "";
@@ -2604,9 +2986,41 @@ function showMain() {
     isInboundCall = false;
     existContact = false;
     isMainActive = false;
+  } else if (
+    isMainOutbound == true &&
+    isMainContactActive == false &&
+    isMainInbound == false &&
+    isMainActive == false
+  ) {
+    document.getElementById("mainOutbound").style.display = "block";
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+  } else if (
+    isMainInbound == true &&
+    isMainContactActive == false &&
+    isMainOutbound == false &&
+    isMainActive == false
+  ) {
+    document.getElementById("mainInbound").style.display = "block";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "none";
+  } else if (
+    isMainInbound == false &&
+    isMainContactActive == false &&
+    isMainOutbound == false &&
+    isMainActive == true
+  ) {
+    document.getElementById("mainInbound").style.display = "none";
+    document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mainListContacts").style.display = "none";
+    document.getElementById("mainInboundListen").style.display = "block";
   }
 
-  // Hide other elements
   document.getElementById("mainBusyCall").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainListHistoryCall").style.display = "none";
@@ -3007,7 +3421,11 @@ function showMainDialpad() {
   document.getElementById("appTextPhone1").innerText = "Correct";
   document.getElementById("appTextPhone1").className = "correct__number__phone";
 
-  stop();
+  ret.innerHTML = "";
+  retCollapse.innerHTML = "";
+  retTimerInbound.innerHTML = "";
+  retTimerInboundListen.innerHTML = "";
+  retTimerInboundListenCollapse.innerHTML = "";
 
   document.getElementById("timerInboundListen").textContent = "";
   document.getElementById("timerInboundListenCollapse").textContent = "";
@@ -3088,15 +3506,19 @@ function renderListHistoryCall(listHisCall) {
 }
 
 function dateFormat(timeStamp) {
-  const date = new Date(timeStamp);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  let dateFormat = new Date(timeStamp);
+  return (dateFormat =
+    dateFormat.getDate() +
+    "/" +
+    (dateFormat.getMonth() + 1) +
+    "/" +
+    dateFormat.getFullYear() +
+    " " +
+    dateFormat.getHours() +
+    ":" +
+    dateFormat.getMinutes() +
+    ":" +
+    dateFormat.getSeconds());
 }
 
 function durationFormat(duration) {
@@ -3105,114 +3527,177 @@ function durationFormat(duration) {
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  const hourString = String(hours).padStart(2, "0");
-  const minuteString = String(minutes).padStart(2, "0");
-  const secondString = String(remainingSeconds).padStart(2, "0");
+  const hourString = hours > 0 && hours < 10 ? `0${hours}` : `${hours}`;
+
+  const minuteString = minutes > 0 && hours < 10 ? `0${minutes}` : `${minutes}`;
+  const secondString =
+    remainingSeconds > 0 && remainingSeconds < 10
+      ? `0${remainingSeconds}`
+      : `${remainingSeconds}`;
 
   if (hours > 0) {
-    return `${hourString}:${minuteString}:${secondString}`;
-  } else if (minutes > 0) {
-    return `${minuteString}:${secondString}`;
-  } else {
-    return `00:${secondString}`;
+    return `${hourString}:${minuteString || ""}:${
+      secondString && `:${secondString}`
+    }`;
+  } else if (!hours && minutes > 0) {
+    return `${minuteString}${secondString && `:${secondString}`}`;
   }
+
+  return `00:${secondString}`;
 }
 
 function renderIconHistoryCall(item) {
-  const hasCalled = item.hasOwnProperty("called");
-  const hasCalling = item.hasOwnProperty("calling");
-  const hasDuration = item.hasOwnProperty("duration");
-
-  if (hasCalled) {
-    return hasDuration
-      ? '<img src="./images/icon_call_out.png">'
-      : '<img src="./images/icon_call_out.png">';
+  if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
+    return '<img src="./images/icon_call_out.png">';
   }
-
-  if (hasCalling) {
-    return hasDuration
-      ? '<img src="./images/icon_call_in.png">'
-      : '<img src="./images/icon_miss_call.png">';
+  if (
+    item.hasOwnProperty("called") &&
+    item.hasOwnProperty("duration") == false
+  ) {
+    return '<img src="./images/icon_call_out.png">';
+  }
+  if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
+    return '<img src="./images/icon_call_in.png">';
+  }
+  if (
+    item.hasOwnProperty("calling") &&
+    item.hasOwnProperty("duration") == false
+  ) {
+    return '<img src="./images/icon_miss_call.png">';
   }
 }
 
 function renderTextHistoryCall(item) {
-  const renderTooltip = (contact, style = "") => {
-    const name = item?.profiles?.name || contact;
+  if (item.hasOwnProperty("called") && item.hasOwnProperty("duration")) {
     return `<fw-tooltip>
-              <a class="text-title-his-call" href="#" style="${style}" attr-sdt="${contact}" onclick="clickToMissCall(this)">
-                ${name}
+              <a class="text-title-his-call" href="#" attr-sdt="${
+                item.called
+              }" onclick="clickToMissCall(this)" >
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.called
+                }
               </a>
               <div slot="tooltip-content">
                 Click to call
               </div>
             </fw-tooltip>`;
-  };
-
-  if (item.hasOwnProperty("called")) {
-    return renderTooltip(item.called);
   }
-
-  if (item.hasOwnProperty("calling")) {
-    const style = item.hasOwnProperty("duration") ? "" : "color: red;";
-    return renderTooltip(item.calling, style);
+  if (
+    item.hasOwnProperty("called") &&
+    item.hasOwnProperty("duration") == false
+  ) {
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" attr-sdt="${
+                item.called
+              }" onclick="clickToMissCall(this)" >
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.called
+                }
+              </a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
   }
-
-  return "";
+  if (item.hasOwnProperty("calling") && item.hasOwnProperty("duration")) {
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" attr-sdt="${
+                item.calling
+              }" onclick="clickToMissCall(this)" >
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.calling
+                }
+              </a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
+  }
+  if (
+    item.hasOwnProperty("calling") &&
+    item.hasOwnProperty("duration") == false
+  ) {
+    return `<fw-tooltip>
+              <a class="text-title-his-call" href="#" style="color: red;" attr-sdt="${
+                item.calling
+              }" onclick="clickToMissCall(this)">
+                ${
+                  item?.profiles != undefined
+                    ? item?.profiles?.name
+                    : item.calling
+                }
+              </a>
+              <div slot="tooltip-content">
+                Click to call
+              </div>
+            </fw-tooltip>`;
+  }
 }
 
 function renderListMissCall(arrListCall) {
-  const listContainer = document.getElementById("listHisMissCall");
-  const listItems = arrListCall
+  document.getElementById("listHisMissCall").innerHTML = arrListCall
     .map((item) => {
-      const avatarSrc = item?.profiles?.avatar || "./images/icon_profile.png";
-      const displayName = item?.profiles?.name || item?.calling;
-      const callTime = dateFormat(item?.time);
-      const callingAttr = item?.calling;
-
-      return `
-      <li>
-        <div class="history-call" style="padding: 0 10px;">
-          <div class="comments-list">
+      return `<li>
+      <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
+        <div class="comments-list">
             <div class="media flex-his">
               <div class="flex-his">
-                <div class="media-left">
-                  <img src="${avatarSrc}" class="avatar-his-call">
+                <div class="media-left" href="#">
+                  <img src="${
+                    item?.profiles != undefined && item?.profiles.avatar != null
+                      ? item?.profiles.avatar
+                      : "./images/icon_profile.png"
+                  }" 
+                    class="avatar-his-call" style="">
                 </div>
                 <div class="pull-right">
                   <h4 class="text-title-his-call">
-                    <fw-tooltip>
-                      <a href="#" style="color: red;" attr-sdt="${callingAttr}" onclick="clickToMissCall(this)">
-                        ${displayName}
-                      </a>
-                      <div slot="tooltip-content">
-                        Click to call
-                      </div>
-                    </fw-tooltip>
+                  <fw-tooltip>
+                    <a class="" href="#" style="color: red;"
+                      attr-sdt="${item?.calling}"
+                      onclick="clickToMissCall(this)">
+                        ${
+                          item?.profiles != undefined
+                            ? item?.profiles?.name
+                            : item.calling
+                        }
+                    </a>
+                    <div slot="tooltip-content">
+                      Click to call
+                  </div>
+                  </fw-tooltip>
                   </h4>
                   <p>
                     <span><img src="./images/icon_miss_call.png"></span>
-                    <span>${callTime}</span>
+                    <span>
+                      ${dateFormat(item?.time)}</span>
                   </p>
                 </div>
               </div>
-              <div class="his-body" style="text-align: right;" attr-sdt-inf="${callingAttr}" onclick="redirectContactInfoMissCall(this)">
-                <fw-tooltip>
-                  <img src="./images/icon-info.png">
-                  <div slot="tooltip-content">
-                    Chi tiết liên hệ
-                  </div>
-                </fw-tooltip>
+              <div class="his-body" style="text-align: right;" 
+                attr-sdt-inf="${item?.calling}"
+                onclick="redirectContactInfoMissCall(this)"
+              >
+              <fw-tooltip>
+                <img src="./images/icon-info.png">
+                <div slot="tooltip-content">
+                  Chi tiết liên hệ
+                </div>
+              </fw-tooltip>
                 <p style="margin-top: 14px; line-height: 13px;">--:--</p>
               </div>
             </div>
           </div>
         </div>
-      </li>`;
+    </li>`;
     })
     .join("");
-
-  listContainer.innerHTML = listItems;
 }
 
 function clickToMissCall(elem) {

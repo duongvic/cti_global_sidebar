@@ -1,0 +1,55 @@
+<!-- màn agent bắt máy  -->
+<div id="mainInboundListen" style="display: none;" class="city">
+  <div style="background: #12344D;">
+    <!-- <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span> -->
+    <fw-button class="action-buttons flr" id="btnCollapseInboundListen" size="small" color="primary">__
+    </fw-button><br><br>
+  </div>
+
+  <div class="calling">
+    <p class="text-algin" style="padding-top: 9% ; padding-bottom: 3rem;">Inbound Call...</p>
+
+    <h4><span id="appTxtNameContactInboundListen"></span></h4>
+    <p id="appTextPhoneInboundListen"></p>
+    <div class="timer-group__inbound">
+      <p id="timerInboundListen"></p>
+    </div>
+    <div><img class="avatar" id="avatarContact" src="./images/avatar_none.png"></div>
+    <div style="padding-top: 22%;">
+      <div class="ac__calling">
+        <div class="ac__calling">
+          <button class="btn-ac"><img class="icon__calling" src="./images/DialPad-InCall.svg" />
+          </button>
+          <!-- Mic - UnMic -->
+          <form name="testMicInbound" method="post" style="display: none;">
+            <input type="text" name="savereportMicInbound" value="false" />
+          </form>
+          <button class="btn-mic" value="false" id="check" onclick="mic(this)">
+            <i class="material-icons mic-un">&#xe02b;</i>
+            <i class="material-icons mic-top">&#xe029;</i>
+          </button>
+          <!-- Mic - UnMic -->
+
+          <!-- Hold - UnHold -->
+          <form name="testInboundHold_Unhold" method="post" style="display: none;">
+            <input type="text" name="savereportInbound_Hold_Unhold" value="false" />
+          </form>
+          <button class="btn-ac" value="false" id="check" onclick="change(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+          </button>
+          <!-- Hold - UnHold -->
+          <button class="btn-ac"><img class="icon__calling" src="./images/Blind_Transfer.svg" /></button>
+          <button class="btn-ac"><img class="icon__calling" src="./images/Attend_Transfer.svg" /></button>
+        </div>
+        <!-- <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div>
+          <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
+          <div class="ct__calling"><span><img class="icon__calling" src="./images/pauseCall.png" /></span></div>
+          <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend_Transfer.svg" /></span></div>
+          <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind_Transfer.svg" /></span></div> -->
+      </div>
+    </div>
+    <button id="toggleEndCallInboundListen" onclick="endCallInboundListen()" class="hint" type="button"><span><img
+          class="icon__calling" src="./images/end_call.png" /></span> End call</button>
+  </div>
+</div>

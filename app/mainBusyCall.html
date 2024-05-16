@@ -1,0 +1,39 @@
+<!-- màn hình bận -->
+<div id="mainBusyCall" style="display: none;" class="city">
+  <div style="background: #12344D;">
+    <!-- <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span> -->
+    <fw-button class="action-buttons flr" id="btnCollapseClickToCall" size="small" color="primary">__
+    </fw-button><br><br>
+  </div>
+
+  <div id="busycall" class="busy__call city">
+    <p class="text-algin" style="padding-top: 9% ; padding-bottom: 3rem;">Outbound Call...</p>
+
+    <h4 id="appTxtNameContactBusyCall"></h4>
+    <p id="appTextPhoneBusyCall"></p>
+    <p>Người dùng bận</p>
+    <div><img class="avatar__busy" id="avatarContact" src="./images/avatar_none.png"></div>
+    <div class="ac__calling__busy">
+      <button class="btn-ac__busy" onclick="openCity('calls')"><img class="icon__calling tablinks"
+          src="./images/DialPad-InCall.svg"></button>
+      <button class="btn-ac__busy" onclick="recordaudio()"><img class="icon__calling tablinks"
+          src="./images/Mic-InCall.svg"></button>
+      <button class="btn-ac__busy change" onclick="myFunction(this)">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+      </button>
+      <button class="btn-ac__busy" onclick="openCity('maincall')"><img class="icon__calling tablinks"
+          src="./images/Blind_Transfer.svg"></button>
+      <button class="btn-ac__busy" onclick="openCity('busycall')"><img class="icon__calling tablinks"
+          src="./images/Attend_Transfer.svg"></button>
+    </div>
+    <div class="btn-bus">
+      <button id="toggleEndCallBusy" class="hint" type="button"><span><img class="icon__calling"
+            src="./images/end_call.png" /></span> Cancel</button>
+      <button id="togglePreCall" onclick="preCall()" class="hint-green precall" type="button"><span><img
+            class="icon__preCall" src="./images/call.png" /></span>Call again</button>
+    </div>
+
+  </div>
+</div>
+<!-- màn hình bận -->
