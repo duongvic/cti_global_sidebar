@@ -1227,9 +1227,9 @@ function resetText() {
     "appTextPhone",
     "appTxtNameContactBusyCall",
     "appTextPhoneBusyCall",
-    "output"
+    "output",
   ];
-  textFields.forEach(id => {
+  textFields.forEach((id) => {
     document.getElementById(id).value = "";
     document.getElementById(id).innerText = "";
   });
@@ -1249,18 +1249,18 @@ function resetText() {
   stop();
 
   function stop() {
-  [
-    "timer",
-    "timerCollapse",
-    "timerInboundListen",
-    "nameNotListen",
-    "timerInboundListenCollapse",
-    "timerInbound",
-  ].forEach((id) => {
-    document.getElementById(id).textContent = "";
-  });
-  clearAllIntervals();
-}
+    [
+      "timer",
+      "timerCollapse",
+      "timerInboundListen",
+      "nameNotListen",
+      "timerInboundListenCollapse",
+      "timerInbound",
+    ].forEach((id) => {
+      document.getElementById(id).textContent = "";
+    });
+    clearAllIntervals();
+  }
   // Reset call and contact variables
   existContact = false;
   phoneNumberReceiver = "";
@@ -3424,8 +3424,12 @@ async function goToOncallCX() {
   document.getElementById("mainConnect").style.display = "none";
   document.getElementById("mainContent").style.display = "block";
 
-  var showValueAppTxtService = document.getElementById("appTxtService");
+  var showValueAppTxtService = document.querySelector(".appTxtService");
   showValueAppTxtService.innerText = appTxtService;
+  const label = document.querySelector(".appTxtService");
+  label.textContent = appTxtService; // U
+
+  console.log("label.textContent", label.textContent);
 }
 
 function capitalizeFirstLetter(string) {
@@ -3436,25 +3440,29 @@ function capitalizeFirstLetter(string) {
     .join(" ");
 }
 
-document.getElementById("appTxtService").addEventListener("click", function () {
-  const dropdown = document.getElementById("dropdown");
-  const label = document.getElementById("appTxtService");
+document.querySelector(".appTxtService").addEventListener("click", function () {
+  const dropdown = document.querySelector(".dropdown--extend");
+  const label = document.querySelector(".appTxtService");
   label.style.display = "none"; // Hide the label when clicked
   dropdown.style.display = "block"; // Show the dropdown
 });
 
-document.getElementById("dropdown").addEventListener("change", function () {
-  const dropdown = document.getElementById("dropdown");
-  const selectedOption = dropdown.options[dropdown.selectedIndex].text;
-  const label = document.getElementById("appTxtService");
-  label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
-  label.style.display = "inline"; // Show the label with the new text
-  dropdown.style.display = "none"; // Hide the dropdown after selection
-});
+document
+  .querySelector(".dropdown--extend")
+  .addEventListener("change", function () {
+    const dropdown = document.querySelector(".dropdown--extend");
+    const selectedOption = dropdown.options[dropdown.selectedIndex].text;
+    const label = document.querySelector(".appTxtService");
+    label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
+    label.style.display = "inline"; // Show the label with the new text
+    dropdown.style.display = "none"; // Hide the dropdown after selection
+  });
 
-document.getElementById("dropdown").addEventListener("mouseleave", function () {
-  const dropdown = document.getElementById("dropdown");
-  const label = document.getElementById("appTxtService");
-  label.style.display = "inline"; // Show the label with the initial text
-  dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
-});
+document
+  .querySelector(".dropdown--extend")
+  .addEventListener("mouseleave", function () {
+    const dropdown = document.querySelector(".dropdown--extend");
+    const label = document.querySelector(".appTxtService");
+    label.style.display = "inline"; // Show the label with the initial text
+    dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
+  });

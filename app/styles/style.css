@@ -357,3 +357,10 @@ html {
   font-size: 14px;
   cursor: pointer;
 }
+
+.appTxtService {
+  cursor: pointer;
+}
+.dropdown--extend {
+  display: none;
+}
