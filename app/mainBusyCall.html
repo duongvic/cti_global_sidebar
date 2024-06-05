@@ -1,13 +1,25 @@
 <!-- màn hình bận -->
 <div id="mainBusyCall" style="display: none;" class="city">
-  <div style="background: #12344D;">
-    <!-- <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span> -->
+  <!-- <div style="background: #12344D;">
+    <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span>
     <fw-button class="action-buttons flr" id="btnCollapseClickToCall" size="small" color="primary">__
     </fw-button><br><br>
+  </div> -->
+
+  <div class="container-main">
+    <div class="left-content-main">
+      <label class="appTxtService" id="appTxtServiceBusyCall"></label>
+    </div>
+    <div class="right-content-main">
+      <fw-button class="action-buttons flr" id="btnCollapseClickToCall" onclick="viewScreenCollapseClickToCall()"
+        size="small" color="primary">-
+      </fw-button>
+    </div>
+    <br><br>
   </div>
 
   <div id="busycall" class="busy__call city">
-    <p class="text-algin" style="padding-top: 9% ; padding-bottom: 3rem;">Outbound Call...</p>
+    <p class="text-algin" style="padding-top: 4% ; padding-bottom: 3rem;">Outbound Call...</p>
 
     <h4 id="appTxtNameContactBusyCall"></h4>
     <p id="appTextPhoneBusyCall"></p>

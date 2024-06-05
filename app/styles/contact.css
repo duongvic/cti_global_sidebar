@@ -215,14 +215,14 @@ a :hover {
   height: 89px;
 }
 
-.menuContact {
-  /* position: fixed; */
-  /* top: 89px; */
-  /* width: 100%; */
-  /* background-color: red; */
-  /* z-index: 999; */
-  height: 89px;
-}
+/* .menuContact { */
+/* position: fixed; */
+/* top: 89px; */
+/* width: 100%; */
+/* background-color: red; */
+/* z-index: 999; */
+/* height: 89px; */
+/* } */
 
 .menuContactList {
   position: fixed;
@@ -254,7 +254,7 @@ a :hover {
   margin-top: 9px;
 }
 
-.loadMore{
+.loadMore {
   display: flex;
   justify-content: center;
   align-items: center;

@@ -850,6 +850,7 @@ let listContactsExample = [
   },
 ];
 
+let displayExtension = "";
 let appTxtService = "";
 let email_acct = undefined;
 let role_acct = undefined;
@@ -868,6 +869,39 @@ const options = {
   avatars: true,
 };
 
+var extDataSource = [
+  {
+    value: "1100",
+    text: "EXT 1100",
+    // subText: "Pirate King",
+    // graphicsProps: { name: "verified" },
+  },
+  {
+    value: "1991",
+    text: "EXT 1991",
+    // subText: "Best Swordsman",
+    // graphicsProps: { name: "magic-wand" },
+  },
+  {
+    value: "1992",
+    text: "EXT 1992",
+    // subText: "Best Chef",
+    // graphicsProps: { name: "ecommerce" },
+  },
+  {
+    value: "1993",
+    text: "EXT 1993",
+    // subText: "Best Chef",
+    // graphicsProps: { name: "ecommerce" },
+  },
+  {
+    value: "1994",
+    text: "EXT 1994",
+    // subText: "Best Chef",
+    // graphicsProps: { name: "ecommerce" },
+  },
+];
+
 agent.startApplicationSession({
   // username: "duongnh4@fpt.com",
   // password: "DuongNH4!!!",
@@ -877,6 +911,7 @@ agent.startApplicationSession({
 agent.on("applicationsessionstarted", () => {
   // webphone = agent.getDevice("sip:1073@term.133");
   webphone = agent.getDevice("sip:1973@term.115");
+  // webphone = agent.getDevice("sip:1217@term.492");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
   webphone.monitorStart({ rtc: true });
@@ -893,8 +928,11 @@ agent.on("remotestream", (event) => {
 });
 
 //----Refactor 2 ---
+async function setUpdateCallAs7(value) {
+  isUpdateCallAs7 = value;
+}
 // Function to toggle mic and hold/unhold states
-function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
+async function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
   x.classList.toggle(updateCallConfig ? "mic" : "change");
   input.value = input.value === "false" ? "true" : "false";
   let call = webphone.calls[0];
@@ -906,7 +944,7 @@ function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
   }
 
   clearAllIntervals();
-  isUpdateCallAs7 = true;
+  await setUpdateCallAs7(true);
 }
 
 // Clear all intervals
@@ -1011,35 +1049,47 @@ agent.on("call", async (event) => {
       return;
     }
 
-    const call = event.call;
-    const localConnectionInfo = call.localConnectionInfo;
-
-    switch (localConnectionInfo) {
-      case "alerting":
-        await handleInboundAlertingCall(call);
-        break;
-      case "connected":
-        handleConnectedCall(call);
-        break;
-      case "fail":
-        console.log(`Call failed, cause: ${event.content.cause}`);
-        break;
-      case "hold":
-        console.log(`Holding call to ${call.number}`);
-        isUpdateCallAs7 = true;
-        break;
-      case "null":
-        handleCallEnded(call);
-        break;
-      default:
-        console.log("Unhandled call state:", localConnectionInfo);
-    }
+    await handleLocalConnectionInfo(event);
   } catch (error) {
     isInboundCall = false;
     console.error("Error: Failed to handle call event");
     console.error(error);
   }
 });
+
+async function handleLocalConnectionInfo(event) {
+  const call = event.call;
+  const localConnectionInfo = call.localConnectionInfo;
+
+  switch (localConnectionInfo) {
+    case "alerting":
+      await handleInboundAlertingCall(call);
+      break;
+    case "connected":
+      await handleConnectedCall(call);
+      break;
+    case "fail":
+      handleCallFail(event);
+      break;
+    case "hold":
+      await handleCallHold(call);
+      break;
+    case "null":
+      handleCallEnded(call);
+      break;
+    default:
+      console.log("Unhandled call state:", localConnectionInfo);
+  }
+}
+
+function handleCallFail(event) {
+  console.log(`Call failed, cause: ${event.content.cause}`);
+}
+
+async function handleCallHold(call) {
+  console.log(`Holding call to ${call.number}`);
+  await setUpdateCallAs7(true);
+}
 
 // Check if the call is busy
 function isBusyCause(event) {
@@ -1088,7 +1138,7 @@ async function handleInboundAlertingCall(call) {
 }
 
 // Handle connected call
-function handleConnectedCall(call) {
+async function handleConnectedCall(call) {
   console.log(`Connected to ${call.number}`);
   console.log("Connected to screen:", isMainActive);
 
@@ -1097,7 +1147,8 @@ function handleConnectedCall(call) {
     startTimeCollapse();
 
     if (!isUpdateCallAs7) {
-      existContact ? createTicket() : createContact();
+      await (existContact ? createTicket() : createContact());
+      await setUpdateCallAs7(true);
     }
   }
 
@@ -1106,7 +1157,8 @@ function handleConnectedCall(call) {
     startTimeInboundListenCollapse();
 
     if (!isUpdateCallAs7) {
-      existContact ? createTicket() : createContact();
+      await (existContact ? createTicket() : createContact());
+      await setUpdateCallAs7(true);
     }
   } else if (!isMainActive && !isInboundCall) {
     clearInterval(intervalInbound);
@@ -1127,6 +1179,7 @@ function handleCallEnded(call) {
   if (isMainShow !== "busycall") {
     document.getElementById("mainContent").style.display = "block";
     document.getElementById("mainOutbound").style.display = "none";
+    document.getElementById("mainCollapseClickToCall").style.display = "none";
     resetText();
     onAppDeactive();
     // location.reload();
@@ -1154,16 +1207,18 @@ async function getUserData() {
 }
 
 function viewMainBusy() {
-  document.getElementById("mainBusyCall").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
+  $("#appTxtServiceBusyCall").text(appTxtService);
+
+  $("#mainBusyCall").css("display", "block");
+  $("#mainContent").css("display", "none");
+  $("#mainOutbound").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
 }
 // navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
 //   mediaDevices
@@ -1191,18 +1246,18 @@ function showNotify(type, message) {
 /**
  * To get the logged in user in Freshdesk
  */
-function getLoggedInUser() {
-  client.data.get("loggedInUser").then(
-    function (data) {
-      console.info("Successfully got loggedInUser data");
-      showNotify("info", `User's name: ${data.loggedInUser.contact.name}`);
-    },
-    function (error) {
-      console.error("Error: Failed to get the loggedInUser information");
-      console.error(error);
-    }
-  );
-}
+// function getLoggedInUser() {
+//   client.data.get("loggedInUser").then(
+//     function (data) {
+//       console.info("Successfully got loggedInUser data");
+//       showNotify("info", `User's name: ${data.loggedInUser.contact.name}`);
+//     },
+//     function (error) {
+//       console.error("Error: Failed to get the loggedInUser information");
+//       console.error(error);
+//     }
+//   );
+// }
 
 /**
  * To open the CTI app
@@ -1345,8 +1400,9 @@ function transformerItems(listItem) {
 }
 
 async function getContactData(page) {
-  document.getElementById("loadingImg").style.display = "block";
-  document.getElementById("loadMoreTxt").style.display = "none";
+  $("#loadingImg").css("display", "block");
+  $("#loadMoreTxt").css("display", "none");
+
   try {
     var data = await client.request.invokeTemplate("getContacts", {
       context: {
@@ -1391,8 +1447,9 @@ async function getContactData(page) {
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
       // renderListContact(listContacts);
     }
-    document.getElementById("loadingImg").style.display = "none";
-    document.getElementById("loadMoreTxt").style.display = "block";
+
+    $("#loadingImg").css("display", "none");
+    $("#loadMoreTxt").css("display", "block");
   } catch (error) {
     // Failure operation
     console.log(error);
@@ -1406,8 +1463,9 @@ async function fetchContactData(page) {
     current_page = page;
   }
   console.log("page", page);
-  document.getElementById("loadingImg").style.display = "block";
-  document.getElementById("loadMoreTxt").style.display = "none";
+  $("#loadingImg").css("display", "block");
+  $("#loadMoreTxt").css("display", "none");
+
   try {
     var data = await client.request.invokeTemplate("getContacts", {
       context: {
@@ -1464,15 +1522,17 @@ async function fetchContactData(page) {
       const transformedItems = transformerItems(listContacts);
       isLoading = false;
       renderListContact(transformedItems?.data ? transformedItems?.data : []);
-      document.getElementById("loadingImg").style.display = "none";
-      document.getElementById("loadMoreTxt").style.display = "none";
+
+      $("#loadingImg").css("display", "none");
+      $("#loadMoreTxt").css("display", "none");
+
       // renderListContact(listContacts);
     }
   } catch (error) {
     console.log(error);
     isLoading = false;
-    document.getElementById("loadingImg").style.display = "none";
-    document.getElementById("loadMoreTxt").style.display = "block";
+    $("#loadingImg").css("display", "none");
+    $("#loadMoreTxt").css("display", "block");
   }
 }
 
@@ -1489,26 +1549,27 @@ async function filterContactDataInbound(phone) {
     // kiểm tra số phone có trong hệ thống không
     if (detail?.length > 0) {
       existContact = true;
-      document.getElementById("appTxtNameContactInbound").value =
-        detail[0].name;
-      document.getElementById("appTxtNameContactInbound").innerText =
-        detail[0].name;
-      document.getElementById("appTxtNameContactInboundListen").value =
-        detail[0].name;
-      document.getElementById("appTxtNameContactInboundListen").innerText =
-        detail[0].name;
+      $("#appTxtNameContactInbound").val(detail[0].name);
+      $("#appTxtNameContactInbound").text(detail[0].name);
+      $("#appTxtNameContactInboundListen").val(detail[0].name);
+      $("#appTxtNameContactInboundListen").text(detail[0].name);
+
       phoneNumberReceiver = phone;
       nameContact = detail[0].name;
       emailContact = detail[0].email;
       idContact = detail[0].id;
     } else {
       existContact = false;
-      document.getElementById("appTextPhoneInbound").style.fontSize = "22px";
-      document.getElementById("appTextPhoneInbound").style.padding = "10px 0px";
-      document.getElementById("appTextPhoneInboundListen").style.fontSize =
-        "22px";
-      document.getElementById("appTextPhoneInboundListen").style.padding =
-        "9px 0px";
+      $("#appTextPhoneInbound").css({
+        fontSize: "22px",
+        padding: "10px 0px",
+      });
+
+      $("#appTextPhoneInboundListen").css({
+        fontSize: "22px",
+        padding: "9px 0px",
+      });
+
       nameContact = "";
       idContact = "";
       emailContact = "";
@@ -1558,14 +1619,16 @@ function handleContactFound(contact, detail) {
   ];
 
   contactElements.forEach((elementId) => {
-    document.getElementById(elementId).textContent = contact.name;
+    $("#" + elementId).text(contact.name);
   });
 
   const phoneElements = ["appTextPhoneInbound", "appTextPhoneInboundListen"];
 
   phoneElements.forEach((elementId) => {
-    document.getElementById(elementId).style.fontSize = "14px";
-    document.getElementById(elementId).style.padding = "0px 0px";
+    $("#" + elementId).css({
+      fontSize: "14px",
+      padding: "0px 0px",
+    });
   });
 
   getContactById(contact.id);
@@ -1577,8 +1640,11 @@ function handleContactFound(contact, detail) {
 
 function handleContactNotFound() {
   existContact = false;
-  document.getElementById("appTextPhone").style.fontSize = "20px";
-  document.getElementById("appTextPhone").style.padding = "10px 0px";
+  $("#appTextPhone").css({
+    fontSize: "20px",
+    padding: "10px 0px",
+  });
+
   nameContact = "";
   current_page = 1;
   renderListContactEmpty();
@@ -1598,15 +1664,18 @@ async function getContactById(id_contact) {
       idContact = id_contact;
       emailContact = detail.email;
       nameContact = detail.name;
-      document.getElementById("appTxtNameContact").textContent = nameContact;
+      $("#appTxtNameContact").text(nameContact);
+
       avtarContact = detail?.avatar?.avatar_url;
       document.getElementById("avatarContact").src = avtarContact;
     } else {
       existContact = false;
       nameContact = "";
       emailContact = "";
-      document.getElementById("appTextPhone").style.fontSize = "20px";
-      document.getElementById("appTextPhone").style.padding = "10px 0px";
+      $("#appTextPhone").css({
+        fontSize: "20px",
+        padding: "10px 0px",
+      });
     }
     return detail;
   } catch (error) {
@@ -1624,16 +1693,18 @@ function clickToCall() {
   isMainOutbound = true;
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
-    document.getElementById("mainContent").style.display = "none";
-    document.getElementById("mainOutbound").style.display = "block";
-    document.getElementById("mainBusyCall").style.display = "none";
-    document.getElementById("mainCollapseClickToCall").style.display = "none";
-    document.getElementById("mainListContacts").style.display = "none";
-    document.getElementById("mainListHistoryCall").style.display = "none";
-    document.getElementById("mainInbound").style.display = "none";
-    document.getElementById("mainInboundCollapse").style.display = "none";
-    document.getElementById("mainInboundListen").style.display = "none";
-    document.getElementById("mainInboundListenCollapse").style.display = "none";
+    $("#mainOutbound").css("display", "block");
+    $("#mainContent").css("display", "none");
+    $("#mainBusyCall").css("display", "none");
+    $("#mainCollapseClickToCall").css("display", "none");
+    $("#mainListContacts").css("display", "none");
+    $("#mainListHistoryCall").css("display", "none");
+    $("#mainInbound").css("display", "none");
+    $("#mainInboundCollapse").css("display", "none");
+    $("#mainInboundListen").css("display", "none");
+    $("#mainInboundListenCollapse").css("display", "none");
+    $("#headCourse").css("display", "none");
+    $("#mainConnect").css("display", "none");
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
@@ -1712,32 +1783,18 @@ function resizeAppDefault() {
 function viewScreenCollapseClickToCall() {
   isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "block";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
+  $(
+    "#mainContent, #mainOutbound, #mainBusyCall, #mainListContacts, #mainListHistoryCall, #mainListMissCall, #mainInbound, #mainInboundCollapse, #mainInboundListen, #mainInboundListenCollapse"
+  ).hide();
+  $("#mainCollapseClickToCall").show();
 }
 
 function viewScreenCollapseClickInBound() {
   client.instance.resize({ height: "48px" });
-  document.getElementById("mainInboundCollapse").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
+  $("#mainInboundCollapse").show();
+  $(
+    "#mainContent, #mainOutbound, #mainBusyCall, #mainCollapseClickToCall, #mainListContacts, #mainListHistoryCall, #mainListMissCall, #mainInbound, #mainInboundListen, #mainInboundListenCollapse"
+  ).hide();
 
   nameNotListen.textContent =
     nameContact != "" ? nameContact : phoneNumberReceiver;
@@ -1756,7 +1813,7 @@ async function init() {
 
 function onAppActivate() {
   resizeAppDefault();
-  openApp();
+  // openApp();
   client.data.get("loggedInUser").then(
     function (data) {
       agent_ref = data?.loggedInUser?.availability?.agent_ref
@@ -1781,19 +1838,35 @@ function onAppActivate() {
         console.log("iparams:", data);
       });
 
-      var displayEmailLogin = document.getElementById("displayValueEmailLogin");
+      //
+      // Tạo JWT
+      // const token = jwt.sign(
+      //   {
+      //     userId: data?.loggedInUser?.id,
+      //     userEmail: email_acct,
+      //     role: data?.loggedInUser?.type,
+      //   },
+      //   secretKey,
+      //   { expiresIn: "1h" }
+      // );
+
+      // console.log("Generated JWT:", token);
+
+      var displayEmailLogin = $("#displayValueEmailLogin");
       // Thiết lập giá trị cho thẻ <p>
-      displayEmailLogin.textContent = email_acct;
+      displayEmailLogin.text(email_acct);
 
       // lay thong tin extend gọi
-      var displayRoleAcct = document.getElementById("roleAcct");
+      var displayRoleAcct = $("#roleAcct");
       // Thiết lập giá trị cho thẻ <input>
-      displayRoleAcct.value =
-        role_acct === "support_agent" ? "Support Agent" : role_acct;
-      displayRoleAcct.innerText =
-        role_acct === "support_agent" ? "Support Agent" : role_acct;
-      displayValueRoleAcct =
-        role_acct === "support_agent" ? "Support Agent" : role_acct;
+      displayRoleAcct.val(
+        role_acct === "support_agent" ? "Support Agent" : role_acct
+      );
+
+      displayRoleAcct.text(
+        role_acct === "support_agent" ? "Support Agent" : role_acct
+      );
+
       // var roleDataSource = [
       //   {
       //     value: role_acct,
@@ -1805,38 +1878,6 @@ function onAppActivate() {
       // roleOptionSelect.options = iconDataSource;
       // roleOptionSelect.setSelectedOptions(roleDataSource);
 
-      var extDataSource = [
-        {
-          value: "1100",
-          text: "EXT 1100",
-          // subText: "Pirate King",
-          // graphicsProps: { name: "verified" },
-        },
-        {
-          value: "1991",
-          text: "EXT 1991",
-          // subText: "Best Swordsman",
-          // graphicsProps: { name: "magic-wand" },
-        },
-        {
-          value: "1992",
-          text: "EXT 1992",
-          // subText: "Best Chef",
-          // graphicsProps: { name: "ecommerce" },
-        },
-        {
-          value: "1993",
-          text: "EXT 1993",
-          // subText: "Best Chef",
-          // graphicsProps: { name: "ecommerce" },
-        },
-        {
-          value: "1994",
-          text: "EXT 1994",
-          // subText: "Best Chef",
-          // graphicsProps: { name: "ecommerce" },
-        },
-      ];
       var iconVariant = document.getElementById("complexSelect");
       iconVariant.options = extDataSource;
 
@@ -1845,8 +1886,8 @@ function onAppActivate() {
 
       iconVariant.addEventListener("fwChange", (e) => {
         // Thiết lập giá trị cho thẻ <input>
-        displayValueExtension.value = e?.detail?.value;
-        displayValueExtension.innerText = e?.detail?.value;
+        // displayValueExtension.value = e?.detail?.value;
+        // displayValueExtension.innerText = e?.detail?.value;
         //thiết lâp giá trị extension
         displayExtension = e?.detail?.value;
 
@@ -1904,31 +1945,35 @@ function onAppActivate() {
         );
         console.log(e?.detail);
       });
-      // document
-      //   .getElementById("btnConnect")
-      //   .addEventListener("fwClick", showSoftphoneConnect());
 
-      // document
-      //   .getElementById("btnGoToOncallCX")
-      //   .addEventListener("fwClick", goToOncallCX());
-      // isMainOutbound = false;
       current_page = 1;
 
       // addEventListeners();
       /* Adding event handlers for all the buttons in the UI of the app */
-      document.getElementById("btnClose").addEventListener("fwClick", closeApp);
 
-      document
-        .getElementById("btnClose1")
-        .addEventListener("fwClick", closeApp);
+      const btnClose = document.getElementById("btnClose");
+      if (btnClose) {
+        btnClose.addEventListener("fwClick", closeApp);
+      }
 
-      document
-        .getElementById("btnCloseHistoryCall")
-        .addEventListener("fwClick", closeApp);
+      const btnClose1 = document.getElementById("btnClose1");
+      if (btnClose1) {
+        btnClose1.addEventListener("fwClick", closeApp);
+      }
 
-      document
-        .getElementById("btnCloseHisMissCall")
-        .addEventListener("fwClick", closeApp);
+      const btnCloseHistoryCall = document.getElementById(
+        "btnCloseHistoryCall"
+      );
+      if (btnCloseHistoryCall) {
+        btnCloseHistoryCall.addEventListener("fwClick", closeApp);
+      }
+
+      const btnCloseHisMissCall = document.getElementById(
+        "btnCloseHisMissCall"
+      );
+      if (btnCloseHisMissCall) {
+        btnCloseHisMissCall.addEventListener("fwClick", closeApp);
+      }
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
       }
@@ -1944,41 +1989,36 @@ function onAppActivate() {
         "correct__number__phone";
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
-      document
-        .getElementById("btnCollapseClickToCall")
-        .addEventListener("fwClick", viewScreenCollapseClickToCall);
+      const btnCollapseClickToCall = document.getElementById(
+        "btnCollapseClickToCall"
+      );
+      if (btnCollapseClickToCall) {
+        btnCollapseClickToCall.addEventListener(
+          "fwClick",
+          viewScreenCollapseClickToCall
+        );
+      }
+      // document
+      //   .getElementById("btnCollapseClickToCall")
+      //   .addEventListener("fwClick", viewScreenCollapseClickToCall);
 
       // mo rong man hinh click to call
       document
         .getElementById("mainCollapseClickToCall")
         .addEventListener("click", () => {
           resizeAppDefault();
-          document.getElementById("mainOutbound").style.display = "block";
-          document.getElementById("mainCollapseClickToCall").style.display =
-            "none";
-          document.getElementById("mainContent").style.display = "none";
-          document.getElementById("mainBusyCall").style.display = "none";
-          document.getElementById("mainListContacts").style.display = "none";
-          document.getElementById("mainListMissCall").style.display = "none";
-          document.getElementById("mainListHistoryCall").style.display = "none";
-          document.getElementById("mainInbound").style.display = "none";
-          document.getElementById("mainInboundCollapse").style.display = "none";
-          document.getElementById("mainInboundListen").style.display = "none";
-          document.getElementById("mainInboundListenCollapse").style.display =
-            "none";
+          $("#mainOutbound").css("display", "block");
+          $("#mainCollapseClickToCall").css("display", "none");
+          $("#mainContent").css("display", "none");
+          $("#mainBusyCall").css("display", "none");
+          $("#mainListContacts").css("display", "none");
+          $("#mainListMissCall").css("display", "none");
+          $("#mainListHistoryCall").css("display", "none");
+          $("#mainInbound").css("display", "none");
+          $("#mainInboundCollapse").css("display", "none");
+          $("#mainInboundListen").css("display", "none");
+          $("#mainInboundListenCollapse").css("display", "none");
         });
-
-      /**End Call **/
-      // document
-      //   .getElementById("toggleEndCall")
-      //   .addEventListener("click", async () => {
-      //   });
-
-      // ------ ----
-      // document
-      //   .getElementById("toggleEndCallCollapse")
-      //   .addEventListener("click", async () => {
-      //   });
 
       document
         .getElementById("toggleEndCallBusy")
@@ -1990,32 +2030,26 @@ function onAppActivate() {
               isMainOutbound = false;
               $("#callEnter").attr("disabled", true);
               $("#callEnter").css({ backgroundColor: "darkgray" });
-              document.getElementById("mainContent").style.display = "block";
-              document.getElementById("mainOutbound").style.display = "none";
-              document.getElementById("mainBusyCall").style.display = "none";
 
-              document.getElementById("mainCollapseClickToCall").style.display =
-                "none";
-              document.getElementById("mainListContacts").style.display =
-                "none";
-              document.getElementById("mainListHistoryCall").style.display =
-                "none";
-              document.getElementById("mainListMissCall").style.display =
-                "none";
-              document.getElementById("mainInbound").style.display = "none";
-              document.getElementById("mainInboundCollapse").style.display =
-                "none";
-              document.getElementById("mainInboundListen").style.display =
-                "none";
-              document.getElementById(
-                "mainInboundListenCollapse"
-              ).style.display = "none";
+              $("#headCourse").css("display", "block");
 
-              document.getElementById("output").innerText = "";
-              phoneNumberReceiver = document.getElementById("output").value =
-                "";
-              document.getElementById("appTextPhone").value = "";
-              document.getElementById("appTextPhone").innerText = "";
+              $("#mainContent").css("display", "block");
+              $("#mainOutbound").css("display", "none");
+              $("#mainBusyCall").css("display", "none");
+
+              $("#mainCollapseClickToCall").css("display", "none");
+              $("#mainListContacts").css("display", "none");
+              $("#mainListHistoryCall").css("display", "none");
+              $("#mainListMissCall").css("display", "none");
+              $("#mainInbound").css("display", "none");
+              $("#mainInboundCollapse").css("display", "none");
+              $("#mainInboundListen").css("display", "none");
+              $("#mainInboundListenCollapse").css("display", "none");
+
+              $("#output").text("");
+              phoneNumberReceiver = $("#output").val("");
+              $("#appTextPhone").val("");
+              $("#appTextPhone").text("");
 
               /**as7 backend **/
               let call = webphone.calls[0];
@@ -2044,12 +2078,6 @@ function onAppActivate() {
       document
         .getElementById("btnCollapseInboundListen")
         .addEventListener("fwClick", viewScreeInboundListenCollapse);
-      //mở rộng màn hình agent nghe máy
-      // document
-      //   .getElementById("toggleShowMainInboundListen")
-      //   .addEventListener("click", () => {
-      //     showMainInboundListen();
-      //   });
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
       clickToCall();
@@ -2142,31 +2170,28 @@ function ResetTxtPhone() {
  * call dialpad events
  **/
 function eventHandlecallDialpad() {
-  // $("#callEnter").attr("disabled", false);
-  // $("#callEnter").css({ backgroundColor: "green" });
-  document.getElementById("appTextPhone1").innerText = "Correct";
-  document.getElementById("appTextPhone1").className = "correct__number__phone";
-
   openApp();
-  let textElementDialpad = document.getElementById("output").value;
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "block";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
 
+  $("#headCourse").css("display", "none");
+  $("#mainContent").hide();
+  $("#mainOutbound").show();
+  $("#mainBusyCall").hide();
+  $("#mainCollapseClickToCall").hide();
+  $("#mainListContacts").hide();
+  $("#mainListHistoryCall").hide();
+  $("#mainInbound").hide();
+  $("#mainInboundCollapse").hide();
+  $("#mainInboundListen").hide();
+  $("#mainInboundListenCollapse").hide();
+
+  // Gán giá trị đó cho thẻ span
+  $("#appTxtServiceOutbound").text(appTxtService);
+
+  let textElementDialpad = $("#output").val();
   phoneNumberReceiver = textElementDialpad;
-  document.getElementById("appTextPhone").value = phoneNumberReceiver;
-  document.getElementById("appTextPhone").innerText = phoneNumberReceiver;
-
-  document.getElementById("appTextPhoneBusyCall").value = phoneNumberReceiver;
-  document.getElementById("appTextPhoneBusyCall").innerText =
-    phoneNumberReceiver;
+  $("#appTextPhone1").text("Correct").attr("class", "correct__number__phone");
+  $("#appTextPhone").val(phoneNumberReceiver).text(phoneNumberReceiver);
+  $("#appTextPhoneBusyCall").val(phoneNumberReceiver).text(phoneNumberReceiver);
 
   if (existContact) {
     goToContact(idContact);
@@ -2199,6 +2224,29 @@ function showContact() {
   isMainInbound = false;
   isMainOutbound = false;
   isMainActive = false;
+
+  var newSvgContact = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M17.8594 14.0161C17.6094 13.3599 17.4844 12.688 17.4844 12.0005C17.4844 11.313 17.6094 10.6411 17.8594 9.98486H19.5L21 8.01611L19.0313 6.00049C18.4688 6.43799 17.9063 7.04736 17.3438 7.82861C16.8125 8.60986 16.4531 9.32861 16.2656 9.98486C16.0781 10.6411 15.9844 11.313 15.9844 12.0005C15.9844 12.688 16.0781 13.3599 16.2656 14.0161C16.4531 14.6724 16.8125 15.3911 17.3438 16.1724C17.9063 16.9536 18.4688 17.563 19.0313 18.0005L21 15.9849L19.5 14.0161H17.8594ZM14.0156 18.0005V17.0161C14.0156 16.1099 13.3281 15.3755 11.9531 14.813C10.5781 14.2192 9.26563 13.9224 8.01563 13.9224C6.76563 13.9224 5.45313 14.2192 4.07813 14.813C2.70313 15.3755 2.01563 16.1099 2.01563 17.0161V18.0005H14.0156ZM10.125 6.89111C9.53125 6.29736 8.82813 6.00049 8.01563 6.00049C7.20313 6.00049 6.5 6.29736 5.90625 6.89111C5.3125 7.48486 5.01563 8.18799 5.01563 9.00049C5.01563 9.81299 5.3125 10.5161 5.90625 11.1099C6.5 11.7036 7.20313 12.0005 8.01563 12.0005C8.82813 12.0005 9.53125 11.7036 10.125 11.1099C10.7188 10.5161 11.0156 9.81299 11.0156 9.00049C11.0156 8.18799 10.7188 7.48486 10.125 6.89111ZM21.9844 3.00049C22.5156 3.00049 22.9844 3.20361 23.3906 3.60986C23.7969 4.01611 24 4.48486 24 5.01611V18.9849C24 19.5161 23.7969 19.9849 23.3906 20.3911C22.9844 20.7974 22.5156 21.0005 21.9844 21.0005H2.01563C1.48438 21.0005 1.01563 20.7974 0.609375 20.3911C0.203125 19.9849 0 19.5161 0 18.9849V5.01611C0 4.48486 0.203125 4.01611 0.609375 3.60986C1.01563 3.20361 1.48438 3.00049 2.01563 3.00049H21.9844Z" fill="white"></path>
+</svg>`;
+  $("#btnContact").html(newSvgContact);
+
+  var oldSvgDialap = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.4211 0.66383C10.8772 0.221277 11.4035 0 12 0C12.5965 0 13.1228 0.221277 13.5789 0.66383C14.0351 1.10638 14.2632 1.61702 14.2632 2.19574C14.2632 2.77447 14.0351 3.28511 13.5789 3.72766C13.1228 4.17021 12.5965 4.39149 12 4.39149C11.4035 4.39149 10.8772 4.17021 10.4211 3.72766C9.96491 3.28511 9.73684 2.77447 9.73684 2.19574C9.73684 1.61702 9.96491 1.10638 10.4211 0.66383ZM10.4211 7.2C10.8772 6.75745 11.4035 6.53617 12 6.53617C12.5965 6.53617 13.1228 6.75745 13.5789 7.2C14.0351 7.64255 14.2632 8.15319 14.2632 8.73191C14.2632 9.31064 14.0351 9.82128 13.5789 10.2638C13.1228 10.7064 12.5965 10.9277 12 10.9277C11.4035 10.9277 10.8772 10.7064 10.4211 10.2638C9.96491 9.82128 9.73684 9.31064 9.73684 8.73191C9.73684 8.15319 9.96491 7.64255 10.4211 7.2ZM17.1579 7.2C17.614 6.75745 18.1404 6.53617 18.7368 6.53617C19.3333 6.53617 19.8596 6.75745 20.3158 7.2C20.7719 7.64255 21 8.15319 21 8.73191C21 9.31064 20.7719 9.82128 20.3158 10.2638C19.8596 10.7064 19.3333 10.9277 18.7368 10.9277C18.1404 10.9277 17.614 10.7064 17.1579 10.2638C16.7018 9.82128 16.4737 9.31064 16.4737 8.73191C16.4737 8.15319 16.7018 7.64255 17.1579 7.2ZM17.1579 13.7362C17.614 13.2936 18.1404 13.0723 18.7368 13.0723C19.3333 13.0723 19.8596 13.2936 20.3158 13.7362C20.7719 14.1787 21 14.6894 21 15.2681C21 15.8468 20.7719 16.3574 20.3158 16.8C19.8596 17.2426 19.3333 17.4638 18.7368 17.4638C18.1404 17.4638 17.614 17.2426 17.1579 16.8C16.7018 16.3574 16.4737 15.8468 16.4737 15.2681C16.4737 14.6894 16.7018 14.1787 17.1579 13.7362ZM10.4211 13.7362C10.8772 13.2936 11.4035 13.0723 12 13.0723C12.5965 13.0723 13.1228 13.2936 13.5789 13.7362C14.0351 14.1787 14.2632 14.6894 14.2632 15.2681C14.2632 15.8468 14.0351 16.3574 13.5789 16.8C13.1228 17.2426 12.5965 17.4638 12 17.4638C11.4035 17.4638 10.8772 17.2426 10.4211 16.8C9.96491 16.3574 9.73684 15.8468 9.73684 15.2681C9.73684 14.6894 9.96491 14.1787 10.4211 13.7362ZM20.3158 3.72766C19.8596 4.17021 19.3333 4.39149 18.7368 4.39149C18.1404 4.39149 17.614 4.17021 17.1579 3.72766C16.7018 3.28511 16.4737 2.77447 16.4737 2.19574C16.4737 1.61702 16.7018 1.10638 17.1579 0.66383C17.614 0.221277 18.1404 0 18.7368 0C19.3333 0 19.8596 0.221277 20.3158 0.66383C20.7719 1.10638 21 1.61702 21 2.19574C21 2.77447 20.7719 3.28511 20.3158 3.72766ZM3.68421 13.7362C4.14035 13.2936 4.66667 13.0723 5.26316 13.0723C5.85965 13.0723 6.38597 13.2936 6.84211 13.7362C7.29825 14.1787 7.52632 14.6894 7.52632 15.2681C7.52632 15.8468 7.29825 16.3574 6.84211 16.8C6.38597 17.2426 5.85965 17.4638 5.26316 17.4638C4.66667 17.4638 4.14035 17.2426 3.68421 16.8C3.22807 16.3574 3 15.8468 3 15.2681C3 14.6894 3.22807 14.1787 3.68421 13.7362ZM3.68421 7.2C4.14035 6.75745 4.66667 6.53617 5.26316 6.53617C5.85965 6.53617 6.38597 6.75745 6.84211 7.2C7.29825 7.64255 7.52632 8.15319 7.52632 8.73191C7.52632 9.31064 7.29825 9.82128 6.84211 10.2638C6.38597 10.7064 5.85965 10.9277 5.26316 10.9277C4.66667 10.9277 4.14035 10.7064 3.68421 10.2638C3.22807 9.82128 3 9.31064 3 8.73191C3 8.15319 3.22807 7.64255 3.68421 7.2ZM3.68421 0.66383C4.14035 0.221277 4.66667 0 5.26316 0C5.85965 0 6.38597 0.221277 6.84211 0.66383C7.29825 1.10638 7.52632 1.61702 7.52632 2.19574C7.52632 2.77447 7.29825 3.28511 6.84211 3.72766C6.38597 4.17021 5.85965 4.39149 5.26316 4.39149C4.66667 4.39149 4.14035 4.17021 3.68421 3.72766C3.22807 3.28511 3 2.77447 3 2.19574C3 1.61702 3.22807 1.10638 3.68421 0.66383ZM10.4211 20.2723C10.8772 19.8298 11.4035 19.6085 12 19.6085C12.5965 19.6085 13.1228 19.8298 13.5789 20.2723C14.0351 20.7149 14.2632 21.2255 14.2632 21.8043C14.2632 22.383 14.0351 22.8936 13.5789 23.3362C13.1228 23.7787 12.5965 24 12 24C11.4035 24 10.8772 23.7787 10.4211 23.3362C9.96491 22.8936 9.73684 22.383 9.73684 21.8043C9.73684 21.2255 9.96491 20.7149 10.4211 20.2723Z" fill="white" fill-opacity="0.65"></path>
+    </svg>`;
+  $("#btnDialpad").html(oldSvgDialap);
+
+  var oldSvgHisCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.0647 7.57292H13.7076V12.2604L17.558 14.6042L16.7366 15.9583L12.0647 13.0938V7.57292ZM6.16071 4.91667C8.11161 2.97222 10.439 2 13.1429 2C15.8467 2 18.157 2.97222 20.0737 4.91667C22.0246 6.86111 23 9.22222 23 12C23 14.7778 22.0246 17.1389 20.0737 19.0833C18.157 21.0278 15.8467 22 13.1429 22C12.0134 22 10.7641 21.7222 9.39509 21.1667C8.06027 20.5764 6.99926 19.8819 6.21205 19.0833L7.75223 17.4688C9.25818 18.9965 11.0551 19.7604 13.1429 19.7604C15.2649 19.7604 17.0789 19.0139 18.5848 17.5208C20.0908 15.9931 20.8438 14.1528 20.8438 12C20.8438 9.84722 20.0908 8.02431 18.5848 6.53125C17.0789 5.00347 15.2649 4.23958 13.1429 4.23958C11.0208 4.23958 9.20685 5.00347 7.70089 6.53125C6.22917 8.02431 5.4933 9.84722 5.4933 12H8.77902L4.36384 16.4792L4.26116 16.3229L0 12H3.28571C3.28571 9.22222 4.24405 6.86111 6.16071 4.91667Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnMissCall").html(oldSvgHisCall);
+
+  var olSvgMissCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.7188 16.7953C23.9063 16.9843 24 17.2205 24 17.5039C24 17.7874 23.9063 18.0236 23.7188 18.2126L21.2344 20.7165C21.0469 20.9055 20.8125 21 20.5313 21C20.25 21 20.0156 20.9055 19.8281 20.7165C18.9531 19.8976 18.0625 19.2677 17.1563 18.8268C16.7813 18.6693 16.5938 18.3701 16.5938 17.9291V14.811C15.1563 14.3386 13.625 14.1024 12 14.1024C10.375 14.1024 8.84375 14.3386 7.40625 14.811V17.9291C7.40625 18.4016 7.21875 18.7165 6.84375 18.874C5.84375 19.3465 4.95313 19.9606 4.17188 20.7165C3.98438 20.9055 3.75 21 3.46875 21C3.1875 21 2.95313 20.9055 2.76563 20.7165L0.28125 18.2126C0.09375 18.0236 0 17.7874 0 17.5039C0 17.2205 0.09375 16.9843 0.28125 16.7953C3.5625 13.6457 7.46875 12.0709 12 12.0709C13.875 12.0709 15.9531 12.5433 18.2344 13.4882C20.5156 14.4016 22.3438 15.5039 23.7188 16.7953ZM6.51563 5.50394V9.04724H5.01563V3H11.0156V4.51181H7.5L12 9.04724L18 3L18.9844 3.99213L12 11.0787L6.51563 5.50394Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnMissCall").html(olSvgMissCall);
 
   document.getElementById("output").innerText = "";
 
@@ -2322,26 +2370,24 @@ function clickContactCall(elem) {
       .trigger("show", { id: "softphone" })
       .then(function () {
         resizeAppDefault();
-        console.log(`Success: Opened the app`);
         existContact = true;
-        document.getElementById("mainOutbound").style.display = "block";
-        document.getElementById("mainContent").style.display = "none";
-        document.getElementById("mainListContacts").style.display = "none";
-        document.getElementById("mainBusyCall").style.display = "none";
-        document.getElementById("mainCollapseClickToCall").style.display =
-          "none";
-        document.getElementById("mainListHistoryCall").style.display = "none";
-        document.getElementById("mainInbound").style.display = "none";
-        document.getElementById("mainInboundCollapse").style.display = "none";
-        document.getElementById("mainInboundListen").style.display = "none";
-        document.getElementById("mainInboundListenCollapse").style.display =
-          "none";
 
-        document.getElementById("appTxtNameContact").value = name_contact;
-        document.getElementById("appTxtNameContact").innerText = name_contact;
+        $("#mainOutbound").css("display", "block");
+        $("#mainContent").css("display", "none");
+        $("#mainListContacts").css("display", "none");
+        $("#mainBusyCall").css("display", "none");
+        $("#mainCollapseClickToCall").css("display", "none");
+        $("#mainListHistoryCall").css("display", "none");
+        $("#mainInbound").css("display", "none");
+        $("#mainInboundCollapse").css("display", "none");
+        $("#mainInboundListen").css("display", "none");
+        $("#mainInboundListenCollapse").css("display", "none");
+        $("#headCourse").css("display", "none");
 
-        document.getElementById("appTextPhone").value = phone_contact;
-        document.getElementById("appTextPhone").innerText = phone_contact;
+        $("#appTxtNameContact").text(name_contact);
+        $("#appTextPhone").text(phone_contact);
+
+        $("#appTxtServiceOutbound").text(appTxtService);
 
         phoneNumberReceiver = phone_contact;
         nameContact = name_contact;
@@ -2445,6 +2491,30 @@ $(document).ready(function () {
 });
 
 async function showHistoryCall() {
+  var newSvgHisCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12.0647 7.57292H13.7076V12.2604L17.558 14.6042L16.7366 15.9583L12.0647 13.0938V7.57292ZM6.16071 4.91667C8.11161 2.97222 10.439 2 13.1429 2C15.8467 2 18.157 2.97222 20.0737 4.91667C22.0246 6.86111 23 9.22222 23 12C23 14.7778 22.0246 17.1389 20.0737 19.0833C18.157 21.0278 15.8467 22 13.1429 22C12.0134 22 10.7641 21.7222 9.39509 21.1667C8.06027 20.5764 6.99926 19.8819 6.21205 19.0833L7.75223 17.4688C9.25818 18.9965 11.0551 19.7604 13.1429 19.7604C15.2649 19.7604 17.0789 19.0139 18.5848 17.5208C20.0908 15.9931 20.8438 14.1528 20.8438 12C20.8438 9.84722 20.0908 8.02431 18.5848 6.53125C17.0789 5.00347 15.2649 4.23958 13.1429 4.23958C11.0208 4.23958 9.20685 5.00347 7.70089 6.53125C6.22917 8.02431 5.4933 9.84722 5.4933 12H8.77902L4.36384 16.4792L4.26116 16.3229L0 12H3.28571C3.28571 9.22222 4.24405 6.86111 6.16071 4.91667Z" fill="white"></path>
+  </svg>
+`;
+  $("#btnHistory").html(newSvgHisCall);
+
+  var oldSvgDialap = `
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.4211 0.66383C10.8772 0.221277 11.4035 0 12 0C12.5965 0 13.1228 0.221277 13.5789 0.66383C14.0351 1.10638 14.2632 1.61702 14.2632 2.19574C14.2632 2.77447 14.0351 3.28511 13.5789 3.72766C13.1228 4.17021 12.5965 4.39149 12 4.39149C11.4035 4.39149 10.8772 4.17021 10.4211 3.72766C9.96491 3.28511 9.73684 2.77447 9.73684 2.19574C9.73684 1.61702 9.96491 1.10638 10.4211 0.66383ZM10.4211 7.2C10.8772 6.75745 11.4035 6.53617 12 6.53617C12.5965 6.53617 13.1228 6.75745 13.5789 7.2C14.0351 7.64255 14.2632 8.15319 14.2632 8.73191C14.2632 9.31064 14.0351 9.82128 13.5789 10.2638C13.1228 10.7064 12.5965 10.9277 12 10.9277C11.4035 10.9277 10.8772 10.7064 10.4211 10.2638C9.96491 9.82128 9.73684 9.31064 9.73684 8.73191C9.73684 8.15319 9.96491 7.64255 10.4211 7.2ZM17.1579 7.2C17.614 6.75745 18.1404 6.53617 18.7368 6.53617C19.3333 6.53617 19.8596 6.75745 20.3158 7.2C20.7719 7.64255 21 8.15319 21 8.73191C21 9.31064 20.7719 9.82128 20.3158 10.2638C19.8596 10.7064 19.3333 10.9277 18.7368 10.9277C18.1404 10.9277 17.614 10.7064 17.1579 10.2638C16.7018 9.82128 16.4737 9.31064 16.4737 8.73191C16.4737 8.15319 16.7018 7.64255 17.1579 7.2ZM17.1579 13.7362C17.614 13.2936 18.1404 13.0723 18.7368 13.0723C19.3333 13.0723 19.8596 13.2936 20.3158 13.7362C20.7719 14.1787 21 14.6894 21 15.2681C21 15.8468 20.7719 16.3574 20.3158 16.8C19.8596 17.2426 19.3333 17.4638 18.7368 17.4638C18.1404 17.4638 17.614 17.2426 17.1579 16.8C16.7018 16.3574 16.4737 15.8468 16.4737 15.2681C16.4737 14.6894 16.7018 14.1787 17.1579 13.7362ZM10.4211 13.7362C10.8772 13.2936 11.4035 13.0723 12 13.0723C12.5965 13.0723 13.1228 13.2936 13.5789 13.7362C14.0351 14.1787 14.2632 14.6894 14.2632 15.2681C14.2632 15.8468 14.0351 16.3574 13.5789 16.8C13.1228 17.2426 12.5965 17.4638 12 17.4638C11.4035 17.4638 10.8772 17.2426 10.4211 16.8C9.96491 16.3574 9.73684 15.8468 9.73684 15.2681C9.73684 14.6894 9.96491 14.1787 10.4211 13.7362ZM20.3158 3.72766C19.8596 4.17021 19.3333 4.39149 18.7368 4.39149C18.1404 4.39149 17.614 4.17021 17.1579 3.72766C16.7018 3.28511 16.4737 2.77447 16.4737 2.19574C16.4737 1.61702 16.7018 1.10638 17.1579 0.66383C17.614 0.221277 18.1404 0 18.7368 0C19.3333 0 19.8596 0.221277 20.3158 0.66383C20.7719 1.10638 21 1.61702 21 2.19574C21 2.77447 20.7719 3.28511 20.3158 3.72766ZM3.68421 13.7362C4.14035 13.2936 4.66667 13.0723 5.26316 13.0723C5.85965 13.0723 6.38597 13.2936 6.84211 13.7362C7.29825 14.1787 7.52632 14.6894 7.52632 15.2681C7.52632 15.8468 7.29825 16.3574 6.84211 16.8C6.38597 17.2426 5.85965 17.4638 5.26316 17.4638C4.66667 17.4638 4.14035 17.2426 3.68421 16.8C3.22807 16.3574 3 15.8468 3 15.2681C3 14.6894 3.22807 14.1787 3.68421 13.7362ZM3.68421 7.2C4.14035 6.75745 4.66667 6.53617 5.26316 6.53617C5.85965 6.53617 6.38597 6.75745 6.84211 7.2C7.29825 7.64255 7.52632 8.15319 7.52632 8.73191C7.52632 9.31064 7.29825 9.82128 6.84211 10.2638C6.38597 10.7064 5.85965 10.9277 5.26316 10.9277C4.66667 10.9277 4.14035 10.7064 3.68421 10.2638C3.22807 9.82128 3 9.31064 3 8.73191C3 8.15319 3.22807 7.64255 3.68421 7.2ZM3.68421 0.66383C4.14035 0.221277 4.66667 0 5.26316 0C5.85965 0 6.38597 0.221277 6.84211 0.66383C7.29825 1.10638 7.52632 1.61702 7.52632 2.19574C7.52632 2.77447 7.29825 3.28511 6.84211 3.72766C6.38597 4.17021 5.85965 4.39149 5.26316 4.39149C4.66667 4.39149 4.14035 4.17021 3.68421 3.72766C3.22807 3.28511 3 2.77447 3 2.19574C3 1.61702 3.22807 1.10638 3.68421 0.66383ZM10.4211 20.2723C10.8772 19.8298 11.4035 19.6085 12 19.6085C12.5965 19.6085 13.1228 19.8298 13.5789 20.2723C14.0351 20.7149 14.2632 21.2255 14.2632 21.8043C14.2632 22.383 14.0351 22.8936 13.5789 23.3362C13.1228 23.7787 12.5965 24 12 24C11.4035 24 10.8772 23.7787 10.4211 23.3362C9.96491 22.8936 9.73684 22.383 9.73684 21.8043C9.73684 21.2255 9.96491 20.7149 10.4211 20.2723Z" fill="white" fill-opacity="0.65"></path>
+    </svg>`;
+  $("#btnDialpad").html(oldSvgDialap);
+
+  var olSvgMissCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.7188 16.7953C23.9063 16.9843 24 17.2205 24 17.5039C24 17.7874 23.9063 18.0236 23.7188 18.2126L21.2344 20.7165C21.0469 20.9055 20.8125 21 20.5313 21C20.25 21 20.0156 20.9055 19.8281 20.7165C18.9531 19.8976 18.0625 19.2677 17.1563 18.8268C16.7813 18.6693 16.5938 18.3701 16.5938 17.9291V14.811C15.1563 14.3386 13.625 14.1024 12 14.1024C10.375 14.1024 8.84375 14.3386 7.40625 14.811V17.9291C7.40625 18.4016 7.21875 18.7165 6.84375 18.874C5.84375 19.3465 4.95313 19.9606 4.17188 20.7165C3.98438 20.9055 3.75 21 3.46875 21C3.1875 21 2.95313 20.9055 2.76563 20.7165L0.28125 18.2126C0.09375 18.0236 0 17.7874 0 17.5039C0 17.2205 0.09375 16.9843 0.28125 16.7953C3.5625 13.6457 7.46875 12.0709 12 12.0709C13.875 12.0709 15.9531 12.5433 18.2344 13.4882C20.5156 14.4016 22.3438 15.5039 23.7188 16.7953ZM6.51563 5.50394V9.04724H5.01563V3H11.0156V4.51181H7.5L12 9.04724L18 3L18.9844 3.99213L12 11.0787L6.51563 5.50394Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnMissCall").html(olSvgMissCall);
+
+  var oldSvgContact = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M17.8594 14.0156C17.6094 13.3594 17.4844 12.6875 17.4844 12C17.4844 11.3125 17.6094 10.6406 17.8594 9.98438H19.5L21 8.01563L19.0313 6C18.4688 6.4375 17.9063 7.04688 17.3438 7.82813C16.8125 8.60938 16.4531 9.32813 16.2656 9.98438C16.0781 10.6406 15.9844 11.3125 15.9844 12C15.9844 12.6875 16.0781 13.3594 16.2656 14.0156C16.4531 14.6719 16.8125 15.3906 17.3438 16.1719C17.9063 16.9531 18.4688 17.5625 19.0313 18L21 15.9844L19.5 14.0156H17.8594ZM14.0156 18V17.0156C14.0156 16.1094 13.3281 15.375 11.9531 14.8125C10.5781 14.2188 9.26563 13.9219 8.01563 13.9219C6.76563 13.9219 5.45313 14.2188 4.07813 14.8125C2.70313 15.375 2.01563 16.1094 2.01563 17.0156V18H14.0156ZM10.125 6.89063C9.53125 6.29688 8.82813 6 8.01563 6C7.20313 6 6.5 6.29688 5.90625 6.89063C5.3125 7.48438 5.01563 8.1875 5.01563 9C5.01563 9.8125 5.3125 10.5156 5.90625 11.1094C6.5 11.7031 7.20313 12 8.01563 12C8.82813 12 9.53125 11.7031 10.125 11.1094C10.7188 10.5156 11.0156 9.8125 11.0156 9C11.0156 8.1875 10.7188 7.48438 10.125 6.89063ZM21.9844 3C22.5156 3 22.9844 3.20313 23.3906 3.60938C23.7969 4.01563 24 4.48438 24 5.01563V18.9844C24 19.5156 23.7969 19.9844 23.3906 20.3906C22.9844 20.7969 22.5156 21 21.9844 21H2.01563C1.48438 21 1.01563 20.7969 0.609375 20.3906C0.203125 19.9844 0 19.5156 0 18.9844V5.01563C0 4.48438 0.203125 4.01563 0.609375 3.60938C1.01563 3.20313 1.48438 3 2.01563 3H21.9844Z" fill="white" fill-opacity="0.65"></path>
+</svg>`;
+  $("#btnContact").html(oldSvgContact);
+
   listMissCall = [];
   listHisCall = [];
 
@@ -2475,6 +2545,21 @@ async function showHistoryCall() {
     await displayItemsHisCall(getItemsForCurrentPageHisCall());
   }
 
+  // const labelMainListHistoryCall = document.querySelector(
+  //   "#mainListHistoryCall .appTxtService"
+  // );
+  // const dropdown = document.querySelector(
+  //   "#mainListHistoryCall .dropdown--extend"
+  // );
+
+  // if (labelMainListHistoryCall && dropdown) {
+  //   labelMainListHistoryCall.textContent = appTxtService; // Thiết lập lại giá trị của label
+  //   labelMainListHistoryCall.style.display = "inline-block";
+  //   dropdown.style.display = "none";
+  // } else {
+  //   console.error("Label or Dropdown element not found in mainListHistoryCall");
+  // }
+  $("#appTxtService").text(appTxtService);
   console.log("listHisCall", listHisCall);
   // });
 }
@@ -2482,6 +2567,29 @@ async function showHistoryCall() {
 async function showMissCall() {
   listMissCall = [];
   listHisCall = [];
+
+  var oldSvgDialap = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.4211 0.66383C10.8772 0.221277 11.4035 0 12 0C12.5965 0 13.1228 0.221277 13.5789 0.66383C14.0351 1.10638 14.2632 1.61702 14.2632 2.19574C14.2632 2.77447 14.0351 3.28511 13.5789 3.72766C13.1228 4.17021 12.5965 4.39149 12 4.39149C11.4035 4.39149 10.8772 4.17021 10.4211 3.72766C9.96491 3.28511 9.73684 2.77447 9.73684 2.19574C9.73684 1.61702 9.96491 1.10638 10.4211 0.66383ZM10.4211 7.2C10.8772 6.75745 11.4035 6.53617 12 6.53617C12.5965 6.53617 13.1228 6.75745 13.5789 7.2C14.0351 7.64255 14.2632 8.15319 14.2632 8.73191C14.2632 9.31064 14.0351 9.82128 13.5789 10.2638C13.1228 10.7064 12.5965 10.9277 12 10.9277C11.4035 10.9277 10.8772 10.7064 10.4211 10.2638C9.96491 9.82128 9.73684 9.31064 9.73684 8.73191C9.73684 8.15319 9.96491 7.64255 10.4211 7.2ZM17.1579 7.2C17.614 6.75745 18.1404 6.53617 18.7368 6.53617C19.3333 6.53617 19.8596 6.75745 20.3158 7.2C20.7719 7.64255 21 8.15319 21 8.73191C21 9.31064 20.7719 9.82128 20.3158 10.2638C19.8596 10.7064 19.3333 10.9277 18.7368 10.9277C18.1404 10.9277 17.614 10.7064 17.1579 10.2638C16.7018 9.82128 16.4737 9.31064 16.4737 8.73191C16.4737 8.15319 16.7018 7.64255 17.1579 7.2ZM17.1579 13.7362C17.614 13.2936 18.1404 13.0723 18.7368 13.0723C19.3333 13.0723 19.8596 13.2936 20.3158 13.7362C20.7719 14.1787 21 14.6894 21 15.2681C21 15.8468 20.7719 16.3574 20.3158 16.8C19.8596 17.2426 19.3333 17.4638 18.7368 17.4638C18.1404 17.4638 17.614 17.2426 17.1579 16.8C16.7018 16.3574 16.4737 15.8468 16.4737 15.2681C16.4737 14.6894 16.7018 14.1787 17.1579 13.7362ZM10.4211 13.7362C10.8772 13.2936 11.4035 13.0723 12 13.0723C12.5965 13.0723 13.1228 13.2936 13.5789 13.7362C14.0351 14.1787 14.2632 14.6894 14.2632 15.2681C14.2632 15.8468 14.0351 16.3574 13.5789 16.8C13.1228 17.2426 12.5965 17.4638 12 17.4638C11.4035 17.4638 10.8772 17.2426 10.4211 16.8C9.96491 16.3574 9.73684 15.8468 9.73684 15.2681C9.73684 14.6894 9.96491 14.1787 10.4211 13.7362ZM20.3158 3.72766C19.8596 4.17021 19.3333 4.39149 18.7368 4.39149C18.1404 4.39149 17.614 4.17021 17.1579 3.72766C16.7018 3.28511 16.4737 2.77447 16.4737 2.19574C16.4737 1.61702 16.7018 1.10638 17.1579 0.66383C17.614 0.221277 18.1404 0 18.7368 0C19.3333 0 19.8596 0.221277 20.3158 0.66383C20.7719 1.10638 21 1.61702 21 2.19574C21 2.77447 20.7719 3.28511 20.3158 3.72766ZM3.68421 13.7362C4.14035 13.2936 4.66667 13.0723 5.26316 13.0723C5.85965 13.0723 6.38597 13.2936 6.84211 13.7362C7.29825 14.1787 7.52632 14.6894 7.52632 15.2681C7.52632 15.8468 7.29825 16.3574 6.84211 16.8C6.38597 17.2426 5.85965 17.4638 5.26316 17.4638C4.66667 17.4638 4.14035 17.2426 3.68421 16.8C3.22807 16.3574 3 15.8468 3 15.2681C3 14.6894 3.22807 14.1787 3.68421 13.7362ZM3.68421 7.2C4.14035 6.75745 4.66667 6.53617 5.26316 6.53617C5.85965 6.53617 6.38597 6.75745 6.84211 7.2C7.29825 7.64255 7.52632 8.15319 7.52632 8.73191C7.52632 9.31064 7.29825 9.82128 6.84211 10.2638C6.38597 10.7064 5.85965 10.9277 5.26316 10.9277C4.66667 10.9277 4.14035 10.7064 3.68421 10.2638C3.22807 9.82128 3 9.31064 3 8.73191C3 8.15319 3.22807 7.64255 3.68421 7.2ZM3.68421 0.66383C4.14035 0.221277 4.66667 0 5.26316 0C5.85965 0 6.38597 0.221277 6.84211 0.66383C7.29825 1.10638 7.52632 1.61702 7.52632 2.19574C7.52632 2.77447 7.29825 3.28511 6.84211 3.72766C6.38597 4.17021 5.85965 4.39149 5.26316 4.39149C4.66667 4.39149 4.14035 4.17021 3.68421 3.72766C3.22807 3.28511 3 2.77447 3 2.19574C3 1.61702 3.22807 1.10638 3.68421 0.66383ZM10.4211 20.2723C10.8772 19.8298 11.4035 19.6085 12 19.6085C12.5965 19.6085 13.1228 19.8298 13.5789 20.2723C14.0351 20.7149 14.2632 21.2255 14.2632 21.8043C14.2632 22.383 14.0351 22.8936 13.5789 23.3362C13.1228 23.7787 12.5965 24 12 24C11.4035 24 10.8772 23.7787 10.4211 23.3362C9.96491 22.8936 9.73684 22.383 9.73684 21.8043C9.73684 21.2255 9.96491 20.7149 10.4211 20.2723Z" fill="white" fill-opacity="0.65"></path>
+    </svg>`;
+  $("#btnDialpad").html(oldSvgDialap);
+
+  var oldSvgHisCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.0647 7.57292H13.7076V12.2604L17.558 14.6042L16.7366 15.9583L12.0647 13.0938V7.57292ZM6.16071 4.91667C8.11161 2.97222 10.439 2 13.1429 2C15.8467 2 18.157 2.97222 20.0737 4.91667C22.0246 6.86111 23 9.22222 23 12C23 14.7778 22.0246 17.1389 20.0737 19.0833C18.157 21.0278 15.8467 22 13.1429 22C12.0134 22 10.7641 21.7222 9.39509 21.1667C8.06027 20.5764 6.99926 19.8819 6.21205 19.0833L7.75223 17.4688C9.25818 18.9965 11.0551 19.7604 13.1429 19.7604C15.2649 19.7604 17.0789 19.0139 18.5848 17.5208C20.0908 15.9931 20.8438 14.1528 20.8438 12C20.8438 9.84722 20.0908 8.02431 18.5848 6.53125C17.0789 5.00347 15.2649 4.23958 13.1429 4.23958C11.0208 4.23958 9.20685 5.00347 7.70089 6.53125C6.22917 8.02431 5.4933 9.84722 5.4933 12H8.77902L4.36384 16.4792L4.26116 16.3229L0 12H3.28571C3.28571 9.22222 4.24405 6.86111 6.16071 4.91667Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnHistory").html(oldSvgHisCall);
+
+  var newSvgMissCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.7188 16.7958C23.9063 16.9847 24 17.221 24 17.5044C24 17.7879 23.9063 18.0241 23.7188 18.2131L21.2344 20.717C21.0469 20.906 20.8125 21.0005 20.5313 21.0005C20.25 21.0005 20.0156 20.906 19.8281 20.717C18.9531 19.8981 18.0625 19.2682 17.1563 18.8273C16.7813 18.6698 16.5938 18.3706 16.5938 17.9296V14.8115C15.1563 14.3391 13.625 14.1029 12 14.1029C10.375 14.1029 8.84375 14.3391 7.40625 14.8115V17.9296C7.40625 18.4021 7.21875 18.717 6.84375 18.8745C5.84375 19.3469 4.95313 19.9611 4.17188 20.717C3.98438 20.906 3.75 21.0005 3.46875 21.0005C3.1875 21.0005 2.95313 20.906 2.76563 20.717L0.28125 18.2131C0.09375 18.0241 0 17.7879 0 17.5044C0 17.221 0.09375 16.9847 0.28125 16.7958C3.5625 13.6462 7.46875 12.0714 12 12.0714C13.875 12.0714 15.9531 12.5438 18.2344 13.4887C20.5156 14.4021 22.3438 15.5044 23.7188 16.7958ZM6.51563 5.50443V9.04773H5.01563V3.00049H11.0156V4.5123H7.5L12 9.04773L18 3.00049L18.9844 3.99261L12 11.0792L6.51563 5.50443Z" fill="white"></path>
+  </svg>`;
+  $("#btnMissCall").html(newSvgMissCall);
+
+  var oldSvgContact = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M17.8594 14.0156C17.6094 13.3594 17.4844 12.6875 17.4844 12C17.4844 11.3125 17.6094 10.6406 17.8594 9.98438H19.5L21 8.01563L19.0313 6C18.4688 6.4375 17.9063 7.04688 17.3438 7.82813C16.8125 8.60938 16.4531 9.32813 16.2656 9.98438C16.0781 10.6406 15.9844 11.3125 15.9844 12C15.9844 12.6875 16.0781 13.3594 16.2656 14.0156C16.4531 14.6719 16.8125 15.3906 17.3438 16.1719C17.9063 16.9531 18.4688 17.5625 19.0313 18L21 15.9844L19.5 14.0156H17.8594ZM14.0156 18V17.0156C14.0156 16.1094 13.3281 15.375 11.9531 14.8125C10.5781 14.2188 9.26563 13.9219 8.01563 13.9219C6.76563 13.9219 5.45313 14.2188 4.07813 14.8125C2.70313 15.375 2.01563 16.1094 2.01563 17.0156V18H14.0156ZM10.125 6.89063C9.53125 6.29688 8.82813 6 8.01563 6C7.20313 6 6.5 6.29688 5.90625 6.89063C5.3125 7.48438 5.01563 8.1875 5.01563 9C5.01563 9.8125 5.3125 10.5156 5.90625 11.1094C6.5 11.7031 7.20313 12 8.01563 12C8.82813 12 9.53125 11.7031 10.125 11.1094C10.7188 10.5156 11.0156 9.8125 11.0156 9C11.0156 8.1875 10.7188 7.48438 10.125 6.89063ZM21.9844 3C22.5156 3 22.9844 3.20313 23.3906 3.60938C23.7969 4.01563 24 4.48438 24 5.01563V18.9844C24 19.5156 23.7969 19.9844 23.3906 20.3906C22.9844 20.7969 22.5156 21 21.9844 21H2.01563C1.48438 21 1.01563 20.7969 0.609375 20.3906C0.203125 19.9844 0 19.5156 0 18.9844V5.01563C0 4.48438 0.203125 4.01563 0.609375 3.60938C1.01563 3.20313 1.48438 3 2.01563 3H21.9844Z" fill="white" fill-opacity="0.65"></path>
+</svg>`;
+  $("#btnContact").html(oldSvgContact);
 
   document.getElementById("output").innerText = "";
   document.getElementById("mainListMissCall").style.display = "block";
@@ -2614,22 +2722,17 @@ function showMain() {
   document.getElementById("mainInboundListenCollapse").style.display = "none";
 }
 
-$("#search_contact").keypress(function (event) {
+function searchContact() {
+  debugger;
   const val = document.querySelector('input[name="search_contact"]').value;
-  let keycode = event.keyCode ? event.keyCode : event.which;
   const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
   const phone = /^\d{10}$/;
-  if (keycode == "13" && (val != "" || val != null)) {
-    if (val.match(phone) || val.match(phone12)) {
-      filteredContactSearch(val);
-    } else {
-      searchContactKeyword(val);
-    }
-  } else if (keycode == "13" && (val == "" || val == null)) {
-    current_page = 1;
-    getContactData(current_page);
+  if (val.match(phone) || val.match(phone12)) {
+    filteredContactSearch(val);
+  } else {
+    searchContactKeyword(val);
   }
-});
+}
 
 async function searchContactKeyword(term) {
   try {
@@ -2816,18 +2919,17 @@ function btShowMainInboundListen() {
     .trigger("show", { id: "softphone" })
     .then(function () {
       resizeAppDefault();
-      document.getElementById("mainInboundListen").style.display = "block";
-      document.getElementById("mainInboundListenCollapse").style.display =
-        "none";
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("mainOutbound").style.display = "none";
-      document.getElementById("mainBusyCall").style.display = "none";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
-      document.getElementById("mainListContacts").style.display = "none";
-      document.getElementById("mainListHistoryCall").style.display = "none";
-      document.getElementById("mainListMissCall").style.display = "none";
-      document.getElementById("mainInbound").style.display = "none";
-      document.getElementById("mainInboundCollapse").style.display = "none";
+      $("#mainInboundListen").css("display", "block");
+      $("#mainInboundListenCollapse").css("display", "none");
+      $("#mainContent").css("display", "none");
+      $("#mainOutbound").css("display", "none");
+      $("#mainBusyCall").css("display", "none");
+      $("#mainCollapseClickToCall").css("display", "none");
+      $("#mainListContacts").css("display", "none");
+      $("#mainListHistoryCall").css("display", "none");
+      $("#mainListMissCall").css("display", "none");
+      $("#mainInbound").css("display", "none");
+      $("#mainInboundCollapse").css("display", "none");
     })
     .catch(function (error) {
       console.error("Error: Failed to open the app");
@@ -2928,55 +3030,8 @@ async function createContact() {
   }
 }
 
-let url_record =
-  "https://hcm.fstorage.vn/pbx-stg/PBX_CRM/cr_20231213-140710_f6369b7d658b3a2e_cc2ftistg-aae15c8057620e40.wav?AWSAccessKeyId=ZB3J75FAFEPIBPA8ZBV6&Signature=fG8%2FgGArKMkMtQ4pAML9A7Kg7ww%3D&Expires=1703481977";
-async function updateTicket(idTicket) {
-  console.log("co chay vao update ticket:", idContact);
-  let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px">
-    <div dir="ltr">
-      <a href="${url_record} rel="noreferrer" target="_blank" heap-ignore="true" class="_ar_hide_"
-          _ar_hide_="width:62px;height:19px;margin:0px;position:static;display:inline-block;" style="
-          text-decoration: unset; padding: 10px 10px;">
-          file record
-      </a>
-      <br />
-      <audio controls preload="auto" style="height: 30px;margin-top: 10px;">
-        <source src="${url_record}" />
-      </audio>
-    </div>
-  </div>`;
-  try {
-    const properties = JSON.stringify({
-      attachment_ids: [],
-      cloud_files: [],
-      requester_id: idContact,
-      description: html,
-    });
-    // Send request
-    var dataUpdateTicket = await client.request.invokeTemplate("updateTicket", {
-      context: {
-        id_ticket: idTicket,
-      },
-      body: properties,
-    });
-
-    var detail = dataUpdateTicket?.response
-      ? JSON.parse(dataUpdateTicket?.response)
-      : [];
-    console.log("dataUpdateTicket thành công:", detail);
-    showNotify("success", `Successfully update a ticket for: ${idTicket}`);
-  } catch (error) {
-    console.error(
-      `Error: Failed to update a ticket ${phoneNumberReceiver}-${idTicket}`
-    );
-    console.error(error);
-    showNotify("danger", "Failed to update a ticket.");
-  }
-}
-
 async function insertIdTicketAs7(idTicket) {
   console.log("co chay vao insertIdTicketAs7:", idTicket);
-  debugger;
   try {
     var data = await client.request.invokeTemplate("insertIdTicketAs7", {
       context: {
@@ -2987,44 +3042,58 @@ async function insertIdTicketAs7(idTicket) {
     });
     var detail = data?.response ? JSON.parse(data?.response) : [];
     console.info("Successfully created insertIdTicketAs7 in Freshdesk", detail);
-    console.log("detail insertIdTicketAs7", detail?.pcdr?.id);
+    console.log("detail insertIdTicketAs7", detail?.cdr?.id);
   } catch (error) {
     console.error("data insertIdTicketAs7", error);
   }
 }
 
-// async function recordS3(data) {
-//   console.log("da vao day", data);
-//   var detail = data?.response ? JSON.parse(data?.response) : [];
-//   console.log("data insertIdTicketAs7", detail);
-// }
-
 function showMainDialpad() {
-  console.log("goi vao show main dialpad");
+  var newSvgDialap = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10.4211 0.66383C10.8772 0.221277 11.4035 0 12 0C12.5965 0 13.1228 0.221277 13.5789 0.66383C14.0351 1.10638 14.2632 1.61702 14.2632 2.19574C14.2632 2.77447 14.0351 3.28511 13.5789 3.72766C13.1228 4.17021 12.5965 4.39149 12 4.39149C11.4035 4.39149 10.8772 4.17021 10.4211 3.72766C9.96491 3.28511 9.73684 2.77447 9.73684 2.19574C9.73684 1.61702 9.96491 1.10638 10.4211 0.66383ZM10.4211 7.2C10.8772 6.75745 11.4035 6.53617 12 6.53617C12.5965 6.53617 13.1228 6.75745 13.5789 7.2C14.0351 7.64255 14.2632 8.15319 14.2632 8.73191C14.2632 9.31064 14.0351 9.82128 13.5789 10.2638C13.1228 10.7064 12.5965 10.9277 12 10.9277C11.4035 10.9277 10.8772 10.7064 10.4211 10.2638C9.96491 9.82128 9.73684 9.31064 9.73684 8.73191C9.73684 8.15319 9.96491 7.64255 10.4211 7.2ZM17.1579 7.2C17.614 6.75745 18.1404 6.53617 18.7368 6.53617C19.3333 6.53617 19.8596 6.75745 20.3158 7.2C20.7719 7.64255 21 8.15319 21 8.73191C21 9.31064 20.7719 9.82128 20.3158 10.2638C19.8596 10.7064 19.3333 10.9277 18.7368 10.9277C18.1404 10.9277 17.614 10.7064 17.1579 10.2638C16.7018 9.82128 16.4737 9.31064 16.4737 8.73191C16.4737 8.15319 16.7018 7.64255 17.1579 7.2ZM17.1579 13.7362C17.614 13.2936 18.1404 13.0723 18.7368 13.0723C19.3333 13.0723 19.8596 13.2936 20.3158 13.7362C20.7719 14.1787 21 14.6894 21 15.2681C21 15.8468 20.7719 16.3574 20.3158 16.8C19.8596 17.2426 19.3333 17.4638 18.7368 17.4638C18.1404 17.4638 17.614 17.2426 17.1579 16.8C16.7018 16.3574 16.4737 15.8468 16.4737 15.2681C16.4737 14.6894 16.7018 14.1787 17.1579 13.7362ZM10.4211 13.7362C10.8772 13.2936 11.4035 13.0723 12 13.0723C12.5965 13.0723 13.1228 13.2936 13.5789 13.7362C14.0351 14.1787 14.2632 14.6894 14.2632 15.2681C14.2632 15.8468 14.0351 16.3574 13.5789 16.8C13.1228 17.2426 12.5965 17.4638 12 17.4638C11.4035 17.4638 10.8772 17.2426 10.4211 16.8C9.96491 16.3574 9.73684 15.8468 9.73684 15.2681C9.73684 14.6894 9.96491 14.1787 10.4211 13.7362ZM20.3158 3.72766C19.8596 4.17021 19.3333 4.39149 18.7368 4.39149C18.1404 4.39149 17.614 4.17021 17.1579 3.72766C16.7018 3.28511 16.4737 2.77447 16.4737 2.19574C16.4737 1.61702 16.7018 1.10638 17.1579 0.66383C17.614 0.221277 18.1404 0 18.7368 0C19.3333 0 19.8596 0.221277 20.3158 0.66383C20.7719 1.10638 21 1.61702 21 2.19574C21 2.77447 20.7719 3.28511 20.3158 3.72766ZM3.68421 13.7362C4.14035 13.2936 4.66667 13.0723 5.26316 13.0723C5.85965 13.0723 6.38597 13.2936 6.84211 13.7362C7.29825 14.1787 7.52632 14.6894 7.52632 15.2681C7.52632 15.8468 7.29825 16.3574 6.84211 16.8C6.38597 17.2426 5.85965 17.4638 5.26316 17.4638C4.66667 17.4638 4.14035 17.2426 3.68421 16.8C3.22807 16.3574 3 15.8468 3 15.2681C3 14.6894 3.22807 14.1787 3.68421 13.7362ZM3.68421 7.2C4.14035 6.75745 4.66667 6.53617 5.26316 6.53617C5.85965 6.53617 6.38597 6.75745 6.84211 7.2C7.29825 7.64255 7.52632 8.15319 7.52632 8.73191C7.52632 9.31064 7.29825 9.82128 6.84211 10.2638C6.38597 10.7064 5.85965 10.9277 5.26316 10.9277C4.66667 10.9277 4.14035 10.7064 3.68421 10.2638C3.22807 9.82128 3 9.31064 3 8.73191C3 8.15319 3.22807 7.64255 3.68421 7.2ZM3.68421 0.66383C4.14035 0.221277 4.66667 0 5.26316 0C5.85965 0 6.38597 0.221277 6.84211 0.66383C7.29825 1.10638 7.52632 1.61702 7.52632 2.19574C7.52632 2.77447 7.29825 3.28511 6.84211 3.72766C6.38597 4.17021 5.85965 4.39149 5.26316 4.39149C4.66667 4.39149 4.14035 4.17021 3.68421 3.72766C3.22807 3.28511 3 2.77447 3 2.19574C3 1.61702 3.22807 1.10638 3.68421 0.66383ZM10.4211 20.2723C10.8772 19.8298 11.4035 19.6085 12 19.6085C12.5965 19.6085 13.1228 19.8298 13.5789 20.2723C14.0351 20.7149 14.2632 21.2255 14.2632 21.8043C14.2632 22.383 14.0351 22.8936 13.5789 23.3362C13.1228 23.7787 12.5965 24 12 24C11.4035 24 10.8772 23.7787 10.4211 23.3362C9.96491 22.8936 9.73684 22.383 9.73684 21.8043C9.73684 21.2255 9.96491 20.7149 10.4211 20.2723Z" fill="white"></path>
+  </svg>`;
+  $("#btnDialpad").html(newSvgDialap);
+
+  var oldSvgHisCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.0647 7.57292H13.7076V12.2604L17.558 14.6042L16.7366 15.9583L12.0647 13.0938V7.57292ZM6.16071 4.91667C8.11161 2.97222 10.439 2 13.1429 2C15.8467 2 18.157 2.97222 20.0737 4.91667C22.0246 6.86111 23 9.22222 23 12C23 14.7778 22.0246 17.1389 20.0737 19.0833C18.157 21.0278 15.8467 22 13.1429 22C12.0134 22 10.7641 21.7222 9.39509 21.1667C8.06027 20.5764 6.99926 19.8819 6.21205 19.0833L7.75223 17.4688C9.25818 18.9965 11.0551 19.7604 13.1429 19.7604C15.2649 19.7604 17.0789 19.0139 18.5848 17.5208C20.0908 15.9931 20.8438 14.1528 20.8438 12C20.8438 9.84722 20.0908 8.02431 18.5848 6.53125C17.0789 5.00347 15.2649 4.23958 13.1429 4.23958C11.0208 4.23958 9.20685 5.00347 7.70089 6.53125C6.22917 8.02431 5.4933 9.84722 5.4933 12H8.77902L4.36384 16.4792L4.26116 16.3229L0 12H3.28571C3.28571 9.22222 4.24405 6.86111 6.16071 4.91667Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnHistory").html(oldSvgHisCall);
+
+  var olgSvgMissCall = `
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.7188 16.7953C23.9063 16.9843 24 17.2205 24 17.5039C24 17.7874 23.9063 18.0236 23.7188 18.2126L21.2344 20.7165C21.0469 20.9055 20.8125 21 20.5313 21C20.25 21 20.0156 20.9055 19.8281 20.7165C18.9531 19.8976 18.0625 19.2677 17.1563 18.8268C16.7813 18.6693 16.5938 18.3701 16.5938 17.9291V14.811C15.1563 14.3386 13.625 14.1024 12 14.1024C10.375 14.1024 8.84375 14.3386 7.40625 14.811V17.9291C7.40625 18.4016 7.21875 18.7165 6.84375 18.874C5.84375 19.3465 4.95313 19.9606 4.17188 20.7165C3.98438 20.9055 3.75 21 3.46875 21C3.1875 21 2.95313 20.9055 2.76563 20.7165L0.28125 18.2126C0.09375 18.0236 0 17.7874 0 17.5039C0 17.2205 0.09375 16.9843 0.28125 16.7953C3.5625 13.6457 7.46875 12.0709 12 12.0709C13.875 12.0709 15.9531 12.5433 18.2344 13.4882C20.5156 14.4016 22.3438 15.5039 23.7188 16.7953ZM6.51563 5.50394V9.04724H5.01563V3H11.0156V4.51181H7.5L12 9.04724L18 3L18.9844 3.99213L12 11.0787L6.51563 5.50394Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnMissCall").html(olgSvgMissCall);
+
+  var oldSvgContact = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.8594 14.0156C17.6094 13.3594 17.4844 12.6875 17.4844 12C17.4844 11.3125 17.6094 10.6406 17.8594 9.98438H19.5L21 8.01563L19.0313 6C18.4688 6.4375 17.9063 7.04688 17.3438 7.82813C16.8125 8.60938 16.4531 9.32813 16.2656 9.98438C16.0781 10.6406 15.9844 11.3125 15.9844 12C15.9844 12.6875 16.0781 13.3594 16.2656 14.0156C16.4531 14.6719 16.8125 15.3906 17.3438 16.1719C17.9063 16.9531 18.4688 17.5625 19.0313 18L21 15.9844L19.5 14.0156H17.8594ZM14.0156 18V17.0156C14.0156 16.1094 13.3281 15.375 11.9531 14.8125C10.5781 14.2188 9.26563 13.9219 8.01563 13.9219C6.76563 13.9219 5.45313 14.2188 4.07813 14.8125C2.70313 15.375 2.01563 16.1094 2.01563 17.0156V18H14.0156ZM10.125 6.89063C9.53125 6.29688 8.82813 6 8.01563 6C7.20313 6 6.5 6.29688 5.90625 6.89063C5.3125 7.48438 5.01563 8.1875 5.01563 9C5.01563 9.8125 5.3125 10.5156 5.90625 11.1094C6.5 11.7031 7.20313 12 8.01563 12C8.82813 12 9.53125 11.7031 10.125 11.1094C10.7188 10.5156 11.0156 9.8125 11.0156 9C11.0156 8.1875 10.7188 7.48438 10.125 6.89063ZM21.9844 3C22.5156 3 22.9844 3.20313 23.3906 3.60938C23.7969 4.01563 24 4.48438 24 5.01563V18.9844C24 19.5156 23.7969 19.9844 23.3906 20.3906C22.9844 20.7969 22.5156 21 21.9844 21H2.01563C1.48438 21 1.01563 20.7969 0.609375 20.3906C0.203125 19.9844 0 19.5156 0 18.9844V5.01563C0 4.48438 0.203125 4.01563 0.609375 3.60938C1.01563 3.20313 1.48438 3 2.01563 3H21.9844Z" fill="white" fill-opacity="0.65"></path>
+  </svg>`;
+  $("#btnContact").html(oldSvgContact);
+
   $("#callEnter").attr("disabled", true);
   $("#callEnter").css({ backgroundColor: "darkgray" });
-  document.getElementById("output").textContent = "";
-  document.getElementById("appTextPhone1").innerText = "Correct";
-  document.getElementById("appTextPhone1").className = "correct__number__phone";
+
+  $("#output").text("");
+  $("#appTextPhone1").text("Correct");
+  $("#appTextPhone1").attr("class", "correct__number__phone");
 
   stop();
 
-  document.getElementById("timerInboundListen").textContent = "";
-  document.getElementById("timerInboundListenCollapse").textContent = "";
+  $("#timerInboundListen").text("");
+  $("#timerInboundListenCollapse").text("");
 
-  document.getElementById("mainContent").style.display = "block";
-  document.getElementById("mainListContacts").style.display = "none";
-
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
+  $("#mainContent").css("display", "block");
+  $("#mainListContacts").css("display", "none");
+  $("#mainOutbound").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
 
   idContact = "";
   nameContact = "";
@@ -3036,6 +3105,19 @@ function showMainDialpad() {
   isMainActive = false;
   isMainContactActive = false;
   isMainOutbound = false;
+
+  const labelMainListHistoryCall = document.querySelector(
+    "#mainContent .appTxtService"
+  );
+  const dropdown = document.querySelector("#mainContent .dropdown--extend");
+
+  if (labelMainListHistoryCall && dropdown) {
+    labelMainListHistoryCall.textContent = appTxtService; // Thiết lập lại giá trị của label
+    labelMainListHistoryCall.style.display = "inline";
+    dropdown.style.display = "none";
+  } else {
+    console.error("Label or Dropdown element not found in mainListHistoryCall");
+  }
 }
 
 function renderListHistoryCall(listHisCall) {
@@ -3222,22 +3304,24 @@ function clickToMissCall(elem) {
   let sdt = $(elem).attr("attr-sdt");
   filteredContactSearch(sdt);
   resizeAppDefault();
-  document.getElementById("mainOutbound").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
-  document.getElementById("appTxtNameContact").value = nameContact;
-  document.getElementById("appTxtNameContact").innerText = nameContact;
+  $("#mainOutbound").css("display", "block");
+  $("#mainContent").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
 
-  document.getElementById("appTextPhone").value = sdt;
-  document.getElementById("appTextPhone").innerText = sdt;
+  $("#appTxtNameContact").val(nameContact);
+  $("#appTxtNameContact").text(nameContact);
+
+  $("#appTextPhone").val(sdt);
+  $("#appTextPhone").text(sdt);
+
   phoneNumberReceiver = sdt;
 
   let call = webphone.calls[0];
@@ -3366,21 +3450,23 @@ async function toggleEndCallCollapse() {
   client.interface
     .trigger("hide", { id: "softphone" })
     .then(function () {
-      document.getElementById("mainContent").style.display = "block";
-      document.getElementById("mainOutbound").style.display = "none";
-      document.getElementById("mainBusyCall").style.display = "none";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
-      document.getElementById("mainListContacts").style.display = "none";
-      document.getElementById("mainListHistoryCall").style.display = "none";
-      document.getElementById("mainListMissCall").style.display = "none";
-      document.getElementById("mainInbound").style.display = "none";
-      document.getElementById("mainInboundCollapse").style.display = "none";
-      document.getElementById("mainInboundListen").style.display = "none";
-      document.getElementById("mainInboundListenCollapse").style.display =
-        "none";
-      phoneNumberReceiver = document.getElementById("output").value = "";
-      document.getElementById("appTextPhone").value = "";
-      document.getElementById("appTextPhone").innerText = "";
+      $("#headCourse").css("display", "block");
+      $("#mainContent").css("display", "block");
+      $("#mainOutbound").css("display", "none");
+      $("#mainBusyCall").css("display", "none");
+      $("#mainCollapseClickToCall").css("display", "none");
+      $("#mainListContacts").css("display", "none");
+      $("#mainListHistoryCall").css("display", "none");
+      $("#mainListMissCall").css("display", "none");
+      $("#mainInbound").css("display", "none");
+      $("#mainInboundCollapse").css("display", "none");
+      $("#mainInboundListen").css("display", "none");
+      $("#mainInboundListenCollapse").css("display", "none");
+
+      phoneNumberReceiver = $("#output").val("");
+      $("#appTextPhone").val("");
+      $("#appTextPhone").text("");
+
       endCall();
     })
     .catch(function (error) {
@@ -3409,28 +3495,29 @@ async function toggleEndCall() {
 }
 
 async function showSoftphoneConnect() {
-  document.getElementById("viewConnecting").style.display = "none";
-  document.getElementById("displayConnect").style.display = "block";
+  $("#viewConnecting").css("display", "none");
+  $("#displayConnect").css("display", "block");
 
   // Thiết lập giá trị cho thẻ <p>
   var showValueRole = document.getElementById("displayValueRoleAcct");
-  showValueRole.textContent = displayValueRoleAcct;
+  showValueRole.textContent = $("#roleAcct").val();
+  console.log("showValueRole", $("#roleAcct").val());
 
   var showValueExtension = document.getElementById("displayValueExtension");
   showValueExtension.textContent = displayExtension;
 }
 
-async function goToOncallCX() {
-  document.getElementById("mainConnect").style.display = "none";
-  document.getElementById("mainContent").style.display = "block";
+// async function goToOncallCX() {
+//   document.getElementById("mainConnect").style.display = "none";
+//   document.getElementById("mainContent").style.display = "block";
 
-  var showValueAppTxtService = document.querySelector(".appTxtService");
-  showValueAppTxtService.innerText = appTxtService;
-  const label = document.querySelector(".appTxtService");
-  label.textContent = appTxtService; // U
+//   var showValueAppTxtService = document.querySelector("appTxtService");
+//   showValueAppTxtService.innerText = appTxtService;
+//   const label = document.querySelector("appTxtService");
+//   label.textContent = appTxtService;
 
-  console.log("label.textContent", label.textContent);
-}
+//   console.log("label.textContent", label.textContent);
+// }
 
 function capitalizeFirstLetter(string) {
   return string
@@ -3440,29 +3527,213 @@ function capitalizeFirstLetter(string) {
     .join(" ");
 }
 
-document.querySelector(".appTxtService").addEventListener("click", function () {
-  const dropdown = document.querySelector(".dropdown--extend");
-  const label = document.querySelector(".appTxtService");
-  label.style.display = "none"; // Hide the label when clicked
-  dropdown.style.display = "block"; // Show the dropdown
+// document.querySelector(".appTxtService").addEventListener("click", function () {
+//   const dropdown = document.querySelector(".dropdown--extend");
+//   const label = document.querySelector(".appTxtService");
+//   label.style.display = "none"; // Hide the label when clicked
+//   dropdown.style.display = "block"; // Show the dropdown
+// });
+
+// document
+//   .querySelector(".dropdown--extend")
+//   .addEventListener("change", function () {
+//     const dropdown = document.querySelector(".dropdown--extend");
+//     const selectedOption = dropdown.options[dropdown.selectedIndex].text;
+//     const label = document.querySelector(".appTxtService");
+//     label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
+//     label.style.display = "inline"; // Show the label with the new text
+//     dropdown.style.display = "none"; // Hide the dropdown after selection
+//   });
+
+// document
+//   .querySelector(".dropdown--extend")
+//   .addEventListener("mouseleave", function () {
+//     const dropdown = document.querySelector(".dropdown--extend");
+//     const label = document.querySelector(".appTxtService");
+//     label.style.display = "inline"; // Show the label with the initial text
+//     dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
+//   });
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   document.querySelectorAll(".appTxtService").forEach((label) => {
+//     label.addEventListener("click", () => {
+//       // Get the associated select element
+//       debugger;
+//       const select = label.nextElementSibling;
+//       if (select && select.tagName === "SELECT") {
+//         // Toggle the display of the select element
+//         if (select.style.display === "none" || select.style.display === "") {
+//           select.style.display = "inline";
+//           label.style.display = "none";
+//           // Focus on the select element to show the options
+//           select.focus();
+//         } else {
+//           select.style.display = "none";
+//           label.style.display = "inline";
+//         }
+//       }
+//     });
+//   });
+
+//   document.querySelectorAll(".dropdown--extend").forEach((select) => {
+//     select.addEventListener("change", () => {
+//       // Hide the select element when an option is selected
+//       select.style.display = "none";
+//       // Show the label again
+//       const label = select.previousElementSibling;
+//       if (label && label.tagName === "LABEL") {
+//         const selectedText = select.options[select.selectedIndex].text;
+//         label.textContent = selectedText;
+//         label.style.display = "inline";
+//         appTxtService = selectedText;
+//       }
+//     });
+
+//     // Optional: Hide the select and show the label again if the select loses focus without changing
+//     select.addEventListener("mouseleave", () => {
+//       // Hide the select element when it loses focus
+//       select.style.display = "none";
+//       // Show the label again
+//       const label = select.previousElementSibling;
+//       if (label && label.tagName === "LABEL") {
+//         const selectedText = select.options[select.selectedIndex].text;
+//         label.textContent = selectedText;
+//         label.style.display = "inline";
+//         appTxtService = selectedText;
+//       }
+//     });
+//   });
+
+//   document.addEventListener("DOMContentLoaded", function () {
+//     const labelMainContent = document.querySelector(
+//       "#mainContent .appTxtService"
+//     );
+
+//     if (labelMainContent) {
+//       appTxtService = labelMainContent.textContent.trim(); // Lưu giá trị ban đầu của label
+//     } else {
+//       console.error("Label element not found in mainContent");
+//     }
+
+//     const label = document.querySelector(".appTxtService");
+//     const dropdown = document.querySelector(".dropdown--extend");
+
+//     if (label && dropdown) {
+//       const selectedOption = dropdown.options[dropdown.selectedIndex].text;
+//       label.textContent = `EXT ${selectedOption}`;
+//       label.style.display = "inline";
+//       appTxtService = label.textContent;
+//       dropdown.style.display = "none";
+//     } else {
+//       console.error("Label or Dropdown element not found");
+//     }
+//   });
+// });
+
+// document
+//   .getElementById("appTxtService")
+//   .addEventListener("click", function () {
+//     const dropdown = document.getElementById(".dropdown--extend");
+//     const label = document.getElementById(".appTxtService");
+//     label.style.display = "none"; // Hide the label when clicked
+//     dropdown.style.display = "block"; // Show the dropdown
+//   });
+
+// document
+//   .getElementById(".dropdown--extend")
+//   .addEventListener("change", function () {
+//     const dropdown = document.getElementById(".dropdown--extend");
+//     const selectedOption = dropdown.options[dropdown.selectedIndex].text;
+//     const label = document.getElementById(".appTxtService");
+//     label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
+//     label.style.display = "inline"; // Show the label with the new text
+//     dropdown.style.display = "none"; // Hide the dropdown after selection
+//   });
+
+// document
+//   .getElementById(".dropdown--extend")
+//   .addEventListener("mouseleave", function () {
+//     const dropdown = document.getElementById(".dropdown--extend");
+//     const label = document.getElementById(".appTxtService");
+//     label.style.display = "inline"; // Show the label with the initial text
+//     dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
+//   });
+
+// document.addEventListener("DOMContentLoaded", function () {
+//   const label = document.getElementById("appTxtService");
+//   const dropdown = document.getElementById("dropdown--extend");
+
+//   if (label && dropdown) {
+//     label.addEventListener("click", function () {
+//       label.style.display = "none"; // Hide the label when clicked
+//       dropdown.style.display = "block"; // Show the dropdown
+//     });
+
+//     dropdown.addEventListener("change", function () {
+//       const selectedOption = dropdown.options[dropdown.selectedIndex].text;
+//       label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
+//       label.style.display = "inline"; // Show the label with the new text
+//       dropdown.style.display = "none"; // Hide the dropdown after selection
+//     });
+
+//     dropdown.addEventListener("mouseleave", function () {
+//       label.style.display = "inline"; // Show the label with the initial text
+//       dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
+//     });
+//   }
+// });
+
+function loadAndInsertHTML(url, targetId) {
+  fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.text();
+    })
+    .then((data) => {
+      document.getElementById(targetId).innerHTML = data;
+    })
+    .catch((error) => console.error("Error loading HTML:", error));
+}
+
+$(document).ready(function () {
+  // Load và chèn nội dung từ các file HTML vào các vị trí tương ứng
+  loadAndInsertHTML("dropDownExtendSST.html", "dropDownExtendSST");
+  $("#mainCourse").css("display", "none");
+
+  $("#btnClose").click(function () {
+    closeApp();
+  });
+
+  // nhập enter search
+  $("#search_contact").on("keypress", function (e) {
+    debugger;
+    const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
+    const phone = /^\d{10}$/;
+    var inputData = $(this).val(); // Lấy giá trị từ ô input
+    if (e.which == 13 && (inputData != "" || inputData != null)) {
+      // Kiểm tra nếu phím Enter được nhấn
+      if (inputData.match(phone) || inputData.match(phone12)) {
+        filteredContactSearch(inputData);
+      } else {
+        searchContactKeyword(inputData);
+      }
+      // $(this).val(""); // Xóa nội dung trong ô input sau khi gửi
+    } else if (e.which == 13 && (inputData == "" || inputData == null)) {
+      current_page = 1;
+      getContactData(current_page);
+    }
+  });
 });
 
-document
-  .querySelector(".dropdown--extend")
-  .addEventListener("change", function () {
-    const dropdown = document.querySelector(".dropdown--extend");
-    const selectedOption = dropdown.options[dropdown.selectedIndex].text;
-    const label = document.querySelector(".appTxtService");
-    label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
-    label.style.display = "inline"; // Show the label with the new text
-    dropdown.style.display = "none"; // Hide the dropdown after selection
-  });
+async function goToOncallCX() {
+  $("#mainConnect").css("display", "none");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#mainContent").css("display", "block");
 
-document
-  .querySelector(".dropdown--extend")
-  .addEventListener("mouseleave", function () {
-    const dropdown = document.querySelector(".dropdown--extend");
-    const label = document.querySelector(".appTxtService");
-    label.style.display = "inline"; // Show the label with the initial text
-    dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
-  });
+  $("#appTxtService").text(appTxtService);
+
+  console.log("appTxtService:", appTxtService);
+}
