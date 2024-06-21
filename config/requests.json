@@ -70,6 +70,28 @@
       }
     }
   },
+  "createNoteTicket": {
+    "schema": {
+      "method": "POST",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/tickets/<%= context.id_ticket %>/notes",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  "conversationNoteTicket": {
+    "schema": {
+      "method": "PUT",
+      "host": "<%= iparam.subdomain %>.freshdesk.com",
+      "path": "/api/v2/conversations/<%= context.id_ticket %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.apiKey) %>",
+        "Content-Type": "application/json"
+      }
+    }
+  },
   "createContact": {
     "schema": {
       "method": "POST",
@@ -104,7 +126,7 @@
       }
     }
   },
-  "getFileS3":{
+  "getFileS3": {
     "schema": {
       "method": "GET",
       "protocol": "https",

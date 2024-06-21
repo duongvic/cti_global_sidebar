@@ -9,6 +9,10 @@
         },
         "ticket_background": {
           "url": "views/contact_details_page/ticket_detail_background.html"
+        },
+        "ticket_sidebar": {
+          "url": "views/contact_details_page/ticket_sidebar.html",
+          "icon": "styles/images/aeroplane.svg"
         }
       },
       "requests": {
@@ -18,6 +22,8 @@
         "filteredContactSearch": {},
         "createTicket": {},
         "updateTicket": {},
+        "createNoteTicket": {},
+        "conversationNoteTicket": {},
         "createContact": {},
         "insertIdTicketAs7": {},
         "getFileCsvTicket": {}

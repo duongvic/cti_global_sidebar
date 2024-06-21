@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="{{{appclient}}}"></script>
-    <script defer src="../../scripts/ticket_detail_background.js"></script>
+    <script defer src="../../scripts/ticket_top_navigation.js"></script>
     <script
       async
       type="module"
@@ -19,8 +18,19 @@
       src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.js"
     ></script>
 
-    <title>Ticket Background</title>
+    <title>Ticket Sidebar</title>
   </head>
 
-  <body></body>
+  <body>
+    <div class="container">
+      <button
+        class="btn btn--primary btn--normal"
+        id="btnLoadRecord"
+        onclick="loadRecord()"
+        disabled
+      >
+        <span class="btn--label">Connect</span>
+      </button>
+    </div>
+  </body>
 </html>

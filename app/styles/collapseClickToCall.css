@@ -22,7 +22,7 @@
   /* float: right; */
   margin-top: 9px;
   margin-right: 0px;
-  line-height: 2.5rem;
+  /* line-height: 2.5rem; */
 }
 .end__calling_collapse .hint:hover {
   opacity: 0.8;

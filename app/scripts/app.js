@@ -1,3 +1,6 @@
+const secretKey = "pYgBQnwbHvhTc6HD89";
+const CryptoJS = window.CryptoJS;
+
 let username = "";
 let password = "";
 let sip = "";
@@ -905,12 +908,12 @@ var extDataSource = [
 agent.startApplicationSession({
   // username: "duongnh4@fpt.com",
   // password: "DuongNH4!!!",
-  username: "phuln6@fpt.com",
-  password: "Phuln6!!!",
+  username: "anntp2@fpt.com",
+  password: "nfcAm%HL7v",
 });
 agent.on("applicationsessionstarted", () => {
   // webphone = agent.getDevice("sip:1073@term.133");
-  webphone = agent.getDevice("sip:1973@term.115");
+  webphone = agent.getDevice("sip:1217@term.498");
   // webphone = agent.getDevice("sip:1217@term.492");
   console.log({ webphone });
   // tell server that we want to use WebRTC (error handling omitted)
@@ -1166,20 +1169,22 @@ async function handleConnectedCall(call) {
 }
 
 // Handle call ended
-function handleCallEnded(call) {
+async function handleCallEnded(call) {
+  debugger;
   console.log(`Call to ${call.number} has ended.`);
   console.log("Is main show:", isMainShow);
-  console.log("Ticket ID after end:", idTicket);
-  console.log("Contact ID after end:", idContact);
 
-  if (idTicket != null && !actionEndCall) {
+  console.log("actionEndCall after end:", actionEndCall);
+  if (idTicket != null && actionEndCall !== true) {
     insertIdTicketAs7(idTicket);
   }
   stop();
   if (isMainShow !== "busycall") {
-    document.getElementById("mainContent").style.display = "block";
-    document.getElementById("mainOutbound").style.display = "none";
-    document.getElementById("mainCollapseClickToCall").style.display = "none";
+    $("#headCourse").css("display", "block");
+    $("#mainContent").css("display", "block");
+    $("#mainOutbound").css("display", "none");
+    $("#mainCollapseClickToCall").css("display", "none");
+
     resetText();
     onAppDeactive();
     // location.reload();
@@ -1317,6 +1322,7 @@ function resetText() {
     clearAllIntervals();
   }
   // Reset call and contact variables
+  actionEndCall = false;
   existContact = false;
   phoneNumberReceiver = "";
   nameContact = "";
@@ -1328,7 +1334,7 @@ function resetText() {
   isMainInbound = false;
   isMainContactActive = false;
   isMainActive = false;
-
+  isMainShow = "";
   // Reset call history and missed call lists
   listMissCall = [];
   listHisCall = [];
@@ -1634,6 +1640,8 @@ function handleContactFound(contact, detail) {
   getContactById(contact.id);
   goToContact(idContact);
 
+  const email_contact = emailContact;
+  console.log("email_contact contact", email_contact);
   const transformedItems = transformerItems(detail);
   renderListContact(transformedItems?.data || []);
 }
@@ -1693,7 +1701,12 @@ function clickToCall() {
   isMainOutbound = true;
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
+
+    $("#mainCourse").css("display", "block");
+    $("#headCourse").css("display", "none");
     $("#mainOutbound").css("display", "block");
+
+    $("#mainConnect").css("display", "none");
     $("#mainContent").css("display", "none");
     $("#mainBusyCall").css("display", "none");
     $("#mainCollapseClickToCall").css("display", "none");
@@ -1703,8 +1716,8 @@ function clickToCall() {
     $("#mainInboundCollapse").css("display", "none");
     $("#mainInboundListen").css("display", "none");
     $("#mainInboundListenCollapse").css("display", "none");
-    $("#headCourse").css("display", "none");
-    $("#mainConnect").css("display", "none");
+
+    $("#appTxtServiceOutbound").text(appTxtService);
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
@@ -1815,7 +1828,7 @@ function onAppActivate() {
   resizeAppDefault();
   // openApp();
   client.data.get("loggedInUser").then(
-    function (data) {
+    async function (data) {
       agent_ref = data?.loggedInUser?.availability?.agent_ref
         ? data?.loggedInUser?.availability?.agent_ref
         : undefined;
@@ -1833,24 +1846,27 @@ function onAppActivate() {
       email_acct = data?.loggedInUser?.contact?.email
         ? data?.loggedInUser?.contact?.email
         : undefined;
-      //Getting all iparams
-      client.iparams.get().then(function (data) {
-        console.log("iparams:", data);
-      });
 
-      //
-      // Tạo JWT
-      // const token = jwt.sign(
-      //   {
-      //     userId: data?.loggedInUser?.id,
-      //     userEmail: email_acct,
-      //     role: data?.loggedInUser?.type,
-      //   },
-      //   secretKey,
-      //   { expiresIn: "1h" }
-      // );
+      const iparams = await getIparamsFreshdesk();
+      const nameDomain = await getDomainName();
 
-      // console.log("Generated JWT:", token);
+      var data = {
+        nameDomain: "uservisitor89.freshdesk.com",
+        email: "user.visitor.89@gmail.com",
+        passPPX: "nfcAm%HL7v",
+      };
+      // Encrypt
+      var ciphertext = CryptoJS.AES.encrypt(
+        JSON.stringify(data),
+        "secret key 123"
+      ).toString();
+      console.log("ciphertext message: ", ciphertext);
+
+      // Decrypt
+      var bytes = CryptoJS.AES.decrypt(ciphertext, "secret key 123");
+      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+      console.log("Decrypted data: ", decryptedData);
 
       var displayEmailLogin = $("#displayValueEmailLogin");
       // Thiết lập giá trị cho thẻ <p>
@@ -1984,9 +2000,9 @@ function onAppActivate() {
       // if (isMainContactActive) {
       //   showContact();
       // }
-      document.getElementById("appTextPhone1").innerText = "Correct";
-      document.getElementById("appTextPhone1").className =
-        "correct__number__phone";
+      // document.getElementById("appTextPhone1").innerText = "Correct";
+      // document.getElementById("appTextPhone1").className =
+      //   "correct__number__phone";
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
       const btnCollapseClickToCall = document.getElementById(
@@ -2360,9 +2376,10 @@ function enableCharacterContact(elem) {
 function clickContactCall(elem) {
   let phone_contact = $(elem).attr("attr-user-phone");
   let name_contact = $(elem).attr("attr-user-contact");
-  emailContact = $(elem).attr("attr-user-email");
+  let email_contact = $(elem).attr("attr-user-email");
   idContact = $(elem).attr("attr-user-id");
   nameContact = name_contact;
+  emailContact = email_contact ? email_contact : emailContact;
   isInboundCall = false;
   if (phone_contact !== "null") {
     //show app
@@ -2723,12 +2740,12 @@ function showMain() {
 }
 
 function searchContact() {
-  debugger;
   const val = document.querySelector('input[name="search_contact"]').value;
   const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
   const phone = /^\d{10}$/;
   if (val.match(phone) || val.match(phone12)) {
     filteredContactSearch(val);
+    // filterContactDataInbound(val)
   } else {
     searchContactKeyword(val);
   }
@@ -2815,14 +2832,17 @@ function endCall() {
   if (call != undefined) {
     call.clearConnection();
   }
-  location.reload(true);
+
   stop();
   document.getElementById("mainInboundCollapse").style.display = "none";
   document.getElementById("mainInbound").style.display = "none";
   document.getElementById("mainCollapseClickToCall").style.display = "none";
   document.getElementById("mainInboundCollapse").style.display = "none";
-  actionEndCall = false;
+
+  $("#headCourse").css("display", "block");
+  // actionEndCall = false;
   onAppDeactive();
+  location.reload(true);
 }
 
 function endCallInboundListen() {
@@ -2960,9 +2980,9 @@ async function createTicket() {
         email: emailContact,
         subject: _subject,
         priority: 1,
-        description: `Hey ${
+        description: `<div id="origin_ticket"><span>Hey ${
           nameContact ? nameContact : "Unknown Contact"
-        } - ${phoneNumberReceiver} 👋, created ticket!`,
+        } - ${phoneNumberReceiver} 👋, created ticket!</span></div>`,
         status: 2,
         source: 3, // phone
       });
@@ -2971,7 +2991,7 @@ async function createTicket() {
         requester_id: idContact,
         subject: _subject,
         priority: 1,
-        description: `Hey "Unknown Contact" - ${phoneNumberReceiver} 👋, created ticket!`,
+        description: `<div id="origin_ticket"><span>Hey "Unknown Contact" - ${phoneNumberReceiver} 👋, created ticket!</span></div>`,
         status: 2,
         source: 3, // phone
       });
@@ -3033,16 +3053,17 @@ async function createContact() {
 async function insertIdTicketAs7(idTicket) {
   console.log("co chay vao insertIdTicketAs7:", idTicket);
   try {
-    var data = await client.request.invokeTemplate("insertIdTicketAs7", {
+    var result = await client.request.invokeTemplate("insertIdTicketAs7", {
       context: {
         // terminalId: 115,
         accountCode: idTicket,
         accountName: idContact,
       },
     });
-    var detail = data?.response ? JSON.parse(data?.response) : [];
-    console.info("Successfully created insertIdTicketAs7 in Freshdesk", detail);
-    console.log("detail insertIdTicketAs7", detail?.cdr?.id);
+
+    var data = result?.response ? JSON.parse(result?.response) : [];
+    console.info("Successfully created insertIdTicketAs7 in Freshdesk", data);
+    console.log("detail insertIdTicketAs7", data);
   } catch (error) {
     console.error("data insertIdTicketAs7", error);
   }
@@ -3443,9 +3464,12 @@ function preCall() {
 }
 
 async function toggleEndCallCollapse() {
+  debugger;
   actionEndCall = true;
   isMainOutbound = false;
-  await insertIdTicketAs7(idTicket);
+  if (idTicket != null) {
+    await insertIdTicketAs7(idTicket);
+  }
   resizeAppDefault();
   client.interface
     .trigger("hide", { id: "softphone" })
@@ -3702,13 +3726,15 @@ $(document).ready(function () {
   loadAndInsertHTML("dropDownExtendSST.html", "dropDownExtendSST");
   $("#mainCourse").css("display", "none");
 
+  $("#appTextPhone1").text("Correct");
+  $("#appTextPhone1").attr("class", "correct__number__phone");
+
   $("#btnClose").click(function () {
     closeApp();
   });
 
   // nhập enter search
   $("#search_contact").on("keypress", function (e) {
-    debugger;
     const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
     const phone = /^\d{10}$/;
     var inputData = $(this).val(); // Lấy giá trị từ ô input
@@ -3737,3 +3763,53 @@ async function goToOncallCX() {
 
   console.log("appTxtService:", appTxtService);
 }
+
+async function getIparamsFreshdesk() {
+  try {
+    const iparams = await client.iparams.get();
+    console.log("iparams", iparams);
+    return iparams || {};
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getDomainName() {
+  try {
+    const data = await client.data.get("domainName");
+    console.log("domainName", data);
+    return data || null;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// function encryptData(data, secretKey) {
+//   try {
+//     return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
+
+// function decryptData(data, secretKey) {
+//   try {
+//     var bytes = CryptoJS.AES.decrypt(data, secretKey);
+//     var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+//     console.log("Decrypted data: ", decryptedData);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
+
+// async function getPosts() {
+//   try {
+//     var data = await client.request.invokeTemplate("getPosts", {
+//       context: {},
+//     });
+//     console.log("gọi local 4000", data);
+//   } catch (error) {
+//     console.error("data getPost", error);
+//   }
+// }

@@ -1,5 +1,5 @@
 let client;
-let descriptionText = "";
+let description = "";
 let name_file = "";
 
 app.initialized().then(function (_client) {
@@ -10,47 +10,45 @@ app.initialized().then(function (_client) {
       .then(async function (data) {
         idTicket = data?.ticket?.id;
         idContact = data?.ticket?.requester_id;
-        descriptionText = data?.ticket?.description_text;
+        description = data?.ticket?.description;
         console.log("Ticket Data", data);
+        // B1. call api lấy file csv
+        const resultDataCsv = await getFileCsvTicket(idTicket);
+        if (resultDataCsv.length > 0) {
+          // console.log("chạy vào bc 1 getFileCsvTicket", resultDataCsv);
+          var crFileName = "cr_" + resultDataCsv[0]?.CallID + ".wav";
+          // B2. get file từ s3
+          const resultDataS3 = await getFileS3(crFileName);
 
-        // const ticketDescriptionElement = document.querySelector(
-        //   ".ticket-description"
-        // );
-        // if (ticketDescriptionElement) {
-        //   const successMessage = document.createElement("div");
-        //   successMessage.innerHTML = `
-        //     <div style="color: green;">
-        //       Successfully upload recored ticket for: ${idTicket}. Reload page!
-        //     </div>
-        //   `;
-        //   ticketDescriptionElement.appendChild(successMessage);
-        //   ticketDescriptionElement.innerHTML =
-        //     ticketDescriptionElement.innerHTML;
-        // }
-
-        // var conbobox = document.getElementById("complexSelect");
-        // console.log("conbobox", conbobox);
-        if (descriptionText == "file record") {
-          return;
-        } else {
-          // B1. call api lấy file csv
-          const resultDataCsv = await getFileCsvTicket(idTicket);
-          if (resultDataCsv.length > 0) {
-            console.log("chay vao bc 1 getFileCsvTicket", resultDataCsv);
-            var crFileName = "cr_" + resultDataCsv[0]?.CallID + ".wav";
-            // B2. get file từ s3
-            const resultDataS3 = await getFileS3(crFileName);
-
-            if (resultDataS3 != null) {
-              await updateTicket(idTicket, idContact, resultDataS3);
-            }
-          } else {
-            console.log(
-              "gọi sang api: s3stg-crm.oncallcx.vn/file/"
-                .concat(idTicket)
-                .concat("chưa trả vê getFileCsvTicket")
+          if (resultDataS3 != null) {
+            const result = await updateTicket(
+              idTicket,
+              idContact,
+              resultDataS3
             );
+
+            if (result?.status === 200) {
+              var detail = result?.response ? JSON.parse(result?.response) : [];
+              console.log("upload recored ticket thanh cong", detail);
+              showNotify(
+                "success",
+                `Successfully uploaded audio file for ticket: ${idTicket}. Press f5 or refresh the page!`
+              );
+              window.location.reload(true);
+            } else {
+              showNotify("danger", `Failed to update a ticket: ${idTicket}`);
+            }
           }
+        } else {
+          console.log(
+            "gọi sang api: s3stg-crm.oncallcx.vn/file/"
+              .concat(idTicket)
+              .concat(" chưa trả về getFileCsvTicket")
+          );
+          showNotify(
+            "danger",
+            `Bạn đợi ít phút nữa gọi lại. Hệ thống đang xử lý file ghi âm.`
+          );
         }
       })
       .catch(function (e) {
@@ -91,7 +89,8 @@ async function getFileS3(crFileName) {
 }
 
 async function updateTicket(idTicket, idContact, url_record) {
-  let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px">
+  let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px" id="file_record_user">
+    <div></div>  <br />
     <div dir="ltr">
       <span>
         file record
@@ -102,6 +101,7 @@ async function updateTicket(idTicket, idContact, url_record) {
       </audio>
     </div>
   </div>`;
+
   try {
     const properties = JSON.stringify({
       attachment_ids: [],
@@ -110,27 +110,20 @@ async function updateTicket(idTicket, idContact, url_record) {
       description: html,
     });
     // Send request
-    var dataUpdateTicket = await client.request.invokeTemplate("updateTicket", {
+    var result = await client.request.invokeTemplate("updateTicket", {
       context: {
         id_ticket: idTicket,
       },
       body: properties,
     });
-
-    var detail = dataUpdateTicket?.response
-      ? JSON.parse(dataUpdateTicket?.response)
-      : [];
-    console.log("upload recored ticket thanh cong", detail);
-    showNotify(
-      "success",
-      `Successfully upload recored ticket for: ${idTicket}. Reload page!`
-    );
+    return result;
   } catch (error) {
     console.error(
       `Error: Failed to update a ticket ${phoneNumberReceiver}-${idTicket}`
     );
     console.error(error);
     showNotify("danger", "Failed to update a ticket.");
+    return null;
   }
 }
 
@@ -169,3 +162,25 @@ function dateFormat(timeStamp) {
     .concat(`${h + min + seconds}`);
   return dateTimeStart;
 }
+
+$(document).ready(function () {});
+
+/**
+ * To open the CTI app
+ */
+function openApp() {
+  client.interface
+    .trigger("show", { id: "softphone" })
+    .then(function () {
+      console.log(`Success: Opened the app`);
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to open the app");
+      console.error(error);
+    });
+}
+
+// "ticket_top_navigation": {
+//           "url": "views/ticket/index.html",
+//           "icon": "styles/images/aeroplane.svg"
+//         },
