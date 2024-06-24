@@ -1,31 +1,73 @@
 <!-- Inbound -->
-<div id="mainInbound" style="display: none;" class="city">
-  <div style="background: #12344D;">
-    <!-- <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span> -->
+<div id="mainInbound" style="display: none" class="city">
+  <!-- <div style="background: #12344D;">
+
     <fw-button class="action-buttons flr" id="btnCollapseClickInBound" size="small" color="primary">__
     </fw-button><br><br>
+  </div> -->
+
+  <div class="container-main">
+    <div class="left-content-main">
+      <label class="appTxtService" id="appTxtServiceOutbound"></label>
+    </div>
+    <div class="right-content-main">
+      <fw-button
+        class="action-buttons flr"
+        id="btnCollapseClickInBound"
+        size="small"
+        color="primary"
+        >-
+      </fw-button>
+    </div>
+    <br /><br />
   </div>
 
   <div class="calling__inbound">
-    <p class="text-algin" style="padding-top: 9% ; padding-bottom: 3rem;">Inbound Call...</p>
+    <p class="text-algin" style="padding-top: 9%; padding-bottom: 3rem">
+      Inbound Call...
+    </p>
 
     <h4><span id="appTxtNameContactInbound"></span></h4>
     <p id="appTextPhoneInbound"></p>
     <div class="timer-group__inbound">
       <p id="timerInbound"></p>
     </div>
-    <div><img class="avatar__inbound" id="avatarContact" src="./images/avatar_none.png"></div>
+    <div>
+      <img
+        class="avatar__inbound"
+        id="avatarContact"
+        src="./images/avatar_none.png"
+      />
+    </div>
     <!-- <div style="padding-top: 30%;">
           <div class="ac__calling">
           </div>
         </div> -->
-    <div class="btn-bus__inbound" style="padding-top: 128px;">
-      <button id="toggleDecline" onclick="endCallDecline()" class="hint" type="button"><span><img
-            class="icon__calling__inbound" src="./images/end_call.png" /></span> Decline</button>
-      <button id="toggleAccept" onclick="acceptCall()" class="hint-green precall__inbound" type="button"><span><img
-            class="icon__calling__inbound icon-call" src="./images/call.png" /></span>
-        Accept</button>
+    <div class="btn-bus__inbound" style="padding-top: 11.5rem">
+      <button
+        id="toggleDecline"
+        onclick="endCallDecline()"
+        class="hint"
+        type="button"
+      >
+        <span
+          ><img class="icon__calling__inbound" src="./images/end_call.png"
+        /></span>
+        Decline
+      </button>
+      <button
+        id="toggleAccept"
+        onclick="acceptCall()"
+        class="hint-green precall__inbound"
+        type="button"
+      >
+        <span
+          ><img
+            class="icon__calling__inbound icon-call"
+            src="./images/call.png"
+        /></span>
+        Accept
+      </button>
     </div>
   </div>
-
 </div>

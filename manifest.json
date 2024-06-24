@@ -7,9 +7,6 @@
           "url": "index.html",
           "icon": "styles/images/icon.svg"
         },
-        "ticket_background": {
-          "url": "views/contact_details_page/ticket_detail_background.html"
-        },
         "ticket_sidebar": {
           "url": "views/contact_details_page/ticket_sidebar.html",
           "icon": "styles/images/aeroplane.svg"

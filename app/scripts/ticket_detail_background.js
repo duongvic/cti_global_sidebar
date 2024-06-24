@@ -1,60 +1,42 @@
-// let client;
-let descriptionText = "";
-// let name_file = "";
+// // let client;
+// let descriptionText = "";
+// // let name_file = "";
 
-app.initialized().then(function (_client) {
-  client = _client;
-  client.events.on("app.activated", function () {
-    client.data
-      .get("ticket")
-      .then(async function (data) {
-        idTicket = data?.ticket?.id;
-        idContact = data?.ticket?.requester_id;
-        descriptionText = data?.ticket?.description_text;
-        console.log("Ticket Data", data);
+// app.initialized().then(function (_client) {
+//   client = _client;
+//   client.events.on("app.activated", function () {
+//     client.data
+//       .get("ticket")
+//       .then(async function (data) {
+//         idTicket = data?.ticket?.id;
+//         idContact = data?.ticket?.requester_id;
+//         descriptionText = data?.ticket?.description_text;
+//         console.log("Ticket Data", data);
 
-        // $(document).ready(function () {
-        //   // Lấy phần tử cần chèn text
-        //   const ticketContainer = $(".ticket-description");
-        //   // Kiểm tra xem phần tử đã được tìm thấy chưa
-        //   if (ticketContainer?.length) {
-        //     // Tạo phần tử div chứa text
-        //     const infoDiv = document.createElement("div");
-        //     infoDiv.innerHTML =
-        //       "Thông tin bổ sung: Successfully upload recorded ticket for: 789. Reload page!";
-        //     // Thêm thuộc tính class hoặc id nếu cần
-        //     infoDiv.classList.add("info-message");
-        //     // Chèn div vào DOM
-        //     ticketContainer.appendChild(infoDiv);
-        //   } else {
-        //     console.error("Không tìm thấy phần tử .ticket-description");
-        //   }
-        // });
+//         //  B1. call api lấy file csv
+//         const resultDataCsv = await getFileCsvTicket(idTicket);
+//         if (resultDataCsv.length > 0) {
+//           console.log("chạy vào bc 1 getFileCsvTicket", resultDataCsv);
+//           var crFileName = "cr_" + resultDataCsv[0]?.CallID + ".wav";
+//           // B2. get file từ s3
+//           const resultDataS3 = await getFileS3(crFileName);
 
-        // B1. call api lấy file csv
-        // const resultDataCsv = await getFileCsvTicket(idTicket);
-        // if (resultDataCsv.length > 0) {
-        //   console.log("chạy vào bc 1 getFileCsvTicket", resultDataCsv);
-        //   var crFileName = "cr_" + resultDataCsv[0]?.CallID + ".wav";
-        //   // B2. get file từ s3
-        //   const resultDataS3 = await getFileS3(crFileName);
-
-        //   if (resultDataS3 != null) {
-        //     await updateTicket(idTicket, idContact, resultDataS3);
-        //   }
-        // } else {
-        //   console.log(
-        //     "gọi sang api: s3stg-crm.oncallcx.vn/file/"
-        //       .concat(idTicket)
-        //       .concat(" chưa trả về getFileCsvTicket")
-        //   );
-        // }
-      })
-      .catch(function (e) {
-        console.log("Exception - ", e);
-      });
-  });
-});
+//           if (resultDataS3 != null) {
+//             await updateTicket(idTicket, idContact, resultDataS3);
+//           }
+//         } else {
+//           console.log(
+//             "gọi sang api: s3stg-crm.oncallcx.vn/file/"
+//               .concat(idTicket)
+//               .concat(" chưa trả về getFileCsvTicket")
+//           );
+//         }
+//       })
+//       .catch(function (e) {
+//         console.log("Exception - ", e);
+//       });
+//   });
+// });
 
 // async function getFileCsvTicket(idTicket) {
 //   try {
@@ -166,3 +148,7 @@ app.initialized().then(function (_client) {
 //     .concat(`${h + min + seconds}`);
 //   return dateTimeStart;
 // }
+
+// "ticket_background": {
+//   "url": "views/contact_details_page/ticket_detail_background.html"
+// },

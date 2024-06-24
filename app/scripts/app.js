@@ -1115,11 +1115,13 @@ function handleBusyCall(event) {
 
 // Handle inbound call in alerting state
 async function handleInboundAlertingCall(call) {
+  isInboundCall = true;
+  resizeAppDefault();
+  viewMainInbound();
+  await showSoftphone();
+
   console.log(`Inbound call from ${call.number} ${call.name}`);
   console.log("Alerting");
-  isInboundCall = true;
-
-  await showSoftphone();
 
   const userData = await getUserData();
   const phone = userData?.contact?.phone || userData?.contact?.mobile || null;
@@ -1135,9 +1137,6 @@ async function handleInboundAlertingCall(call) {
   if (existContact) {
     goToContact(idContact);
   }
-
-  resizeAppDefault();
-  viewMainInbound();
 }
 
 // Handle connected call
@@ -1170,7 +1169,6 @@ async function handleConnectedCall(call) {
 
 // Handle call ended
 async function handleCallEnded(call) {
-  debugger;
   console.log(`Call to ${call.number} has ended.`);
   console.log("Is main show:", isMainShow);
 
@@ -1180,6 +1178,7 @@ async function handleCallEnded(call) {
   }
   stop();
   if (isMainShow !== "busycall") {
+    $("#mainConnect").css("display", "none");
     $("#headCourse").css("display", "block");
     $("#mainContent").css("display", "block");
     $("#mainOutbound").css("display", "none");
@@ -1187,7 +1186,7 @@ async function handleCallEnded(call) {
 
     resetText();
     onAppDeactive();
-    // location.reload();
+    location.reload();
   }
 }
 
@@ -1281,6 +1280,7 @@ function openApp() {
 }
 
 function resetText() {
+  $("#appTxtService").text(appTxtService);
   // Clear text fields and innerText properties
   const textFields = [
     "appTxtNameContact",
@@ -1695,13 +1695,11 @@ async function getContactById(id_contact) {
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
 function clickToCall() {
-  // client.instance.resize({ height: "560px" });
-  let textElementPhone = document.getElementById("appTextPhone");
-  // let textElementDialpad = document.getElementById("output").value;
-  isMainOutbound = true;
+  console.log("clickToCall appTxtService", appTxtService);
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
-
+    let textElementPhone = document.getElementById("appTextPhone");
+    isMainOutbound = true;
     $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "none");
     $("#mainOutbound").css("display", "block");
@@ -1812,8 +1810,6 @@ function viewScreenCollapseClickInBound() {
   nameNotListen.textContent =
     nameContact != "" ? nameContact : phoneNumberReceiver;
 }
-
-// viewScreeInboundListenCollapse;
 
 let client;
 init();
@@ -2097,7 +2093,6 @@ function onAppActivate() {
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
       clickToCall();
-
       console.info("App is activated");
     },
     function (error) {
@@ -2834,12 +2829,26 @@ function endCall() {
   }
 
   stop();
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
+  // document.getElementById("mainInboundCollapse").style.display = "none";
+  // document.getElementById("mainInbound").style.display = "none";
+  // document.getElementById("mainCollapseClickToCall").style.display = "none";
+  // document.getElementById("mainInboundCollapse").style.display = "none";
 
+  $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
+  $("#mainContent").css("display", "block");
+  $("#mainOutbound").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
+
+  // $("#headCourse").css("display", "block");
   // actionEndCall = false;
   onAppDeactive();
   location.reload(true);
@@ -2908,17 +2917,20 @@ function viewMainInbound() {
   isMainOutbound = false;
   isMainContactActive = false;
 
-  document.getElementById("mainInbound").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
+  $("#mainConnect").css("display", "none");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "none");
+  $("#mainInbound").css("display", "block");
+  $("#mainContent").css("display", "none");
+  $("#mainOutbound").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
 }
 
 function btnShowMainInbound() {
@@ -3464,7 +3476,6 @@ function preCall() {
 }
 
 async function toggleEndCallCollapse() {
-  debugger;
   actionEndCall = true;
   isMainOutbound = false;
   if (idTicket != null) {
@@ -3474,18 +3485,18 @@ async function toggleEndCallCollapse() {
   client.interface
     .trigger("hide", { id: "softphone" })
     .then(function () {
-      $("#headCourse").css("display", "block");
-      $("#mainContent").css("display", "block");
-      $("#mainOutbound").css("display", "none");
-      $("#mainBusyCall").css("display", "none");
-      $("#mainCollapseClickToCall").css("display", "none");
-      $("#mainListContacts").css("display", "none");
-      $("#mainListHistoryCall").css("display", "none");
-      $("#mainListMissCall").css("display", "none");
-      $("#mainInbound").css("display", "none");
-      $("#mainInboundCollapse").css("display", "none");
-      $("#mainInboundListen").css("display", "none");
-      $("#mainInboundListenCollapse").css("display", "none");
+      // $("#headCourse").css("display", "block");
+      // $("#mainContent").css("display", "block");
+      // $("#mainOutbound").css("display", "none");
+      // $("#mainBusyCall").css("display", "none");
+      // $("#mainCollapseClickToCall").css("display", "none");
+      // $("#mainListContacts").css("display", "none");
+      // $("#mainListHistoryCall").css("display", "none");
+      // $("#mainListMissCall").css("display", "none");
+      // $("#mainInbound").css("display", "none");
+      // $("#mainInboundCollapse").css("display", "none");
+      // $("#mainInboundListen").css("display", "none");
+      // $("#mainInboundListenCollapse").css("display", "none");
 
       phoneNumberReceiver = $("#output").val("");
       $("#appTextPhone").val("");
