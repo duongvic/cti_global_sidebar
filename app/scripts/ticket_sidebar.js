@@ -216,7 +216,7 @@ async function createNoteTicket() {
                 </div>`;
     try {
       const properties = JSON.stringify({
-        private: true,
+        private: false,
         body: html,
       });
       var result = await client.request.invokeTemplate("createNoteTicket", {
@@ -228,7 +228,10 @@ async function createNoteTicket() {
       if (result?.status === 200 || result?.status === 201) {
         showNotify("success", `Create note ticket success: ${idTicket}`);
       } else {
-        showNotify("danger", `Failed create note ticket: ${idTicket}`);
+        showNotify(
+          "danger",
+          `Failed create note ticket: ${idTicket}.Audio recording file does not exist`
+        );
       }
     } catch (err) {
       if (err) {
