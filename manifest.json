@@ -8,8 +8,8 @@
           "icon": "styles/images/icon.svg"
         },
         "ticket_sidebar": {
-          "url": "views/contact_details_page/ticket_sidebar.html",
-          "icon": "styles/images/aeroplane.svg"
+          "url": "views/ticket/ticket_sidebar.html",
+          "icon": "styles/images/icon1.svg"
         }
       },
       "requests": {
@@ -28,7 +28,7 @@
     }
   },
   "engines": {
-    "node": "18.13.0",
-    "fdk": "9.0.5"
+    "node": "18.20.3",
+    "fdk": "9.1.1"
   }
 }
