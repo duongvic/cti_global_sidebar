@@ -23,7 +23,9 @@
         "conversationNoteTicket": {},
         "createContact": {},
         "insertIdTicketAs7": {},
-        "getFileCsvTicket": {}
+        "getFileCsvTicket": {},
+        "getSipandExtensionAs7": {},
+        "getUserInfoAs7":{}
       }
     }
   },

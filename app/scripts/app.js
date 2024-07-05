@@ -1,5 +1,6 @@
 const secretKey = "pYgBQnwbHvhTc6HD89";
 const CryptoJS = window.CryptoJS;
+const matchEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 let username = "";
 let password = "";
@@ -865,12 +866,44 @@ let isMainShow = "";
 /**as7 backend **/
 let agent = anCti.newAgent();
 let webphone;
+
 let audio = new Audio();
 audio.autoplay = true;
 
 const options = {
   avatars: true,
 };
+
+agent.startApplicationSession({
+  // username: "anntp2@fpt.com",
+  // password: "nfcAm%HL7v",
+  username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
+  password: JSON.parse(localStorage.getItem("initialUserAs7"))?.pbCode,
+});
+
+// agent.on("applicationsessionstarted", () => {
+//   webphone = agent.getDevice("sip:1217@term.498");
+//   console.log("webphone", webphone);
+//   // tell server that we want to use WebRTC (error handling omitted)
+//   webphone.monitorStart({ rtc: true });
+// });
+
+// handler is called if application-session could not be started
+agent.on("applicationsessionterminated", (event) => {
+  if (event.reason == "invalidApplicationInfo") {
+    console.log("Please check your credentials and try again");
+  }
+});
+
+// if WebRTC creates a media-stream we bind it to the corresponding elements
+agent.on("localstream", (event) => {
+  document.getElementById("localView").srcObject = event.stream;
+});
+
+agent.on("remotestream", (event) => {
+  document.getElementById("remoteView").srcObject = event.stream;
+  audio.srcObject = event.stream;
+});
 
 var extDataSource = [
   {
@@ -905,31 +938,6 @@ var extDataSource = [
   },
 ];
 
-agent.startApplicationSession({
-  // username: "duongnh4@fpt.com",
-  // password: "DuongNH4!!!",
-  username: "anntp2@fpt.com",
-  password: "nfcAm%HL7v",
-});
-agent.on("applicationsessionstarted", () => {
-  // webphone = agent.getDevice("sip:1073@term.133");
-  webphone = agent.getDevice("sip:1217@term.498");
-  // webphone = agent.getDevice("sip:1217@term.492");
-  console.log({ webphone });
-  // tell server that we want to use WebRTC (error handling omitted)
-  webphone.monitorStart({ rtc: true });
-});
-
-// if WebRTC creates a media-stream we bind it to the corresponding elements
-agent.on("localstream", (event) => {
-  document.getElementById("localView").srcObject = event.stream;
-});
-
-agent.on("remotestream", (event) => {
-  document.getElementById("remoteView").srcObject = event.stream;
-  audio.srcObject = event.stream;
-});
-
 //----Refactor 2 ---
 async function setUpdateCallAs7(value) {
   isUpdateCallAs7 = value;
@@ -938,7 +946,7 @@ async function setUpdateCallAs7(value) {
 async function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
   x.classList.toggle(updateCallConfig ? "mic" : "change");
   input.value = input.value === "false" ? "true" : "false";
-  let call = webphone.calls[0];
+  let call = webphone?.calls[0];
 
   if (updateCallConfig) {
     call.updateCall({ audio: input.value === "true" ? "false" : "true" });
@@ -1727,10 +1735,11 @@ function clickToCall() {
     goToContact(data?.id);
 
     /**click to call as7*/
-    let call = webphone.calls[0];
+    startWebPhoneCall();
+    let call = webphone?.calls[0];
     if (!call) {
       // click without an active call -> start a video call to number 23
-      webphone.makeCall(phoneNumberReceiver, {
+      webphone?.makeCall(phoneNumberReceiver, {
         autoOriginate: "doNotPrompt",
         audio: true,
         video: false,
@@ -2064,7 +2073,7 @@ function onAppActivate() {
               $("#appTextPhone").text("");
 
               /**as7 backend **/
-              let call = webphone.calls[0];
+              let call = webphone?.calls[0];
               if (call != undefined) {
                 call.clearConnection();
               }
@@ -2082,14 +2091,33 @@ function onAppActivate() {
 
       // Xử lý sự kiên liên quan đến Inbound
       // thu gon màn hinh khi btnCollapseClickInBound
-      document
-        .getElementById("btnCollapseClickInBound")
-        .addEventListener("fwClick", viewScreenCollapseClickInBound);
+      const btnCollapseClickInBound = document.getElementById(
+        "btnCollapseClickInBound"
+      );
+      if (btnCollapseClickInBound) {
+        btnCollapseClickInBound.addEventListener(
+          "fwClick",
+          viewScreenCollapseClickInBound
+        );
+      }
+
+      // document
+      //   .getElementById("btnCollapseClickInBound")
+      //   .addEventListener("fwClick", viewScreenCollapseClickInBound);
 
       //thu gọn màn khi agent bắt máy
-      document
-        .getElementById("btnCollapseInboundListen")
-        .addEventListener("fwClick", viewScreeInboundListenCollapse);
+      const btnCollapseInboundListen = document.getElementById(
+        "btnCollapseInboundListen"
+      );
+      if (btnCollapseInboundListen) {
+        btnCollapseInboundListen.addEventListener(
+          "fwClick",
+          viewScreeInboundListenCollapse
+        );
+      }
+      // document
+      //   .getElementById("btnCollapseInboundListen")
+      //   .addEventListener("fwClick", viewScreeInboundListenCollapse);
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
       clickToCall();
@@ -2209,10 +2237,25 @@ function eventHandlecallDialpad() {
   }
 
   /**click to call as7*/
-  let call = webphone.calls[0];
+  // startWebPhoneCall();
+
+  const userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  let sip = userDevices[0]?.sip;
+  const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
+  let term = userTerminals[0]?.term;
+  let sipTerm = sip + term;
+  console.log("sipTerm:", sipTerm);
+
+  webphone = agent.getDevice(sipTerm);
+  console.log("webphone", webphone);
+  // tell server that we want to use WebRTC (error handling omitted)
+  webphone.monitorStart({ rtc: true });
+
+  let call = webphone?.calls[0];
+  debugger;
   if (!call) {
     // click without an active call -> start a video call to number 23
-    webphone.makeCall(phoneNumberReceiver, {
+    webphone?.makeCall(phoneNumberReceiver, {
       autoOriginate: "doNotPrompt",
       audio: true,
       video: false,
@@ -2406,10 +2449,10 @@ function clickContactCall(elem) {
         if (existContact) {
           goToContact(idContact);
         }
-        let call = webphone.calls[0];
+        let call = webphone?.calls[0];
         if (!call) {
           // click without an active call -> start a video call to number 23
-          webphone.makeCall(phoneNumberReceiver, {
+          webphone?.makeCall(phoneNumberReceiver, {
             autoOriginate: "doNotPrompt",
             audio: true,
             video: false,
@@ -2545,7 +2588,7 @@ async function showHistoryCall() {
   const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
   // lấy data historycall
   // setTimeout(async () => {
-  let readCall = await webphone.readCallDetails(options);
+  let readCall = await webphone?.readCallDetails(options);
   listHisCall = readCall.reverse();
   if (
     dataCached != null &&
@@ -2617,7 +2660,7 @@ async function showMissCall() {
 
   const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
   // setTimeout(async () => {
-  let readCall = await webphone.readCallDetails(options);
+  let readCall = await webphone?.readCallDetails(options);
   const arr = readCall.reverse();
   for (let i = 0; i < arr.length; i++) {
     if (
@@ -2780,10 +2823,11 @@ function endCallDecline() {
 // nghe máy từ ngoài gọi vào
 async function listenCall() {
   /**click to call as7*/
-  let call = webphone.calls[0];
+  startWebPhoneCall();
+  let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
-    webphone.makeCall(phoneNumberReceiver, {
+    webphone?.makeCall(phoneNumberReceiver, {
       autoOriginate: "doNotPrompt",
       audio: true,
       video: false,
@@ -2823,7 +2867,7 @@ function acceptCall() {
 }
 
 function endCall() {
-  let call = webphone.calls[0];
+  let call = webphone?.calls[0];
   if (call != undefined) {
     call.clearConnection();
   }
@@ -2855,7 +2899,7 @@ function endCall() {
 }
 
 function endCallInboundListen() {
-  let call = webphone.calls[0];
+  let call = webphone?.calls[0];
   if (call != undefined) {
     call.clearConnection();
   }
@@ -3357,10 +3401,11 @@ function clickToMissCall(elem) {
 
   phoneNumberReceiver = sdt;
 
-  let call = webphone.calls[0];
+  startWebPhoneCall();
+  let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
-    webphone.makeCall(phoneNumberReceiver, {
+    webphone?.makeCall(phoneNumberReceiver, {
       autoOriginate: "doNotPrompt",
       audio: true,
       video: false,
@@ -3457,10 +3502,11 @@ function preCall() {
   phoneNumberReceiver = phone_again;
   openCity("mainOutbound");
 
-  let call = webphone.calls[0];
+  startWebPhoneCall();
+  let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
-    webphone.makeCall(phoneNumberReceiver, {
+    webphone?.makeCall(phoneNumberReceiver, {
       autoOriginate: "doNotPrompt",
       audio: true,
       video: false,
@@ -3795,6 +3841,182 @@ async function getDomainName() {
   }
 }
 
+async function submitLogin() {
+  let userLogin = $("#pbx_username").val();
+  let passLogin = $("#pbx_code").val();
+
+  if (userLogin === "" || !userLogin.match(matchEmail)) {
+    $("#pbx_username").attr("error-text", "Pbx username is incorrect");
+    $("#pbx_username").attr("state", "error");
+
+    return console.log("PBX username không được để trống");
+  }
+
+  if (userLogin.match(matchEmail) && passLogin === "") {
+    $("#pbx_username").removeAttr("error-text").removeAttr("state");
+    $("#pbx_code").attr("error-text", "PBX code is incorrect");
+    $("#pbx_code").attr("state", "error");
+    return console.log("PBX username correct");
+  }
+  if (passLogin === "") {
+    $("#pbx_code").attr("error-text", "PBX code is incorrect");
+    $("#pbx_code").attr("state", "error");
+    return console.log("PBX code không được để trống");
+  }
+  if (userLogin !== "" && userLogin.match(matchEmail) && passLogin !== "") {
+    $("#pbx_username").removeAttr("error-text").removeAttr("state");
+    $("#pbx_code").removeAttr("error-text").removeAttr("state");
+
+    try {
+      const resultUserAs7 = await getUserInfoAs7(userLogin, passLogin);
+      if (resultUserAs7 !== null) {
+        const userInfAs7 = resultUserAs7?.users?.map((item) => {
+          return {
+            ...item,
+            pbCode: passLogin,
+            fullName: item.firstName + " " + item.lastName,
+          };
+        });
+        const initialUserAs7 = userInfAs7[0];
+        localStorage.setItem("initialUserAs7", JSON.stringify(initialUserAs7));
+
+        try {
+          const [resultTerminals, resultDeviceid] = await Promise.all([
+            getTerminalsByUserId(initialUserAs7),
+            getDeviceidByUserId(initialUserAs7),
+          ]);
+
+          if (resultTerminals !== null) {
+            const userTerminals = resultTerminals?.terminals?.map((item) => {
+              return {
+                ...item,
+                term: "@term.".concat(item.id),
+              };
+            });
+            localStorage.setItem(
+              "userTerminals",
+              JSON.stringify(userTerminals)
+            );
+          }
+
+          if (resultDeviceid !== null) {
+            const userDevices = resultDeviceid?.addresses?.map((item) => {
+              return {
+                ...item,
+                sip: "sip:".concat(item.number),
+              };
+            });
+            localStorage.setItem("userDevices", JSON.stringify(userDevices));
+          }
+
+          $("#mainContent").css("display", "block");
+          $("#mainCourse").css("display", "block");
+          $("#headCourse").css("display", "block");
+          $("#mainLogin").css("display", "none");
+        } catch (error) {
+          console.error("Error in fetching terminals or devices: ", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error in fetching user info: ", error);
+    }
+  }
+  $("#btn_sub_login").attr({ disabled: false, loading: false });
+}
+
+async function getUserInfoAs7(param_email_as7, param_code_as7) {
+  $("#btn_sub_login").attr({ disabled: true, loading: true });
+  const encodedAuth = btoa(
+    `${param_email_as7}`.concat(":").concat(`${param_code_as7}`)
+  );
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  };
+  const url = `https://pbx-stg.oncallcx.vn/rest/users?where=email.like('${param_email_as7}')`;
+  try {
+    const response = await fetch(url, requestOptions);
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log("Success:", data);
+
+      return data;
+    } else {
+      showNotify("danger", response.statusText);
+
+      return null;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+
+    return null;
+  }
+}
+
+async function getTerminalsByUserId(objUsersAs7) {
+  const encodedAuth = btoa(
+    `${objUsersAs7?.email}`.concat(":").concat(`${objUsersAs7?.pbCode}`)
+  );
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  };
+  const url = `https://pbx-stg.oncallcx.vn/rest/terminals?where=userId.eq(${objUsersAs7?.id})`;
+  try {
+    const response = await fetch(url, requestOptions);
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log("Success Terminals:", data);
+
+      return data;
+    } else {
+      showNotify("danger", response.statusText);
+
+      return null;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+
+    return null;
+  }
+}
+
+async function getDeviceidByUserId(objUsersAs7) {
+  const encodedAuth = btoa(
+    `${objUsersAs7?.email}`.concat(":").concat(`${objUsersAs7?.pbCode}`)
+  );
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  };
+  const url = `https://pbx-stg.oncallcx.vn/rest/addresses?where=userId.eq(${objUsersAs7?.id})`;
+  try {
+    const response = await fetch(url, requestOptions);
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log("Success Deviceid:", data);
+
+      return data;
+    } else {
+      showNotify("danger", response.statusText);
+
+      return null;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+
+    return null;
+  }
+}
 // function encryptData(data, secretKey) {
 //   try {
 //     return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
@@ -3824,3 +4046,32 @@ async function getDomainName() {
 //     console.error("data getPost", error);
 //   }
 // }
+
+$(document).ready(function () {
+  $("#pbx_username").mouseleave(function () {
+    if ($(this).val().match(matchEmail)) {
+      $(this).removeAttr("error-text");
+      $(this).removeAttr("state");
+    }
+  });
+});
+
+function startWebPhoneCall() {
+  try {
+    const userDevices = JSON.parse(localStorage.getItem("userDevices"));
+    console.log("userDevices", userDevices);
+    const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
+    console.log("userTerminals", userTerminals);
+
+    const webphone = agent.getDevice(
+      `${userDevices[0]?.sip}${userTerminals[0]?.term}`
+    );
+    console.log("webphone", webphone);
+    // tell server that we want to use WebRTC (error handling omitted)
+    webphone.monitorStart({ rtc: true });
+  } catch (error) {
+    if (error) {
+      console.error("Error:", error);
+    }
+  }
+}

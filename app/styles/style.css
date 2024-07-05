@@ -364,3 +364,29 @@ html {
 .dropdown--extend {
   display: none;
 }
+
+.background-login {
+  background-image: url("../images/background-login.png");
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.content-login {
+  padding-top: 80%;
+}
+
+.pt-10 {
+  padding-top: 10px;
+}
+
+.ph-10 {
+  padding: 0 10px 0 10px;
+}
+
+.pb-10 {
+  padding-bottom: 10px;
+}
+
+.pt-10 {
+  padding-top: 10px;
+}

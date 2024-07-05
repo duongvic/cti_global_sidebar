@@ -136,5 +136,29 @@
         "Content-Type": "application/json"
       }
     }
+  },
+  "getSipandExtensionAs7": {
+    "schema": {
+      "method": "GET",
+      "protocol": "https",
+      "host": "pbx-stg.oncallcx.vn",
+      "path": "/rest/terminals",
+      "headers": {
+        "Authorization": "Basic <%= encode(context.usernameAs7 + ':' + context.passwordAs7) %>",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  "getUserInfoAs7": {
+    "schema": {
+      "method": "GET",
+      "protocol": "https",
+      "host": "pbx-stg.oncallcx.vn",
+      "path": "/rest/users?where=email.like(<%= context.emailAs7 %>)",
+      "headers": {
+        "Authorization": "Basic <%= encode('duongnguyenhoang.103@gmail.com' + ':' + 'Admin@123') %>",
+        "Content-Type": "application/json"
+      }
+    }
   }
 }

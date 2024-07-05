@@ -67,8 +67,42 @@
         muted
       ></video>
 
+      <div id="mainLogin" class="background-login" style="display: block">
+        <div class="content-login">
+          <div class="ph-10 pb-10">
+            <fw-input
+              id="pbx_username"
+              label="PBX username"
+              placeholder="example@gmail.com"
+              required
+              clear-input
+            >
+            </fw-input>
+          </div>
+          <div class="ph-10 pb-10">
+            <fw-input
+              label="PBX code"
+              id="pbx_code"
+              placeholder="Enter code"
+              required
+              clear-input
+              type="password"
+              icon-right="visible"
+            >
+            </fw-input>
+          </div>
+          <div class="ph-10 pt-10" >
+            <fw-button
+              style="width: 100%"
+              onclick="submitLogin()"
+              id="btn_sub_login"
+              >Login</fw-button
+            >
+          </div>
+        </div>
+      </div>
       <!-- Your existing content -->
-      <div id="mainConnect" class="city">
+      <div id="mainConnect" class="city" style="display: none">
         <div class="containerConnect">
           <div class="column">
             <h4>Softphone Connection</h4>
