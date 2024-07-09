@@ -875,36 +875,75 @@ const options = {
   avatars: true,
 };
 
-// agent.startApplicationSession({
-//   username: "anntp2@fpt.com",
-//   password: "nfcAm%HL7v",
-//   // username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
-//   // password: JSON.parse(localStorage.getItem("initialUserAs7"))?.uidPbFs,
-// });
+function functionPass() {
+  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
 
-// agent.on("applicationsessionstarted", () => {
-//   webphone = agent.getDevice("sip:1217@term.498");
-//   console.log("webphone", webphone);
-//   // tell server that we want to use WebRTC (error handling omitted)
-//   webphone.monitorStart({ rtc: true });
-// });
+  if (initialUserAs7 && userDevices && userTerminals) {
+    var bytes = CryptoJS.AES.decrypt(
+      `${initialUserAs7?.uidPbFs}`,
+      "encryptAsFsk"
+    );
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedData;
+  }
+}
 
-// // handler is called if application-session could not be started
-// agent.on("applicationsessionterminated", (event) => {
-//   if (event.reason == "invalidApplicationInfo") {
-//     console.log("Please check your credentials and try again");
-//   }
-// });
+agent.startApplicationSession({
+  // username: "anntp2@fpt.com",
+  // password: "nfcAm%HL7v",
+  username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
+  password: functionPass(),
+});
 
-// // if WebRTC creates a media-stream we bind it to the corresponding elements
-// agent.on("localstream", (event) => {
-//   document.getElementById("localView").srcObject = event.stream;
-// });
+agent.on("applicationsessionstarted", () => {
+  // webphone = agent.getDevice("sip:1217@term.498");
+  const userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
 
-// agent.on("remotestream", (event) => {
-//   document.getElementById("remoteView").srcObject = event.stream;
-//   audio.srcObject = event.stream;
-// });
+  webphone = agent.getDevice(
+    `${userDevices && userDevices[0]?.sip}${
+      userTerminals && userTerminals[0]?.term
+    }`
+  );
+  console.log("webphone", webphone);
+  // tell server that we want to use WebRTC (error handling omitted)
+  webphone.monitorStart({ rtc: true });
+});
+
+// handler is called if application-session could not be started
+agent.on("applicationsessionterminated", (event) => {
+  if (event.reason == "invalidApplicationInfo") {
+    console.log("Please check your credentials and try again");
+  }
+});
+
+// if WebRTC creates a media-stream we bind it to the corresponding elements
+agent.on("localstream", (event) => {
+  document.getElementById("localView").srcObject = event.stream;
+});
+
+agent.on("remotestream", (event) => {
+  document.getElementById("remoteView").srcObject = event.stream;
+  audio.srcObject = event.stream;
+});
+
+// Event handler for call events
+agent.on("call", async (event) => {
+  try {
+    if (isBusyCause(event)) {
+      handleBusyCall(event);
+      return;
+    }
+
+    await handleLocalConnectionInfo(event);
+  } catch (error) {
+    isInboundCall = false;
+    console.error("Error: Failed to handle call event");
+    console.error(error);
+  }
+});
 
 var extDataSource = [
   {
@@ -1725,7 +1764,7 @@ function clickToCall() {
     goToContact(data?.id);
 
     /**click to call as7*/
-    startWebPhoneCall();
+    // startWebPhoneCall();
     let call = webphone?.calls[0];
     if (!call) {
       // click without an active call -> start a video call to number 23
@@ -1846,6 +1885,7 @@ function showFormLogin() {
     $("#headCourse").css("display", "none");
     $("#mainContent").css("display", "none");
     $("#mainOutbound").css("display", "none");
+    $("#mainListMissCall").css("display", "none");
   } else {
     $("#mainLogin").css("display", "none");
     if (!isMainActive) {
@@ -2272,11 +2312,10 @@ function eventHandlecallDialpad() {
     goToContact(idContact);
   }
   isMainActive = true;
-  debugger;
   /**click to call as7*/
-  startWebPhoneCall();
-
+  // startWebPhoneCall();
   let call = webphone?.calls[0];
+  debugger;
   if (!call) {
     // click without an active call -> start a video call to number 23
     webphone?.makeCall(phoneNumberReceiver, {
@@ -2612,7 +2651,7 @@ async function showHistoryCall() {
   const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
   // lấy data historycall
   // setTimeout(async () => {
-  startWebPhoneCall();
+  // startWebPhoneCall();
   let readCall = await webphone?.readCallDetails(options);
   listHisCall = readCall?.reverse();
   if (
@@ -2671,7 +2710,7 @@ async function showMissCall() {
 
   const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
   // setTimeout(async () => {
-  startWebPhoneCall();
+  // startWebPhoneCall();
   let readCall = await webphone?.readCallDetails(options);
   const arr = readCall?.reverse();
 
@@ -2846,7 +2885,7 @@ function endCallDecline() {
 // nghe máy từ ngoài gọi vào
 async function listenCall() {
   /**click to call as7*/
-  startWebPhoneCall();
+  // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -2890,7 +2929,7 @@ function acceptCall() {
 }
 
 function endCall() {
-  startWebPhoneCall();
+  // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (call != undefined) {
     call.clearConnection();
@@ -3459,7 +3498,7 @@ function clickToMissCall(elem) {
 
   phoneNumberReceiver = sdt;
 
-  startWebPhoneCall();
+  // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -3561,7 +3600,7 @@ function preCall() {
   phoneNumberReceiver = phone_again;
   openCity("mainOutbound");
 
-  startWebPhoneCall();
+  // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -4090,12 +4129,21 @@ async function startWebPhoneCall() {
         password: decryptedData,
       });
 
-      webphone = agent.getDevice(
-        `${userDevices[0]?.sip}${userTerminals[0]?.term}`
-      );
-      console.log("webphone", webphone);
-      // tell server that we want to use WebRTC (error handling omitted)
-      webphone.monitorStart({ rtc: true });
+      agent.on("applicationsessionstarted", () => {
+        webphone = agent.getDevice(
+          `${userDevices[0]?.sip}${userTerminals[0]?.term}`
+        );
+        console.log("webphone", webphone);
+        // tell server that we want to use WebRTC (error handling omitted)
+        webphone.monitorStart({ rtc: true });
+      });
+
+      // webphone = agent.getDevice(
+      //   `${userDevices[0]?.sip}${userTerminals[0]?.term}`
+      // );
+      // console.log("webphone", webphone);
+      // // tell server that we want to use WebRTC (error handling omitted)
+      // webphone.monitorStart({ rtc: true });
 
       // handler is called if application-session could not be started
       agent.on("applicationsessionterminated", (event) => {
@@ -4138,6 +4186,7 @@ async function startWebPhoneCall() {
     }
   }
 }
+
 function fromCharCode() {
   // viết code ở đây.
   for (i = 97; i < 123; i++) {
