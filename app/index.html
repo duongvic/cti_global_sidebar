@@ -91,7 +91,7 @@
             >
             </fw-input>
           </div>
-          <div class="ph-10 pt-10" >
+          <div class="ph-10 pt-10">
             <fw-button
               style="width: 100%"
               onclick="submitLogin()"
@@ -233,7 +233,25 @@
 
       <div id="mainCourse">
         <div id="headCourse">
-          <div id="dropDownExtendSST"></div>
+          <div class="container-main">
+            <div class="left-content-main">
+              <label
+                class="appTxtService"
+                id="appTxtService"
+                for="dropdown--extend"
+              ></label>
+            </div>
+            <div class="right-content-main">
+              <fw-button
+                class="action-buttons flr"
+                id="btnClose"
+                size="small"
+                color="primary"
+                >-</fw-button
+              >
+            </div>
+            <br /><br />
+          </div>
           <div class="fw-divider-solid"></div>
 
           <div class="row menu-app" style="background: #12344d">
@@ -306,7 +324,7 @@
             </div>
           </div>
         </div>
-        <div id=" ">
+        <div>
           <!-- Placeholder divs where HTML content will be loaded -->
           <div id="dynamicMainContent"></div>
 
@@ -373,41 +391,41 @@
      * Hiển thị ra màn hình bảng chữ cái abc.
      * Ví dụ: String.fromCharCode(97)) sẽ trả về ký tự"a"
      */
-    function fromCharCode() {
-      // viết code ở đây.
-      for (i = 97; i < 123; i++) {
-        var s = String.fromCharCode(i);
-        console.log(s.toUpperCase());
-      }
-    }
+    // function fromCharCode() {
+    //   // viết code ở đây.
+    //   for (i = 97; i < 123; i++) {
+    //     var s = String.fromCharCode(i);
+    //     console.log(s.toUpperCase());
+    //   }
+    // }
 
-    // Function to load external HTML file into a specified element
-    function loadHTML(url, targetId) {
-      fetch(url)
-        .then((response) => response.text())
-        .then((html) => {
-          const targetElement = document.getElementById(targetId);
-          if (targetElement) {
-            targetElement.innerHTML = html;
-          }
-        })
-        .catch((error) => console.error("Error loading HTML:", error));
-    }
+    // // Function to load external HTML file into a specified element
+    // function loadHTML(url, targetId) {
+    //   fetch(url)
+    //     .then((response) => response.text())
+    //     .then((html) => {
+    //       const targetElement = document.getElementById(targetId);
+    //       if (targetElement) {
+    //         targetElement.innerHTML = html;
+    //       }
+    //     })
+    //     .catch((error) => console.error("Error loading HTML:", error));
+    // }
 
-    loadHTML("mainContent.html", "dynamicMainContent");
-    loadHTML("mainOutbound.html", "dynamicMainOutbound");
-    loadHTML("mainBusyCall.html", "dynamicMainBusyCall");
-    loadHTML("mainCollapseClickToCall.html", "dynamicMainCollapseClickToCall");
-    loadHTML("mainInbound.html", "dynamicMainInbound");
-    loadHTML("mainInboundCollapse.html", "dynamicMainInboundCollapse");
-    loadHTML("mainInboundListen.html", "dynamicMainInboundListen");
-    loadHTML(
-      "mainInboundListenCollapse.html",
-      "dynamicMainInboundListenCollapse"
-    );
-    loadHTML("mainListContacts.html", "dynamicMainListContacts");
-    loadHTML("mainListHistoryCall.html", "dynamicMainListHistoryCall");
-    loadHTML("mainListMissCall.html", "dynamicMainListMissCall");
+    // loadHTML("mainContent.html", "dynamicMainContent");
+    // loadHTML("mainOutbound.html", "dynamicMainOutbound");
+    // loadHTML("mainBusyCall.html", "dynamicMainBusyCall");
+    // loadHTML("mainCollapseClickToCall.html", "dynamicMainCollapseClickToCall");
+    // loadHTML("mainInbound.html", "dynamicMainInbound");
+    // loadHTML("mainInboundCollapse.html", "dynamicMainInboundCollapse");
+    // loadHTML("mainInboundListen.html", "dynamicMainInboundListen");
+    // loadHTML(
+    //   "mainInboundListenCollapse.html",
+    //   "dynamicMainInboundListenCollapse"
+    // );
+    // loadHTML("mainListContacts.html", "dynamicMainListContacts");
+    // loadHTML("mainListHistoryCall.html", "dynamicMainListHistoryCall");
+    // loadHTML("mainListMissCall.html", "dynamicMainListMissCall");
   </script>
 
   <script>

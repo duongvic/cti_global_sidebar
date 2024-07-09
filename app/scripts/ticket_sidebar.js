@@ -226,7 +226,7 @@ async function createNoteTicket() {
         body: properties,
       });
       if (result?.status === 200 || result?.status === 201) {
-        showNotify("success", `Create note ticket success: ${idTicket}`);
+        showNotify("success", `Audio recording file has been loaded in a ticket note.`);
       } else {
         showNotify(
           "danger",
@@ -239,7 +239,7 @@ async function createNoteTicket() {
       }
     }
   } else {
-    showNotify("danger", `Chưa có file ghi âm: ${idTicket}`);
+    showNotify("danger", `Audio recording file does not exist. Please check the system or the storage terms and conditions`);
   }
   $("#btn_upload_record").attr({ disabled: false, loading: false });
 }

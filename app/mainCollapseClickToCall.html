@@ -1,13 +1,26 @@
-<div id="mainCollapseClickToCall" style="display: none;" class="city">
+<div
+  id="mainCollapseClickToCall"
+  onclick="mainCollapseClickToCall()"
+  style="display: none"
+  class="city"
+>
   <div class="waiting__screen">
     <div class="col-6">
       <div class="timer-group">
-        <p id="timerCollapse" style="color: aliceblue; line-height: 3.5;"></p>
+        <p id="timerCollapse" style="color: aliceblue; line-height: 3.5"></p>
       </div>
     </div>
     <div class="col-6">
-      <button class="end__calling_collapse flr" id="toggleEndCallCollapse" onclick="toggleEndCallCollapse()" size="small"
-        color="primary"><span><img class="icon__calling__collapse" src="./images/end_call.png" /></span>
+      <button
+        class="end__calling_collapse flr"
+        id="toggleEndCallCollapse"
+        onclick="toggleEndCallCollapse()"
+        size="small"
+        color="primary"
+      >
+        <span
+          ><img class="icon__calling__collapse" src="./images/end_call.png"
+        /></span>
       </button>
     </div>
   </div>

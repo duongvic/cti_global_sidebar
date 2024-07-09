@@ -5,8 +5,9 @@ const matchEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 let username = "";
 let password = "";
 let sip = "";
+let isLogger = false;
+let actionDesktopEndCall = false;
 
-let actionEndCall = false;
 let idTicket = null;
 let idContact = "";
 let nameContact = "";
@@ -874,12 +875,12 @@ const options = {
   avatars: true,
 };
 
-agent.startApplicationSession({
-  // username: "anntp2@fpt.com",
-  // password: "nfcAm%HL7v",
-  username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
-  password: JSON.parse(localStorage.getItem("initialUserAs7"))?.pbCode,
-});
+// agent.startApplicationSession({
+//   username: "anntp2@fpt.com",
+//   password: "nfcAm%HL7v",
+//   // username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
+//   // password: JSON.parse(localStorage.getItem("initialUserAs7"))?.uidPbFs,
+// });
 
 // agent.on("applicationsessionstarted", () => {
 //   webphone = agent.getDevice("sip:1217@term.498");
@@ -888,22 +889,22 @@ agent.startApplicationSession({
 //   webphone.monitorStart({ rtc: true });
 // });
 
-// handler is called if application-session could not be started
-agent.on("applicationsessionterminated", (event) => {
-  if (event.reason == "invalidApplicationInfo") {
-    console.log("Please check your credentials and try again");
-  }
-});
+// // handler is called if application-session could not be started
+// agent.on("applicationsessionterminated", (event) => {
+//   if (event.reason == "invalidApplicationInfo") {
+//     console.log("Please check your credentials and try again");
+//   }
+// });
 
-// if WebRTC creates a media-stream we bind it to the corresponding elements
-agent.on("localstream", (event) => {
-  document.getElementById("localView").srcObject = event.stream;
-});
+// // if WebRTC creates a media-stream we bind it to the corresponding elements
+// agent.on("localstream", (event) => {
+//   document.getElementById("localView").srcObject = event.stream;
+// });
 
-agent.on("remotestream", (event) => {
-  document.getElementById("remoteView").srcObject = event.stream;
-  audio.srcObject = event.stream;
-});
+// agent.on("remotestream", (event) => {
+//   document.getElementById("remoteView").srcObject = event.stream;
+//   audio.srcObject = event.stream;
+// });
 
 var extDataSource = [
   {
@@ -1052,22 +1053,6 @@ let interval,
 
 //----Refactor 2 ---
 
-// Event handler for call events
-agent.on("call", async (event) => {
-  try {
-    if (isBusyCause(event)) {
-      handleBusyCall(event);
-      return;
-    }
-
-    await handleLocalConnectionInfo(event);
-  } catch (error) {
-    isInboundCall = false;
-    console.error("Error: Failed to handle call event");
-    console.error(error);
-  }
-});
-
 async function handleLocalConnectionInfo(event) {
   const call = event.call;
   const localConnectionInfo = call.localConnectionInfo;
@@ -1123,6 +1108,7 @@ function handleBusyCall(event) {
 
 // Handle inbound call in alerting state
 async function handleInboundAlertingCall(call) {
+  debugger;
   isInboundCall = true;
   resizeAppDefault();
   viewMainInbound();
@@ -1149,6 +1135,7 @@ async function handleInboundAlertingCall(call) {
 
 // Handle connected call
 async function handleConnectedCall(call) {
+  debugger;
   console.log(`Connected to ${call.number}`);
   console.log("Connected to screen:", isMainActive);
 
@@ -1157,6 +1144,7 @@ async function handleConnectedCall(call) {
     startTimeCollapse();
 
     if (!isUpdateCallAs7) {
+      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
@@ -1177,18 +1165,19 @@ async function handleConnectedCall(call) {
 
 // Handle call ended
 async function handleCallEnded(call) {
+  debugger;
   console.log(`Call to ${call.number} has ended.`);
   console.log("Is main show:", isMainShow);
 
-  console.log("actionEndCall after end:", actionEndCall);
-  if (idTicket != null && actionEndCall !== true) {
-    insertIdTicketAs7(idTicket);
+  console.log("actionDesktopEndCall after end:", actionDesktopEndCall);
+  if (idTicket != null && actionDesktopEndCall !== true) {
+    await insertIdTicketAs7(idTicket);
   }
   stop();
   if (isMainShow !== "busycall") {
     $("#mainConnect").css("display", "none");
-    $("#headCourse").css("display", "block");
     $("#mainContent").css("display", "block");
+    $("#headCourse").css("display", "block");
     $("#mainOutbound").css("display", "none");
     $("#mainCollapseClickToCall").css("display", "none");
 
@@ -1330,7 +1319,7 @@ function resetText() {
     clearAllIntervals();
   }
   // Reset call and contact variables
-  actionEndCall = false;
+  actionDesktopEndCall = false;
   existContact = false;
   phoneNumberReceiver = "";
   nameContact = "";
@@ -1362,6 +1351,7 @@ function closeApp() {
       resizeAppDefault();
       // resetText();
       // location.reload(); // thử nhơ mở lại
+      // showFormLogin();
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
@@ -1803,18 +1793,35 @@ function resizeAppDefault() {
 function viewScreenCollapseClickToCall() {
   isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
-  $(
-    "#mainContent, #mainOutbound, #mainBusyCall, #mainListContacts, #mainListHistoryCall, #mainListMissCall, #mainInbound, #mainInboundCollapse, #mainInboundListen, #mainInboundListenCollapse"
-  ).hide();
-  $("#mainCollapseClickToCall").show();
+
+  $("#mainCollapseClickToCall").css("display", "block");
+
+  $("#mainContent").css("display", "none");
+  $("#mainOutbound").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("mainInbound").css("display", "none");
+  $("mainInboundCollapse").css("display", "none");
+  $("mainInboundListen").css("display", "none");
+  $("mainInboundListenCollapse").css("display", "none");
+  $("mainListContacts").css("display", "none");
+  $("mainListHistoryCall").css("display", "none");
+  $("mainListMissCall").css("display", "none");
 }
 
 function viewScreenCollapseClickInBound() {
   client.instance.resize({ height: "48px" });
-  $("#mainInboundCollapse").show();
-  $(
-    "#mainContent, #mainOutbound, #mainBusyCall, #mainCollapseClickToCall, #mainListContacts, #mainListHistoryCall, #mainListMissCall, #mainInbound, #mainInboundListen, #mainInboundListenCollapse"
-  ).hide();
+  $("#mainContent").css("display", "none");
+  $("#mainOutbound").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("mainInbound").css("display", "none");
+  $("mainInboundListen").css("display", "none");
+  $("mainInboundListenCollapse").css("display", "none");
+  $("mainListContacts").css("display", "none");
+  $("mainListHistoryCall").css("display", "none");
+  $("mainListMissCall").css("display", "none");
+
+  $("mainInboundCollapse").css("display", "block");
 
   nameNotListen.textContent =
     nameContact != "" ? nameContact : phoneNumberReceiver;
@@ -1827,6 +1834,32 @@ async function init() {
 
   client.events.on("app.activated", onAppActivate);
   client.events.on("app.deactivated", onAppDeactive);
+}
+
+function showFormLogin() {
+  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
+  if (!initialUserAs7 && !userDevices && !userTerminals) {
+    $("#mainLogin").css("display", "block");
+    $("#mainCourse").css("display", "none");
+    $("#headCourse").css("display", "none");
+    $("#mainContent").css("display", "none");
+    $("#mainOutbound").css("display", "none");
+  } else {
+    $("#mainLogin").css("display", "none");
+    if (!isMainActive) {
+      debugger;
+      $("#mainCourse").css("display", "block");
+      $("#headCourse").css("display", "block");
+      $("#mainContent").css("display", "block");
+
+      renderNameSipExtension("#appTxtService");
+    } else {
+      debugger;
+      $("#mainContent").css("display", "none");
+    }
+  }
 }
 
 function onAppActivate() {
@@ -1852,41 +1885,43 @@ function onAppActivate() {
         ? data?.loggedInUser?.contact?.email
         : undefined;
 
-      const iparams = await getIparamsFreshdesk();
-      const nameDomain = await getDomainName();
+      // const iparams = await getIparamsFreshdesk();
+      // const nameDomain = await getDomainName();
 
-      var data = {
-        nameDomain: "uservisitor89.freshdesk.com",
-        email: "user.visitor.89@gmail.com",
-        passPPX: "nfcAm%HL7v",
-      };
+      // showFormLogin();
+
+      // var data = {
+      //   nameDomain: "uservisitor89.freshdesk.com",
+      //   email: "user.visitor.89@gmail.com",
+      //   passPPX: "nfcAm%HL7v",
+      // };
       // Encrypt
-      var ciphertext = CryptoJS.AES.encrypt(
-        JSON.stringify(data),
-        "secret key 123"
-      ).toString();
-      console.log("ciphertext message: ", ciphertext);
+      // var ciphertext = CryptoJS.AES.encrypt(
+      //   JSON.stringify(data),
+      //   "secret key 123"
+      // ).toString();
+      // console.log("ciphertext message: ", ciphertext);
 
-      // Decrypt
-      var bytes = CryptoJS.AES.decrypt(ciphertext, "secret key 123");
-      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      // // Decrypt
+      // var bytes = CryptoJS.AES.decrypt(ciphertext, "secret key 123");
+      // var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-      console.log("Decrypted data: ", decryptedData);
+      // console.log("Decrypted data: ", decryptedData);
 
       var displayEmailLogin = $("#displayValueEmailLogin");
       // Thiết lập giá trị cho thẻ <p>
       displayEmailLogin.text(email_acct);
 
       // lay thong tin extend gọi
-      var displayRoleAcct = $("#roleAcct");
+      // var displayRoleAcct = $("#roleAcct");
       // Thiết lập giá trị cho thẻ <input>
-      displayRoleAcct.val(
-        role_acct === "support_agent" ? "Support Agent" : role_acct
-      );
+      // displayRoleAcct.val(
+      //   role_acct === "support_agent" ? "Support Agent" : role_acct
+      // );
 
-      displayRoleAcct.text(
-        role_acct === "support_agent" ? "Support Agent" : role_acct
-      );
+      // displayRoleAcct.text(
+      //   role_acct === "support_agent" ? "Support Agent" : role_acct
+      // );
 
       // var roleDataSource = [
       //   {
@@ -1899,73 +1934,73 @@ function onAppActivate() {
       // roleOptionSelect.options = iconDataSource;
       // roleOptionSelect.setSelectedOptions(roleDataSource);
 
-      var iconVariant = document.getElementById("complexSelect");
-      iconVariant.options = extDataSource;
+      // var iconVariant = document.getElementById("complexSelect");
+      // iconVariant.options = extDataSource;
 
       // lay thong tin extend gọi
-      var appTxtServiceValue = "SST-QC05";
+      // var appTxtServiceValue = "SST-QC05";
 
-      iconVariant.addEventListener("fwChange", (e) => {
-        // Thiết lập giá trị cho thẻ <input>
-        // displayValueExtension.value = e?.detail?.value;
-        // displayValueExtension.innerText = e?.detail?.value;
-        //thiết lâp giá trị extension
-        displayExtension = e?.detail?.value;
+      // iconVariant.addEventListener("fwChange", (e) => {
+      //   // Thiết lập giá trị cho thẻ <input>
+      //   // displayValueExtension.value = e?.detail?.value;
+      //   // displayValueExtension.innerText = e?.detail?.value;
+      //   //thiết lâp giá trị extension
+      //   displayExtension = e?.detail?.value;
 
-        //thiet lập giá trị thẻ <span>
+      //   //thiet lập giá trị thẻ <span>
 
-        appTxtService = appTxtServiceValue + " . " + e?.detail?.value;
+      //   appTxtService = appTxtServiceValue + " . " + e?.detail?.value;
 
-        $("#btnConnect").attr("disabled", false);
-        console.log(e?.detail);
-      });
+      //   $("#btnConnect").attr("disabled", false);
+      //   console.log(e?.detail);
+      // });
 
-      var statusDataSource = [
-        {
-          value: "ready",
-          text: "Status_Ready",
-        },
-        {
-          value: "lunch",
-          text: "Status_Lunch",
-        },
-        {
-          value: "messages",
-          text: "Status_Messages",
-        },
-        {
-          value: "wrapUp",
-          text: "Status_WrapUp",
-        },
-        {
-          value: "pause",
-          text: "Status_Pause",
-        },
-        {
-          value: "logOff",
-          text: "Status_LogOff",
-        },
-      ];
+      // var statusDataSource = [
+      //   {
+      //     value: "ready",
+      //     text: "Status_Ready",
+      //   },
+      //   {
+      //     value: "lunch",
+      //     text: "Status_Lunch",
+      //   },
+      //   {
+      //     value: "messages",
+      //     text: "Status_Messages",
+      //   },
+      //   {
+      //     value: "wrapUp",
+      //     text: "Status_WrapUp",
+      //   },
+      //   {
+      //     value: "pause",
+      //     text: "Status_Pause",
+      //   },
+      //   {
+      //     value: "logOff",
+      //     text: "Status_LogOff",
+      //   },
+      // ];
 
-      var statusOptionSelect = document.getElementById("statusAcct");
-      statusOptionSelect.options = statusDataSource;
-      statusOptionSelect.setSelectedOptions([
-        {
-          value: "ready",
-          text: "Status_Ready",
-        },
-      ]);
+      // var statusOptionSelect = document.getElementById("statusAcct");
+      // statusOptionSelect.options = statusDataSource;
+      // statusOptionSelect.setSelectedOptions([
+      //   {
+      //     value: "ready",
+      //     text: "Status_Ready",
+      //   },
+      // ]);
 
-      var displayValueStatusAcct = document.getElementById(
-        "displayValueStatusAcct"
-      );
+      // var displayValueStatusAcct = document.getElementById(
+      //   "displayValueStatusAcct"
+      // );
 
-      statusOptionSelect.addEventListener("fwChange", (e) => {
-        displayValueStatusAcct.textContent = capitalizeFirstLetter(
-          e?.detail?.value
-        );
-        console.log(e?.detail);
-      });
+      // statusOptionSelect.addEventListener("fwChange", (e) => {
+      //   displayValueStatusAcct.textContent = capitalizeFirstLetter(
+      //     e?.detail?.value
+      //   );
+      //   console.log(e?.detail);
+      // });
 
       current_page = 1;
 
@@ -2010,118 +2045,121 @@ function onAppActivate() {
       //   "correct__number__phone";
 
       // thu nhỏ màn hinh khi callbtnCollapseClickToCall
-      const btnCollapseClickToCall = document.getElementById(
-        "btnCollapseClickToCall"
-      );
-      if (btnCollapseClickToCall) {
-        btnCollapseClickToCall.addEventListener(
-          "fwClick",
-          viewScreenCollapseClickToCall
-        );
-      }
+      // const btnCollapseClickToCall = document.getElementById(
+      //   "btnCollapseClickToCall"
+      // );
+      // if (btnCollapseClickToCall) {
+      //   btnCollapseClickToCall.addEventListener(
+      //     "fwClick",
+      //     viewScreenCollapseClickToCall
+      //   );
+      // }
+
       // document
       //   .getElementById("btnCollapseClickToCall")
       //   .addEventListener("fwClick", viewScreenCollapseClickToCall);
 
-      // mo rong man hinh click to call
-      document
-        .getElementById("mainCollapseClickToCall")
-        .addEventListener("click", () => {
-          resizeAppDefault();
-          $("#mainOutbound").css("display", "block");
-          $("#mainCollapseClickToCall").css("display", "none");
-          $("#mainContent").css("display", "none");
-          $("#mainBusyCall").css("display", "none");
-          $("#mainListContacts").css("display", "none");
-          $("#mainListMissCall").css("display", "none");
-          $("#mainListHistoryCall").css("display", "none");
-          $("#mainInbound").css("display", "none");
-          $("#mainInboundCollapse").css("display", "none");
-          $("#mainInboundListen").css("display", "none");
-          $("#mainInboundListenCollapse").css("display", "none");
-        });
+      // document
+      //   .getElementById("toggleEndCallBusy")
+      //   .addEventListener("click", () => {
+      //     resizeAppDefault();
+      //     client.interface
+      //       .trigger("hide", { id: "softphone" })
+      //       .then(function () {
+      //         isMainOutbound = false;
+      //         $("#callEnter").attr("disabled", true);
+      //         $("#callEnter").css({ backgroundColor: "darkgray" });
 
-      document
-        .getElementById("toggleEndCallBusy")
-        .addEventListener("click", () => {
-          resizeAppDefault();
-          client.interface
-            .trigger("hide", { id: "softphone" })
-            .then(function () {
-              isMainOutbound = false;
-              $("#callEnter").attr("disabled", true);
-              $("#callEnter").css({ backgroundColor: "darkgray" });
+      //         $("#headCourse").css("display", "block");
 
-              $("#headCourse").css("display", "block");
+      //         $("#mainContent").css("display", "block");
+      //         $("#mainOutbound").css("display", "none");
+      //         $("#mainBusyCall").css("display", "none");
 
-              $("#mainContent").css("display", "block");
-              $("#mainOutbound").css("display", "none");
-              $("#mainBusyCall").css("display", "none");
+      //         $("#mainCollapseClickToCall").css("display", "none");
+      //         $("#mainListContacts").css("display", "none");
+      //         $("#mainListHistoryCall").css("display", "none");
+      //         $("#mainListMissCall").css("display", "none");
+      //         $("#mainInbound").css("display", "none");
+      //         $("#mainInboundCollapse").css("display", "none");
+      //         $("#mainInboundListen").css("display", "none");
+      //         $("#mainInboundListenCollapse").css("display", "none");
 
-              $("#mainCollapseClickToCall").css("display", "none");
-              $("#mainListContacts").css("display", "none");
-              $("#mainListHistoryCall").css("display", "none");
-              $("#mainListMissCall").css("display", "none");
-              $("#mainInbound").css("display", "none");
-              $("#mainInboundCollapse").css("display", "none");
-              $("#mainInboundListen").css("display", "none");
-              $("#mainInboundListenCollapse").css("display", "none");
+      //         $("#output").text("");
+      //         phoneNumberReceiver = $("#output").val("");
+      //         $("#appTextPhone").val("");
+      //         $("#appTextPhone").text("");
 
-              $("#output").text("");
-              phoneNumberReceiver = $("#output").val("");
-              $("#appTextPhone").val("");
-              $("#appTextPhone").text("");
-
-              /**as7 backend **/
-              let call = webphone?.calls[0];
-              if (call != undefined) {
-                call.clearConnection();
-              }
-              /**as7 backend **/
-              onAppDeactive();
-              // location.reload();
-            })
-            .catch(function (error) {
-              console.error("Error: Failed to close the CTI app");
-              console.error(error);
-            });
-        });
+      //         /**as7 backend **/
+      //         let call = webphone?.calls[0];
+      //         if (call != undefined) {
+      //           call.clearConnection();
+      //         }
+      //         /**as7 backend **/
+      //         onAppDeactive();
+      //         // location.reload();
+      //       })
+      //       .catch(function (error) {
+      //         console.error("Error: Failed to close the CTI app");
+      //         console.error(error);
+      //       });
+      //   });
 
       /**End Call **/
 
       // Xử lý sự kiên liên quan đến Inbound
       // thu gon màn hinh khi btnCollapseClickInBound
-      const btnCollapseClickInBound = document.getElementById(
-        "btnCollapseClickInBound"
-      );
-      if (btnCollapseClickInBound) {
-        btnCollapseClickInBound.addEventListener(
-          "fwClick",
-          viewScreenCollapseClickInBound
-        );
-      }
+      // const btnCollapseClickInBound = document.getElementById(
+      //   "btnCollapseClickInBound"
+      // );
+      // if (btnCollapseClickInBound) {
+      //   btnCollapseClickInBound.addEventListener(
+      //     "fwClick",
+      //     viewScreenCollapseClickInBound
+      //   );
+      // }
 
       // document
       //   .getElementById("btnCollapseClickInBound")
       //   .addEventListener("fwClick", viewScreenCollapseClickInBound);
 
       //thu gọn màn khi agent bắt máy
-      const btnCollapseInboundListen = document.getElementById(
-        "btnCollapseInboundListen"
-      );
-      if (btnCollapseInboundListen) {
-        btnCollapseInboundListen.addEventListener(
-          "fwClick",
-          viewScreeInboundListenCollapse
-        );
-      }
+      // const btnCollapseInboundListen = document.getElementById(
+      //   "btnCollapseInboundListen"
+      // );
+      // if (btnCollapseInboundListen) {
+      //   btnCollapseInboundListen.addEventListener(
+      //     "fwClick",
+      //     viewScreeInboundListenCollapse
+      //   );
+      // }
       // document
       //   .getElementById("btnCollapseInboundListen")
       //   .addEventListener("fwClick", viewScreeInboundListenCollapse);
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
+
+      console.log("mow ap no da chay vao appActive dau tien");
+      console.log("isMainActive", isMainActive);
+
+      // let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+      // let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+      // let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
+
+      // if (!initialUserAs7 && !userDevices && !userTerminals) {
+      //   console.log("show form login");
+      // } else {
+      //   $("#mainCourse").css("display", "block");
+      //   $("#headCourse").css("display", "block");
+      //   $("#mainContent").css("display", "block");
+      // }
+
+      showFormLogin();
+
       clickToCall();
       console.info("App is activated");
+
+      // showFormLogin();
     },
     function (error) {
       console.error("Failed to get logged in user data");
@@ -2190,14 +2228,14 @@ function toggleCall() {
 /**
  * Adds dialer events
  **/
-var count = 0;
-$(".digit").on("click", function () {
-  var num = $(this).clone().children().remove().end().text();
-  var prevOutput = document.getElementById("output").value;
-  document.getElementById("output").value = prevOutput + num;
-  count++;
-  checkPhone();
-});
+// var count = 0;
+// $(".digit").on("click", function () {
+//   var num = $(this).clone().children().remove().end().text();
+//   var prevOutput = document.getElementById("output").value;
+//   document.getElementById("output").value = prevOutput + num;
+//   count++;
+//   checkPhone();
+// });
 
 function ResetTxtPhone() {
   var x = document.getElementById("output").value;
@@ -2210,21 +2248,19 @@ function ResetTxtPhone() {
  **/
 function eventHandlecallDialpad() {
   openApp();
-
   $("#headCourse").css("display", "none");
-  $("#mainContent").hide();
-  $("#mainOutbound").show();
-  $("#mainBusyCall").hide();
-  $("#mainCollapseClickToCall").hide();
-  $("#mainListContacts").hide();
-  $("#mainListHistoryCall").hide();
-  $("#mainInbound").hide();
-  $("#mainInboundCollapse").hide();
-  $("#mainInboundListen").hide();
-  $("#mainInboundListenCollapse").hide();
+  $("#mainContent").css("display", "none");
+  $("#mainOutbound").css("display", "block");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
 
-  // Gán giá trị đó cho thẻ span
-  $("#appTxtServiceOutbound").text(appTxtService);
+  renderNameSipExtension("#appTxtServiceOutbound");
 
   let textElementDialpad = $("#output").val();
   phoneNumberReceiver = textElementDialpad;
@@ -2235,24 +2271,12 @@ function eventHandlecallDialpad() {
   if (existContact) {
     goToContact(idContact);
   }
-
+  isMainActive = true;
+  debugger;
   /**click to call as7*/
-  // startWebPhoneCall();
-
-  const userDevices = JSON.parse(localStorage.getItem("userDevices"));
-  let sip = userDevices[0]?.sip;
-  const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
-  let term = userTerminals[0]?.term;
-  let sipTerm = sip + term;
-  console.log("sipTerm:", sipTerm);
-
-  webphone = agent.getDevice(sipTerm);
-  console.log("webphone", webphone);
-  // tell server that we want to use WebRTC (error handling omitted)
-  webphone.monitorStart({ rtc: true });
+  startWebPhoneCall();
 
   let call = webphone?.calls[0];
-  debugger;
   if (!call) {
     // click without an active call -> start a video call to number 23
     webphone?.makeCall(phoneNumberReceiver, {
@@ -2304,17 +2328,17 @@ function showContact() {
 
   document.getElementById("output").innerText = "";
 
-  document.getElementById("mainListContacts").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
+  $("#mainListContacts").css("display", "block");
+  $("#mainContent").css("display", "none");
+  $("#mainOutbound").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
 
   current_page = 1;
   getContactData(current_page);
@@ -2546,6 +2570,18 @@ $(document).ready(function () {
 });
 
 async function showHistoryCall() {
+  document.getElementById("output").innerText = "";
+  document.getElementById("mainListHistoryCall").style.display = "block";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainListMissCall").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
+
   var newSvgHisCall = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M12.0647 7.57292H13.7076V12.2604L17.558 14.6042L16.7366 15.9583L12.0647 13.0938V7.57292ZM6.16071 4.91667C8.11161 2.97222 10.439 2 13.1429 2C15.8467 2 18.157 2.97222 20.0737 4.91667C22.0246 6.86111 23 9.22222 23 12C23 14.7778 22.0246 17.1389 20.0737 19.0833C18.157 21.0278 15.8467 22 13.1429 22C12.0134 22 10.7641 21.7222 9.39509 21.1667C8.06027 20.5764 6.99926 19.8819 6.21205 19.0833L7.75223 17.4688C9.25818 18.9965 11.0551 19.7604 13.1429 19.7604C15.2649 19.7604 17.0789 19.0139 18.5848 17.5208C20.0908 15.9931 20.8438 14.1528 20.8438 12C20.8438 9.84722 20.0908 8.02431 18.5848 6.53125C17.0789 5.00347 15.2649 4.23958 13.1429 4.23958C11.0208 4.23958 9.20685 5.00347 7.70089 6.53125C6.22917 8.02431 5.4933 9.84722 5.4933 12H8.77902L4.36384 16.4792L4.26116 16.3229L0 12H3.28571C3.28571 9.22222 4.24405 6.86111 6.16071 4.91667Z" fill="white"></path>
@@ -2573,55 +2609,39 @@ async function showHistoryCall() {
   listMissCall = [];
   listHisCall = [];
 
-  document.getElementById("output").innerText = "";
-  document.getElementById("mainListHistoryCall").style.display = "block";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-
   const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
   // lấy data historycall
   // setTimeout(async () => {
+  startWebPhoneCall();
   let readCall = await webphone?.readCallDetails(options);
-  listHisCall = readCall.reverse();
+  listHisCall = readCall?.reverse();
   if (
     dataCached != null &&
-    dataCached.length > 0 &&
-    listHisCall.length == dataCached.length
+    dataCached?.length > 0 &&
+    listHisCall?.length == dataCached?.length
   ) {
     renderListHistoryCall(dataCached);
   } else {
     await displayItemsHisCall(getItemsForCurrentPageHisCall());
   }
 
-  // const labelMainListHistoryCall = document.querySelector(
-  //   "#mainListHistoryCall .appTxtService"
-  // );
-  // const dropdown = document.querySelector(
-  //   "#mainListHistoryCall .dropdown--extend"
-  // );
-
-  // if (labelMainListHistoryCall && dropdown) {
-  //   labelMainListHistoryCall.textContent = appTxtService; // Thiết lập lại giá trị của label
-  //   labelMainListHistoryCall.style.display = "inline-block";
-  //   dropdown.style.display = "none";
-  // } else {
-  //   console.error("Label or Dropdown element not found in mainListHistoryCall");
-  // }
-  $("#appTxtService").text(appTxtService);
+  renderNameSipExtension("#appTxtService");
   console.log("listHisCall", listHisCall);
   // });
 }
 
 async function showMissCall() {
-  listMissCall = [];
-  listHisCall = [];
+  document.getElementById("output").innerText = "";
+  document.getElementById("mainListMissCall").style.display = "block";
+  document.getElementById("mainListHistoryCall").style.display = "none";
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mainOutbound").style.display = "none";
+  document.getElementById("mainBusyCall").style.display = "none";
+  document.getElementById("mainCollapseClickToCall").style.display = "none";
+  document.getElementById("mainListContacts").style.display = "none";
+  document.getElementById("mainInbound").style.display = "none";
+  document.getElementById("mainInboundCollapse").style.display = "none";
+  document.getElementById("mainInboundListen").style.display = "none";
 
   var oldSvgDialap = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2646,23 +2666,17 @@ async function showMissCall() {
 </svg>`;
   $("#btnContact").html(oldSvgContact);
 
-  document.getElementById("output").innerText = "";
-  document.getElementById("mainListMissCall").style.display = "block";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
+  listMissCall = [];
+  listHisCall = [];
 
   const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
   // setTimeout(async () => {
+  startWebPhoneCall();
   let readCall = await webphone?.readCallDetails(options);
-  const arr = readCall.reverse();
-  for (let i = 0; i < arr.length; i++) {
+  const arr = readCall?.reverse();
+
+  console.log("arr data", arr);
+  for (let i = 0; i < arr?.length; i++) {
     if (
       arr[i].hasOwnProperty("calling") &&
       arr[i].hasOwnProperty("duration") == false
@@ -2691,7 +2705,16 @@ let currentPage = 1;
 // Hàm lấy phần tử cho trang hiện tại
 function getItemsForCurrentPage() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  return listMissCall.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  if (listMissCall?.length > 0) {
+    $("#noDataMisCall").css("display", "none");
+    $("#loadMoreTxtMisCall").css("display", "block");
+    return listMissCall.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  } else {
+    $("#noDataMisCall").css("display", "block");
+    $("#noDataMisCall").text("There is no missed call data");
+    $("#loadMoreTxtMisCall").css("display", "none");
+    return listMissCall;
+  }
 }
 
 // Hàm xử lý sự kiện khi nhấn "Load More"
@@ -2709,7 +2732,7 @@ async function loadMoreItems() {
     })
   );
   let itemsOld = JSON.parse(localStorage.getItem("cacheDataMissCall"));
-  let arrayOfArrays = [...itemsOld, response];
+  let arrayOfArrays = [...(itemsOld && itemsOld), response && response];
   const flattenedArray = [].concat(...arrayOfArrays);
   localStorage.setItem("cacheDataMissCall", JSON.stringify(flattenedArray));
   renderListMissCall(flattenedArray);
@@ -2867,16 +2890,13 @@ function acceptCall() {
 }
 
 function endCall() {
+  startWebPhoneCall();
   let call = webphone?.calls[0];
   if (call != undefined) {
     call.clearConnection();
   }
 
   stop();
-  // document.getElementById("mainInboundCollapse").style.display = "none";
-  // document.getElementById("mainInbound").style.display = "none";
-  // document.getElementById("mainCollapseClickToCall").style.display = "none";
-  // document.getElementById("mainInboundCollapse").style.display = "none";
 
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
@@ -2892,8 +2912,6 @@ function endCall() {
   $("#mainInboundListen").css("display", "none");
   $("#mainInboundListenCollapse").css("display", "none");
 
-  // $("#headCourse").css("display", "block");
-  // actionEndCall = false;
   onAppDeactive();
   location.reload(true);
 }
@@ -2941,6 +2959,7 @@ function showMainInboundListen() {
 }
 
 function viewScreeInboundListenCollapse() {
+  debugger;
   isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
   document.getElementById("mainInboundListenCollapse").style.display = "block";
@@ -3108,21 +3127,60 @@ async function createContact() {
 
 async function insertIdTicketAs7(idTicket) {
   console.log("co chay vao insertIdTicketAs7:", idTicket);
-  try {
-    var result = await client.request.invokeTemplate("insertIdTicketAs7", {
-      context: {
-        // terminalId: 115,
-        accountCode: idTicket,
-        accountName: idContact,
-      },
-    });
+  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
 
-    var data = result?.response ? JSON.parse(result?.response) : [];
-    console.info("Successfully created insertIdTicketAs7 in Freshdesk", data);
-    console.log("detail insertIdTicketAs7", data);
-  } catch (error) {
-    console.error("data insertIdTicketAs7", error);
+  if (initialUserAs7 && userDevices && userTerminals) {
+    var bytes = CryptoJS.AES.decrypt(
+      `${initialUserAs7?.uidPbFs}`,
+      "encryptAsFsk"
+    );
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+    const encodedAuth = btoa(
+      `${initialUserAs7?.email}`.concat(":").concat(`${decryptedData}`)
+    );
+    const requestOptions = {
+      method: "PUT",
+      headers: {
+        Authorization: `Basic ${encodedAuth}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const url = "https://pbx-stg.oncallcx.vn/rest/service/accountCode?"
+      .concat(`terminalId=${userTerminals[0].id}`)
+      .concat(`&accountCode=${idTicket}`)
+      .concat(`&accountName=${idContact}`);
+    try {
+      const response = await fetch(url, requestOptions);
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log("detail insertIdTicketAs7", data);
+        return data;
+      } else {
+        showNotify("danger", `call Aranet error: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("data insertIdTicketAs7", error);
+    }
   }
+
+  // try {
+  //   var result = await client.request.invokeTemplate("insertIdTicketAs7", {
+  //     context: {
+  //       // terminalId: 115,
+  //       accountCode: idTicket,
+  //       accountName: idContact,
+  //     },
+  //   });
+
+  //   var data = result?.response ? JSON.parse(result?.response) : [];
+  //   console.info("Successfully created insertIdTicketAs7 in Freshdesk", data);
+  //   console.log("detail insertIdTicketAs7", data);
+  // } catch (error) {
+  //   console.error("data insertIdTicketAs7", error);
+  // }
 }
 
 function showMainDialpad() {
@@ -3452,6 +3510,7 @@ let currentPageHisCall = 1;
 // Hàm lấy phần tử cho trang hiện tại
 function getItemsForCurrentPageHisCall() {
   const startIndex = (currentPageHisCall - 1) * ITEMS_PER_PAGE_HIS_CALL;
+
   return listHisCall.slice(startIndex, startIndex + ITEMS_PER_PAGE_HIS_CALL);
 }
 
@@ -3522,7 +3581,7 @@ function preCall() {
 }
 
 async function toggleEndCallCollapse() {
-  actionEndCall = true;
+  actionDesktopEndCall = true;
   isMainOutbound = false;
   if (idTicket != null) {
     await insertIdTicketAs7(idTicket);
@@ -3531,18 +3590,18 @@ async function toggleEndCallCollapse() {
   client.interface
     .trigger("hide", { id: "softphone" })
     .then(function () {
-      // $("#headCourse").css("display", "block");
-      // $("#mainContent").css("display", "block");
-      // $("#mainOutbound").css("display", "none");
-      // $("#mainBusyCall").css("display", "none");
-      // $("#mainCollapseClickToCall").css("display", "none");
-      // $("#mainListContacts").css("display", "none");
-      // $("#mainListHistoryCall").css("display", "none");
-      // $("#mainListMissCall").css("display", "none");
-      // $("#mainInbound").css("display", "none");
-      // $("#mainInboundCollapse").css("display", "none");
-      // $("#mainInboundListen").css("display", "none");
-      // $("#mainInboundListenCollapse").css("display", "none");
+      $("#headCourse").css("display", "block");
+      $("#mainContent").css("display", "block");
+      $("#mainOutbound").css("display", "none");
+      $("#mainBusyCall").css("display", "none");
+      $("#mainCollapseClickToCall").css("display", "none");
+      $("#mainListContacts").css("display", "none");
+      $("#mainListHistoryCall").css("display", "none");
+      $("#mainListMissCall").css("display", "none");
+      $("#mainInbound").css("display", "none");
+      $("#mainInboundCollapse").css("display", "none");
+      $("#mainInboundListen").css("display", "none");
+      $("#mainInboundListenCollapse").css("display", "none");
 
       phoneNumberReceiver = $("#output").val("");
       $("#appTextPhone").val("");
@@ -3558,7 +3617,7 @@ async function toggleEndCallCollapse() {
 
 async function toggleEndCall() {
   // await updateTicket(idTicket);
-  actionEndCall = true;
+  actionDesktopEndCall = true;
   isMainOutbound = false;
   if (idTicket != null) {
     await insertIdTicketAs7(idTicket);
@@ -3764,52 +3823,6 @@ function capitalizeFirstLetter(string) {
 //   }
 // });
 
-function loadAndInsertHTML(url, targetId) {
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.text();
-    })
-    .then((data) => {
-      document.getElementById(targetId).innerHTML = data;
-    })
-    .catch((error) => console.error("Error loading HTML:", error));
-}
-
-$(document).ready(function () {
-  // Load và chèn nội dung từ các file HTML vào các vị trí tương ứng
-  loadAndInsertHTML("dropDownExtendSST.html", "dropDownExtendSST");
-  $("#mainCourse").css("display", "none");
-
-  $("#appTextPhone1").text("Correct");
-  $("#appTextPhone1").attr("class", "correct__number__phone");
-
-  $("#btnClose").click(function () {
-    closeApp();
-  });
-
-  // nhập enter search
-  $("#search_contact").on("keypress", function (e) {
-    const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
-    const phone = /^\d{10}$/;
-    var inputData = $(this).val(); // Lấy giá trị từ ô input
-    if (e.which == 13 && (inputData != "" || inputData != null)) {
-      // Kiểm tra nếu phím Enter được nhấn
-      if (inputData.match(phone) || inputData.match(phone12)) {
-        filteredContactSearch(inputData);
-      } else {
-        searchContactKeyword(inputData);
-      }
-      // $(this).val(""); // Xóa nội dung trong ô input sau khi gửi
-    } else if (e.which == 13 && (inputData == "" || inputData == null)) {
-      current_page = 1;
-      getContactData(current_page);
-    }
-  });
-});
-
 async function goToOncallCX() {
   $("#mainConnect").css("display", "none");
   $("#mainCourse").css("display", "block");
@@ -3841,10 +3854,32 @@ async function getDomainName() {
   }
 }
 
+async function renderNameSipExtension(id_app_txt_service) {
+  try {
+    const userDevicesString = localStorage.getItem("userDevices");
+    const userDevices = JSON.parse(userDevicesString);
+    const userAs7String = localStorage.getItem("initialUserAs7");
+    const userAs7 = JSON.parse(userAs7String);
+    if (userAs7 && userDevices) {
+      if ($(`${id_app_txt_service}`).length) {
+        $(`${id_app_txt_service}`).text(
+          `${userAs7?.fullName} . ${userDevices[0]?.number}`
+        );
+      } else {
+        $(`${id_app_txt_service}`).text("");
+      }
+    }
+  } catch (error) {
+    console.log("error RenderNameSipE", error);
+    $(`${id_app_txt_service}`).text("");
+  }
+}
+
 async function submitLogin() {
+  localStorage.clear();
   let userLogin = $("#pbx_username").val();
   let passLogin = $("#pbx_code").val();
-
+  debugger;
   if (userLogin === "" || !userLogin.match(matchEmail)) {
     $("#pbx_username").attr("error-text", "Pbx username is incorrect");
     $("#pbx_username").attr("state", "error");
@@ -3869,11 +3904,23 @@ async function submitLogin() {
 
     try {
       const resultUserAs7 = await getUserInfoAs7(userLogin, passLogin);
-      if (resultUserAs7 !== null) {
+      if (resultUserAs7 !== null && resultUserAs7 !== undefined) {
+        // Encrypt
+        var ciphertext = CryptoJS.AES.encrypt(
+          JSON.stringify(passLogin),
+          "encryptAsFsk"
+        ).toString();
+        console.log("ciphertext message: ", ciphertext);
+
+        // Decrypt
+        var bytes = CryptoJS.AES.decrypt(ciphertext, "encryptAsFsk");
+        var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        console.log("Decrypted data: ", decryptedData);
+
         const userInfAs7 = resultUserAs7?.users?.map((item) => {
           return {
             ...item,
-            pbCode: passLogin,
+            uidPbFs: ciphertext,
             fullName: item.firstName + " " + item.lastName,
           };
         });
@@ -3886,7 +3933,7 @@ async function submitLogin() {
             getDeviceidByUserId(initialUserAs7),
           ]);
 
-          if (resultTerminals !== null) {
+          if (resultTerminals !== null && resultTerminals !== undefined) {
             const userTerminals = resultTerminals?.terminals?.map((item) => {
               return {
                 ...item,
@@ -3899,7 +3946,7 @@ async function submitLogin() {
             );
           }
 
-          if (resultDeviceid !== null) {
+          if (resultDeviceid !== null && resultDeviceid !== undefined) {
             const userDevices = resultDeviceid?.addresses?.map((item) => {
               return {
                 ...item,
@@ -3913,6 +3960,8 @@ async function submitLogin() {
           $("#mainCourse").css("display", "block");
           $("#headCourse").css("display", "block");
           $("#mainLogin").css("display", "none");
+
+          renderNameSipExtension("#appTxtService");
         } catch (error) {
           console.error("Error in fetching terminals or devices: ", error);
         }
@@ -3957,8 +4006,11 @@ async function getUserInfoAs7(param_email_as7, param_code_as7) {
 }
 
 async function getTerminalsByUserId(objUsersAs7) {
+  var bytes = CryptoJS.AES.decrypt(`${objUsersAs7?.uidPbFs}`, "encryptAsFsk");
+  var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
   const encodedAuth = btoa(
-    `${objUsersAs7?.email}`.concat(":").concat(`${objUsersAs7?.pbCode}`)
+    `${objUsersAs7?.email}`.concat(":").concat(`${decryptedData}`)
   );
   const requestOptions = {
     method: "GET",
@@ -3988,8 +4040,10 @@ async function getTerminalsByUserId(objUsersAs7) {
 }
 
 async function getDeviceidByUserId(objUsersAs7) {
+  var bytes = CryptoJS.AES.decrypt(`${objUsersAs7?.uidPbFs}`, "encryptAsFsk");
+  var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   const encodedAuth = btoa(
-    `${objUsersAs7?.email}`.concat(":").concat(`${objUsersAs7?.pbCode}`)
+    `${objUsersAs7?.email}`.concat(":").concat(`${decryptedData}`)
   );
   const requestOptions = {
     method: "GET",
@@ -4017,61 +4071,237 @@ async function getDeviceidByUserId(objUsersAs7) {
     return null;
   }
 }
-// function encryptData(data, secretKey) {
-//   try {
-//     return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
 
-// function decryptData(data, secretKey) {
-//   try {
-//     var bytes = CryptoJS.AES.decrypt(data, secretKey);
-//     var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+async function startWebPhoneCall() {
+  try {
+    let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+    let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+    let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
 
-//     console.log("Decrypted data: ", decryptedData);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
+    if (initialUserAs7 && userDevices && userTerminals) {
+      var bytes = CryptoJS.AES.decrypt(
+        `${initialUserAs7?.uidPbFs}`,
+        "encryptAsFsk"
+      );
+      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-// async function getPosts() {
-//   try {
-//     var data = await client.request.invokeTemplate("getPosts", {
-//       context: {},
-//     });
-//     console.log("gọi local 4000", data);
-//   } catch (error) {
-//     console.error("data getPost", error);
-//   }
-// }
+      agent.startApplicationSession({
+        username: initialUserAs7?.email,
+        password: decryptedData,
+      });
+
+      webphone = agent.getDevice(
+        `${userDevices[0]?.sip}${userTerminals[0]?.term}`
+      );
+      console.log("webphone", webphone);
+      // tell server that we want to use WebRTC (error handling omitted)
+      webphone.monitorStart({ rtc: true });
+
+      // handler is called if application-session could not be started
+      agent.on("applicationsessionterminated", (event) => {
+        if (event.reason == "invalidApplicationInfo") {
+          console.log("Please check your credentials and try again");
+        }
+      });
+
+      // if WebRTC creates a media-stream we bind it to the corresponding elements
+      agent.on("localstream", (event) => {
+        document.getElementById("localView").srcObject = event.stream;
+      });
+
+      agent.on("remotestream", (event) => {
+        document.getElementById("remoteView").srcObject = event.stream;
+        audio.srcObject = event.stream;
+      });
+
+      // Event handler for call events
+      agent.on("call", async (event) => {
+        try {
+          if (isBusyCause(event)) {
+            handleBusyCall(event);
+            return;
+          }
+
+          await handleLocalConnectionInfo(event);
+        } catch (error) {
+          isInboundCall = false;
+          console.error("Error: Failed to handle call event");
+          console.error(error);
+        }
+      });
+    } else {
+      console.log("localStorage not found");
+    }
+  } catch (error) {
+    if (error) {
+      console.error("Error:", error);
+    }
+  }
+}
+function fromCharCode() {
+  // viết code ở đây.
+  for (i = 97; i < 123; i++) {
+    var s = String.fromCharCode(i);
+    console.log(s.toUpperCase());
+  }
+}
+
+function loadHTML(url, targetId) {
+  fetch(url)
+    .then((response) => response.text())
+    .then((html) => {
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        targetElement.innerHTML = html;
+      }
+    })
+    .catch((error) => console.error("Error loading HTML:", error));
+}
 
 $(document).ready(function () {
+  // Function to load external HTML file into a specified element
+
+  loadHTML("mainContent.html", "dynamicMainContent");
+  loadHTML("mainOutbound.html", "dynamicMainOutbound");
+  loadHTML("mainBusyCall.html", "dynamicMainBusyCall");
+  loadHTML("mainCollapseClickToCall.html", "dynamicMainCollapseClickToCall");
+  loadHTML("mainInbound.html", "dynamicMainInbound");
+  loadHTML("mainInboundCollapse.html", "dynamicMainInboundCollapse");
+  loadHTML("mainInboundListen.html", "dynamicMainInboundListen");
+  loadHTML(
+    "mainInboundListenCollapse.html",
+    "dynamicMainInboundListenCollapse"
+  );
+  loadHTML("mainListContacts.html", "dynamicMainListContacts");
+  loadHTML("mainListHistoryCall.html", "dynamicMainListHistoryCall");
+  loadHTML("mainListMissCall.html", "dynamicMainListMissCall");
+
+  // showFormLogin();
+
+  console.log("co luon chayj dau tien k:");
   $("#pbx_username").mouseleave(function () {
     if ($(this).val().match(matchEmail)) {
       $(this).removeAttr("error-text");
       $(this).removeAttr("state");
     }
   });
+
+  $("#mainCourse").css("display", "none");
+  $("#appTextPhone1").text("Correct");
+  $("#appTextPhone1").attr("class", "correct__number__phone");
+
+  $("#btnClose").click(function () {
+    closeApp();
+  });
+
+  // nhập enter search
+  $("#search_contact").on("keypress", function (e) {
+    const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
+    const phone = /^\d{10}$/;
+    var inputData = $(this).val(); // Lấy giá trị từ ô input
+    if (e.which == 13 && (inputData != "" || inputData != null)) {
+      // Kiểm tra nếu phím Enter được nhấn
+      if (inputData.match(phone) || inputData.match(phone12)) {
+        filteredContactSearch(inputData);
+      } else {
+        searchContactKeyword(inputData);
+      }
+      // $(this).val(""); // Xóa nội dung trong ô input sau khi gửi
+    } else if (e.which == 13 && (inputData == "" || inputData == null)) {
+      current_page = 1;
+      getContactData(current_page);
+    }
+  });
 });
 
-function startWebPhoneCall() {
-  try {
-    const userDevices = JSON.parse(localStorage.getItem("userDevices"));
-    console.log("userDevices", userDevices);
-    const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
-    console.log("userTerminals", userTerminals);
+// Add click event listeners to all elements with class 'lb-phone digit'
+$(".lb-phone.digit").on("click", function () {
+  const digit = $(this).text().trim();
+  appendDigit(digit);
+});
 
-    const webphone = agent.getDevice(
-      `${userDevices[0]?.sip}${userTerminals[0]?.term}`
-    );
-    console.log("webphone", webphone);
-    // tell server that we want to use WebRTC (error handling omitted)
-    webphone.monitorStart({ rtc: true });
-  } catch (error) {
-    if (error) {
-      console.error("Error:", error);
-    }
-  }
+// Function to append the digit to the input field
+function appendDigit(digit) {
+  debugger;
+  const output = $("#output");
+  output.val(output.val() + digit);
+  checkPhone();
+}
+
+$("#mainCollapseClickToCall").click(function () {
+  resizeAppDefault();
+  $("#mainOutbound").css("display", "block");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainContent").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
+});
+
+$("#toggleEndCallBusy").click(function () {
+  resizeAppDefault();
+  client.interface
+    .trigger("hide", { id: "softphone" })
+    .then(function () {
+      isMainOutbound = false;
+      $("#callEnter").attr("disabled", true);
+      $("#callEnter").css({ backgroundColor: "darkgray" });
+
+      $("#headCourse").css("display", "block");
+
+      $("#mainContent").css("display", "block");
+      $("#mainOutbound").css("display", "none");
+      $("#mainBusyCall").css("display", "none");
+
+      $("#mainCollapseClickToCall").css("display", "none");
+      $("#mainListContacts").css("display", "none");
+      $("#mainListHistoryCall").css("display", "none");
+      $("#mainListMissCall").css("display", "none");
+      $("#mainInbound").css("display", "none");
+      $("#mainInboundCollapse").css("display", "none");
+      $("#mainInboundListen").css("display", "none");
+      $("#mainInboundListenCollapse").css("display", "none");
+
+      $("#output").text("");
+      phoneNumberReceiver = $("#output").val("");
+      $("#appTextPhone").val("");
+      $("#appTextPhone").text("");
+
+      /**as7 backend **/
+      let call = webphone?.calls[0];
+      if (call != undefined) {
+        call.clearConnection();
+      }
+      /**as7 backend **/
+      onAppDeactive();
+      // location.reload();
+    })
+    .catch(function (error) {
+      console.error("Error: Failed to close the CTI app");
+      console.error(error);
+    });
+});
+
+// mo rong man hinh click to call
+function mainCollapseClickToCall() {
+  debugger;
+  resizeAppDefault();
+  $("#headCourse").css("display", "none");
+  $("#mainCollapseClickToCall").css("display", "none");
+  $("#mainContent").css("display", "none");
+  $("#mainBusyCall").css("display", "none");
+  $("#mainListContacts").css("display", "none");
+  $("#mainListMissCall").css("display", "none");
+  $("#mainListHistoryCall").css("display", "none");
+  $("#mainInbound").css("display", "none");
+  $("#mainInboundCollapse").css("display", "none");
+  $("#mainInboundListen").css("display", "none");
+  $("#mainInboundListenCollapse").css("display", "none");
+
+  $("#mainOutbound").css("display", "block");
 }
