@@ -1,14 +1,25 @@
-<div id="mainContent"  class="city">
+<div id="mainContent" class="city">
   <!-- chèn đoạn code từ file dropDownExtendSST.html vào -->
-
   <div id="mainDialpad">
     <div class="txt-phone">
       <div class="input">
-        <input type="text" name="output" id="output" value="" onblur="checkPhone()" onchange="checkPhone()">
+        <input
+          type="text"
+          name="output"
+          id="output"
+          value=""
+          onblur="checkPhone()"
+          onchange="checkPhone()"
+        />
       </div>
       <div class="reset">
-        <button class="btn__back" id="reset_txt_phone" onclick="ResetTxtPhone()"><span><img style="size: 24px;"
-              src="./images/reset_phone.png" /></span></button>
+        <button
+          class="btn__back"
+          id="reset_txt_phone"
+          onclick="ResetTxtPhone()"
+        >
+          <span><img style="size: 24px" src="./images/reset_phone.png" /></span>
+        </button>
       </div>
     </div>
 
@@ -17,7 +28,7 @@
         <p id="appTextPhone1" class="correct__number__phone">Correct</p>
       </div>
       <div class="row enter-phone">
-        <div class="col-sm-3 muted" style="margin-top: -1.5rem;">
+        <div class="col-sm-3 muted" style="margin-top: -1.5rem">
           <p id="1" class="lb-phone digit">1</p>
         </div>
         <div class="col-sm-3 muted">
@@ -66,7 +77,7 @@
         </div>
         <div class="col-sm-3 muted">
           <p id="0" class="lb-phone digit">0</p>
-          <span id="+" class="digit" style="margin-left: 0.45rem;">+</span>
+          <span id="+" class="digit" style="margin-left: 0.45rem">+</span>
         </div>
         <div class="col-sm-3 muted">
           <p id="#" class="lb-phone digit">#</p>
@@ -74,13 +85,18 @@
       </div>
     </div>
     <div class="call-action">
-      <button class="btn-call" id="callEnter" onclick="toggleCall()" disabled="disabled"
-        style="background-color: darkgray;" type=" button"><span style="margin-right: 9px;"><img class="icon__call"
-            src="./images/call.png" /></span><span style="font-size: large;">Call</span></button>
+      <button
+        class="btn-call"
+        id="callEnter"
+        onclick="toggleCall()"
+        disabled="disabled"
+        style="background-color: darkgray"
+        type=" button"
+      >
+        <span style="margin-right: 9px"
+          ><img class="icon__call" src="./images/call.png" /></span
+        ><span style="font-size: large">Call</span>
+      </button>
     </div>
   </div>
 </div>
-</body>
-
-
-</html>

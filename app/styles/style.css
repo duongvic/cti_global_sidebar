@@ -390,3 +390,17 @@ html {
 .pt-10 {
   padding-top: 10px;
 }
+
+.content-logout {
+  padding-top: 80%;
+  text-align: center;
+}
+.content-logout-label {
+  font-size: 14px;
+  line-height: 22px;
+  align-content: center;
+  font-weight: bold;
+}
+.pav-30{
+  padding: 30px 0 30px 0;
+}
