@@ -1,46 +1,470 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
-    <style>
-        .tooltip {
-            display: none;
-            background-color: yellow;
-            color: black;
-            position: absolute;
-            border-radius: 6px;
-            padding: 5px 0;
-            text-align: center;
-            width: 120px;
-        }
-    </style>
-    <title>Tooltip to a div</title>
+    <meta charset="utf-8">
+    <title>Click to call</title>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://pbx-stg.oncallcx.vn/cti/ancti/ancti.js"></script>
+    <!-- https://pbx-stg.oncallcx.vn/cti/ancti/ancti.js -->
 </head>
 
 <body>
-    <div id="myDiv" style="padding: 30px;">
-        This is my div
-        <span class="tooltip">This is my tooltip</span>
-    </div>
+
+    <button style="float: right;" id="call" onclick="clickGetValue()" type="button">GetValue</button>
+
+    <div class="calling">
+
+        <button style="float: right;" id="call" onclick="clickCall()" type="button"><span id="status"></span><i
+                id="hook" class="material-icons">Call</i></button>
+        <div class="calling">
+            <div id="maincall" class="w3-container city">
+                <div class="text-algin flex-call">Đang gọi
+                    <div class="ball-loader">
+                        <div class="ball-loader-ball ball1"></div>
+                        <div class="ball-loader-ball ball2"></div>
+                        <div class="ball-loader-ball ball3"></div>
+                    </div>
+                </div>
+                <h4>Khách hàng XXXX</h4>
+                <p>0353293254</p>
+                <div class="timer-group" style="height: 34px;">
+                    <p id="timer"> </p>
+                </div>
+                <img class="avatar" src="./images/avatar_none.png" />
+                <div class="ac__calling">
+                    <button class="btn-ac" onclick="openCity('calls')"><img class="icon__calling tablinks"
+                            src="./images/DialPad-InCall.svg" /></button>
+                    <form name="test" method="post" style="display: none;">
+                        <input type="text" name="savereport" value="false" />
+                    </form>
+                    <button class="btn-mic" value="false" id="check" onclick="mic(this)">
+                        <i class="material-icons mic-un">&#xe02b;</i>
+                        <i class="material-icons mic-top">&#xe029;</i>
+                    </button>
+                    <button class="btn-ac" value="false" id="check" onclick="change(this)">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                    </button>
+                    <button class="btn-ac" onclick="openCity('tranfer')"><img class="icon__calling tablinks"
+                            src="./images/Blind Transfer.svg" /></button>
+                    <button class="btn-ac" onclick="openCity('busycall')"><img class="icon__calling tablinks"
+                            src="./images/Attend Transfer.svg" /></button>
+                </div>
+                <button id="toggle" onclick="endCall()" class="hint-call " type="button"> <img class="icon__calling"
+                        src="./images/endcall.png"> End call</button>
+            </div>
+            <div class="wap-his">
+                <div class="histrory">
+                    <div class="comments-list">
+                        <div class="media flex-his">
+                            <div class="flex-his">
+                                <div class="media-left" href="#">
+                                    <img src="./images/call in.png">
+                                </div>
+                                <div class="pull-right">
+                                    <h4 class="text-title"><a class="text-title" href="#">Phuln</a></h4>
+                                    <p>Hôm nay 10:20</p>
+                                </div>
+                            </div>
+                            <div class="media-body">
+                                <a class="media-heading user_name"><img src="./images/Info.png"></a>
+                                <p><small>00:22 </small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="histrory">
+                    <div class="comments-list">
+                        <div class="media flex-his">
+                            <div class="flex-his">
+                                <div class="media-left" href="#">
+                                    <img src="./images/call out.png">
+                                </div>
+                                <div class="pull-right">
+                                    <h4 class="text-title"><a class="text-title" href="#">Phuln</a></h4>
+                                    <p>Hôm nay 10:20</p>
+                                </div>
+                            </div>
+                            <div class="media-body">
+                                <a class="media-heading user_name"><img src="./images/Info.png"></a>
+                                <p><small>00:22 </small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="histrory">
+                    <div class="comments-list">
+                        <div class="media flex-his">
+                            <div class="flex-his">
+                                <div class="media-left" href="#">
+                                    <img src="./images/miss call.png">
+                                </div>
+                                <div class="pull-right">
+                                    <h4><a class="text-title miss-color" href="#">Phuln</a></h4>
+                                    <p class="miss-color">Hôm nay 10:20</p>
+                                </div>
+                            </div>
+                            <div class="media-body">
+                                <a class="media-heading user_name"><img src="./images/Info.png"></a>
+                                <p class="miss-color"><small>00:22 </small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="calls" class="w3-container city" style="display:block">
+                <div class="input-group-btn">
+                    <div id="sip-dialpad" class="dropdown-menu">
+                        <form action="#" method="post" name="form_name" id="form_id" class="form_class">
+                            <input class="handel__btn" type="text" id="formsubmit"></input>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="1">1<span>&nbsp;</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="2">2<span>ABC</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="3">3<span>DEF</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="4">4<span>GHI</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="5">5<span>JKL</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="6">6<span>MNO</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="7">7<span>PQRS</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="8">8<span>TUV</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="9">9<span>WXYZ</span></button>
+                            <button type="button" class="btn btn-default digit"
+                                data-digit="*">*<span>&nbsp;</span></button>
+                            <button type="button" class="btn btn-default digit" data-digit="0">0<span>+</span></button>
+                            <button type="submit" class="btn btn-default digit"
+                                data-digit="#">#<span>&nbsp;</span></button>
+                        </form>
+                    </div>
+                </div>
+                <div class="ac__calling">
+                    <button class="btn-ac" onclick="openCity('calls')"><img class="icon__calling tablinks"
+                            src="./images/DialPad-InCall.svg" /></button>
+                    <button class="btn-ac" onclick="recordaudio()"><img class="icon__calling tablinks"
+                            src="./images/Mic-InCall.svg" /></button>
+                    <button class="btn-ac" onclick="myFunction(this)">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                    </button>
+                    <button class="btn-ac" onclick="openCity('maincall')"><img class="icon__calling tablinks"
+                            src="./images/Blind Transfer.svg" /></button>
+                    <button class="btn-ac" onclick="openCity('busycall')"><img class="icon__calling tablinks"
+                            src="./images/Attend Transfer.svg" /></button>
+                </div>
+                <button id="toggle" onclick="endCall()" class="hint-call " type="button">End call1</button>
+            </div>
+            <div id="busycall" class="w3-container city" style="display:block">
+                <p class="text-algin">Đang gọi...</p>
+                <h4>Khách hàng Phú Lê</h4>
+                <p>0941684344</p>
+                <p>Người dùng bận</p>
+                <img class="avatar" src="./images/avatar_none.png" />
+                <div class="ac__calling">
+                    <button class="btn-ac" onclick="openCity('calls')"><img class="icon__calling tablinks"
+                            src="./images/DialPad-InCall.svg" /></button>
+                    <button class="btn-ac" onclick="recordaudio()"><img class="icon__calling tablinks"
+                            src="./images/Mic-InCall.svg" /></button>
+                    <button class="btn-ac" onclick="myFunction(this)">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                    </button>
+                    <button class="btn-ac" onclick="openCity('maincall')"><img class="icon__calling tablinks"
+                            src="./images/Blind Transfer.svg" /></button>
+                    <button class="btn-ac" onclick="openCity('busycall')"><img class="icon__calling tablinks"
+                            src="./images/Attend Transfer.svg" /></button>
+                </div>
+                <div class="btn-bus">
+                    <button id="toggle" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
+                                src="./images/endcall.png" /></span> Cancel</button>
+                    <button id="toggle" onclick="endCall()" class="hint-green precall" type="button"><span><img
+                                class="icon__calling icon-call" src="./images/Call.png" /></span> Call Again</button>
+                </div>
+            </div>
+            <div id="tranfer" class="w3-container city" style="display:block">
+                <p class="text-algin">Attended Transfer</p>
+                <button class="btn-tranfer">Anh Phú</button>
+                <button class="btn-tranfer">SST-QC05 1000</button>
+                <div id="custom-search-input">
+                    <div class="input-group">
+                        <input type="text" class="search-query form-control" placeholder="Search" />
+                        <span class="input-group-btn">
+                            <button type="button" disabled>
+                                Connect
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="list-tranfer">
+                    <ul>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                        <li><a href="#"><img src="./images/Frame 427319496.png"> SST-QC05 . 1000</a></li>
+                    </ul>
+                </div>
+                <div class="ac__calling">
+                    <button class="btn-ac" onclick="openCity('calls')"><img class="icon__calling tablinks"
+                            src="./images/DialPad-InCall.svg" /></button>
+                    <button class="btn-ac" onclick="recordaudio()"><img class="icon__calling tablinks"
+                            src="./images/Mic-InCall.svg" /></button>
+                    <button class="btn-ac" onclick="myFunction(this)">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                    </button>
+                    <button class="btn-ac" onclick="openCity('maincall')"><img class="icon__calling tablinks"
+                            src="./images/Blind Transfer.svg" /></button>
+                    <button class="btn-ac" onclick="openCity('busycall')"><img class="icon__calling tablinks"
+                            src="./images/Attend Transfer.svg" /></button>
+                </div>
+                <div class="btn-bus">
+                    <button id="toggle" onclick="endCall()" class="hint-call " type="button">End call</button>
+
+                </div>
+            </div>
+            <div id="inbourd" class="w3-container city" style="display:block">
+                <p class="text-algin">Inbound Call...</p>
+                <h4>Khách hàng Phú Lê</h4>
+                <p>Khách hàng Phú Lê</p>
+                <p>0941684344</p>
+                <img class="avatar" src="./images/avatar_none.png" />
+                <div class="ac__calling">
+
+                </div>
+                <div class="btn-bus">
+                    <button id="toggle" onclick="endCall()" class="hint" type="button"><span><img class="icon__calling"
+                                src="./images/endcall.png" /></span> Decline</button>
+                    <button id="toggle" onclick="clickCall()" class="hint-green precall" type="button"><span><img
+                                class="icon__calling icon-call" src="./images/Call.png" /></span> Accept</button>
+                </div>
+            </div>
+        </div>
+        <video id="localView" playsInline autoPlay muted></video>
+        <video id="remoteView" playsInline autoPlay muted></video>
+
+        <script>
+            // tabs ctiapp
+            function openCity(cityName) {
+                var i;
+                var x = document.getElementsByClassName("city");
+                for (i = 0; i < x.length; i++) {
+                    x[i].style.display = "none";
+                }
+                document.getElementById(cityName).style.display = "block";
+            }
+
+            let sip;
+            let term;
+            let a;
+            function clickGetValue() {
+                //sip= "sip:1217";
+                //term= "@term.498";
+                sip = "sip:1218";
+                term = "@term.559";
+                a = sip + term;
+                console.log("a:", a);
+                console.log("sip:", sip);
+                console.log("term:", term);
+            }
+
+            let agent = AnCti.newAgent();
+            let webphone;
+            let audio = new Audio();
+            audio.autoplay = true;
 
 
-    <div class="tooltip">Hover over me
-        <span class="tooltiptext">Tooltip text</span>
-      </div>
-      
-    <script>
-        const myDiv = document.getElementById("myDiv");
-        myDiv.addEventListener("mouseover", showTooltip);
-        myDiv.addEventListener("mouseout", hideTooltip);
-        function showTooltip() {
-            const tooltip = document.querySelector(".tooltip");
-            tooltip.style.display = "block";
-        }
-        function hideTooltip() {
-            const tooltip = document.querySelector(".tooltip");
-            tooltip.style.display = "none";
-        }  
-    </script>
+            // api ctiapp
+            agent.startApplicationSession({
+                //username: "anntp2@fpt.com",
+                //password: "nfcAm%HL7v",
+                username: "duongnguyenhoang.103@gmail.com",
+                password: "Admin@123",
+            })
+
+            // handler is called if application-session could not be started
+            agent.on("applicationsessionterminated", (event) => {
+                if (event.reason == "invalidApplicationInfo") {
+                    console.log("Please check your credentials and try again");
+                }
+            });
+
+
+            // agent.on("applicationsessionstarted", (event) => {
+            //  webphone = agent.getDevice(a);
+            // console.log('webphone', webphone);
+            // tell server that we want to use WebRTC (error handling omitted)
+            //  webphone.monitorStart({ rtc: true });
+            // });
+
+            // if WebRTC creates a media-stream we bind it to the corresponding elements
+            agent.on('localstream', (event) => {
+                document.getElementById('localView').srcObject = event.stream;
+            });
+            agent.on('remotestream', (event) => {
+                document.getElementById('remoteView').srcObject = event.stream;
+                audio.srcObject = event.stream;
+            });
+
+
+            // 688 máy bận 
+            document.clickCall = () => {
+
+                webphone = agent.getDevice(a);
+                console.log('webphone', webphone);
+                // tell server that we want to use WebRTC (error handling omitted)
+                webphone.monitorStart({ rtc: true });
+
+                let call = webphone?.calls[0];
+
+                if (!call) {
+                    // click without an active call -> start a video call to number 23
+                    webphone?.makeCall("0353293254", {
+                        autoOriginate: "doNotPrompt", audio: true, video: false
+                    });
+                } else if (call?.localConnectionInfo == "alerting") {
+                    // click while we have an alerting call -> accept it
+                    call?.answerCall({ audio: true, video: false });
+                } else {
+                    // otherwise we release the call
+                    call?.clearConnection();
+                }
+            }
+
+            // end call
+            document.endCall = () => {
+                let call = webphone?.calls[0];
+                call?.clearConnection();
+                stop();
+
+            }
+            // // inbournd
+            // document.inbound = () => {
+            //   let call = webphone.calls[0];
+            //   call.answerCall({
+            //       audio: true
+            //   });
+            // }
+            var input = document.test.savereport;
+            function mic(x) {
+                x.classList.toggle("mic");
+                if (input.value === String(false)) {
+                    input.value = true;
+                    let call = webphone.calls[0];
+                    call.updateCall({
+                        audio: 'muted',
+                    });
+                } else {
+                    input.value = false;
+                    let call = webphone.calls[0];
+                    call.updateCall({
+                        audio: 'true',
+                    });
+                }
+            }
+            var input = document.test.savereport;
+            function change(x) {
+                x.classList.toggle("change");
+                if (input.value === String(false)) {
+                    input.value = true;
+                    let call = webphone.calls[0];
+                    call.holdCall();
+
+                } else {
+                    input.value = false;
+                    let call = webphone.calls[0];
+                    call.retrieveCall();
+                }
+            }
+            // timer call
+            const ret = document.getElementById("timer");
+            let counter = 0;
+            let interval;
+            function convertSec(cnt) {
+                let sec = cnt % 60;
+                let min = Math.floor(cnt / 60);
+                if (sec < 10) {
+                    if (min < 10) {
+                        return "0" + min + ":0" + sec;
+                    } else {
+                        return min + ":0" + sec;
+                    }
+                } else if ((min < 10) && (sec >= 10)) {
+                    return "0" + min + ":" + sec;
+                } else {
+                    return min + ":" + sec;
+                }
+            }
+            function start() {
+                interval = setInterval(function () {
+                    ret.innerHTML = convertSec(counter++); // timer start counting here...
+                }, 1000);
+            }
+            function stop() {
+                clearInterval(interval);
+            }
+            agent.on("call", (event) => {
+                let call = event.call;
+                let x = document.getElementById(event?.call);
+                switch (call.localConnectionInfo) {
+                    case 'alerting':
+                        console.log(`incomming call from ${call.number} ${call.name}`);
+                        break;
+                    case 'connected':
+                        console.log(`connected to ${call.number}`);
+                        return start();
+
+
+                        break;
+                    case 'fail':
+                        console.log(`call failed, cause is ${event.content.cause}`);
+                        break;
+                    case 'hold':
+                        console.log(`holding call to ${call.number}`);
+                        break;
+                    case 'null':
+                        console.log(`call to ${call.number} is gone`);
+                        return stop();
+                        location.reload();
+                        break;
+                }
+            });
+
+            agent.on("call", (event) => {
+                if (event?.content?.cause == "busy") {
+                    // let div_elem = document.getElementById("busycall") 
+                    // return div_element;
+                    openCity("busycall")
+                    // document.getElementById("busycall").style.display = "block"
+                }
+
+            });
+            navigator.mediaDevices.enumerateDevices().then(mediaDevices => {
+                mediaDevices
+                    .filter(({ kind }) => kind == "audioinput")
+                    .forEach(dev => {
+                        console.log(`${dev.label} => ${dev.deviceId}`);
+                    });
+            })
+
+
+        </script>
+
+
 </body>
 
 </html>

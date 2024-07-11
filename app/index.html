@@ -556,14 +556,8 @@
         <!-- màn agent bắt máy  -->
         <!-- <div id="dynamicMainInboundListen"></div> -->
         <div id="mainInboundListen" class="city">
-          <div style="background: #12344D;">
-            <!-- <span style="color: aliceblue; line-height: 2%;">SST-CQ05 1100</span> -->
-            <fw-button class="action-buttons flr" id="btnCollapseInboundListen" size="small" color="primary">__
-            </fw-button><br><br>
-          </div>
-
           <div class="calling">
-            <p class="text-algin" style="padding-top: 9% ; padding-bottom: 3rem;">Inbound Call...</p>
+            <p class="text-algin" style="padding-top: 5% ; padding-bottom: 3rem;">Inbound Call...</p>
 
             <h4><span id="appTxtNameContactInboundListen"></span></h4>
             <p id="appTextPhoneInboundListen"></p>
@@ -580,7 +574,7 @@
                   <form name="testMicInbound" method="post" style="display: none;">
                     <input type="text" name="savereportMicInbound" value="false" />
                   </form>
-                  <button class="btn-mic" value="false" id="check" onclick="mic(this)">
+                  <button class="btn-mic" value="false" id="check" onclick="micInbound(this)">
                     <i class="material-icons mic-un">&#xe02b;</i>
                     <i class="material-icons mic-top">&#xe029;</i>
                   </button>
@@ -590,7 +584,7 @@
                   <form name="testInboundHold_Unhold" method="post" style="display: none;">
                     <input type="text" name="savereportInbound_Hold_Unhold" value="false" />
                   </form>
-                  <button class="btn-ac" value="false" id="check" onclick="change(this)">
+                  <button class="btn-ac" value="false" id="check" onclick="changeInbound(this)">
                     <div class="bar1"></div>
                     <div class="bar2"></div>
                   </button>

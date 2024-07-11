@@ -2,6 +2,7 @@ const secretKey = "pYgBQnwbHvhTc6HD89";
 const CryptoJS = window.CryptoJS;
 const matchEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+let isTimeStarted = false;
 let username = "";
 let password = "";
 let sip = "";
@@ -983,19 +984,113 @@ async function setUpdateCallAs7(value) {
   isUpdateCallAs7 = value;
 }
 // Function to toggle mic and hold/unhold states
-async function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
-  x.classList.toggle(updateCallConfig ? "mic" : "change");
-  input.value = input.value === "false" ? "true" : "false";
-  let call = webphone?.calls[0];
+// async function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
+//   debugger;
+//   x.classList.toggle(updateCallConfig ? "mic" : "change");
+//   input.value = input.value === "false" ? "true" : "false";
+//   let call = webphone?.calls[0];
 
-  if (updateCallConfig) {
-    call.updateCall({ audio: input.value === "true" ? "false" : "true" });
+//   if (updateCallConfig) {
+//     debugger
+//     call.updateCall({ audio: input.value === "true" ? "false" : "true" });
+//   } else {
+//     input.value === "true" ? call.holdCall() : call.retrieveCall();
+//   }
+
+//   clearAllIntervals();
+//   await setUpdateCallAs7(true);
+// }
+
+// click start stop action button
+var input = document.testMic.savereportMic;
+async function mic(x) {
+  isTimeStarted = true;
+  x.classList.toggle("mic");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "muted",
+    });
+    debugger;
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
   } else {
-    input.value === "true" ? call.holdCall() : call.retrieveCall();
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+    debugger;
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
   }
+}
 
-  clearAllIntervals();
-  await setUpdateCallAs7(true);
+var input = document.testHold_Unhold.savereportHold_Unhold;
+async function change(x) {
+  isTimeStarted = true;
+  x.classList.toggle("change");
+  if (input.value === String(false)) {
+    debugger;
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.holdCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    debugger;
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.retrieveCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
+}
+
+var input = document.testMicInbound.savereportMicInbound;
+async function micInbound(x) {
+  isTimeStarted = true;
+  x.classList.toggle("mic");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "mute",
+    });
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
+}
+var input = document.testInboundHold_Unhold.savereportInbound_Hold_Unhold;
+async function changeInbound(x) {
+  isTimeStarted = true;
+  x.classList.toggle("change");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.holdCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.retrieveCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
 }
 
 // Clear all intervals
@@ -1007,27 +1102,31 @@ function clearAllIntervals() {
 }
 
 // Mic toggle functions
-function mic(x) {
-  toggleState(x, document.testMic.savereportMic, true, false);
-}
+// function mic(x) {
+//   debugger;
+//   toggleState(x, document.testMic.savereportMic, true, false);
+// }
 
-function micInbound(x) {
-  toggleState(x, document.testMicInbound.savereportMicInbound, true, false);
-}
+// function micInbound(x) {
+//   debugger;
+//   toggleState(x, document.testMicInbound.savereportMicInbound, true, false);
+// }
 
-// Hold/Unhold toggle functions
-function change(x) {
-  toggleState(x, document.testHold_Unhold.savereportHold_Unhold, false, true);
-}
+// // Hold/Unhold toggle functions
+// function change(x) {
+//   debugger;
+//   toggleState(x, document.testHold_Unhold.savereportHold_Unhold, false, true);
+// }
 
-function changeInbound(x) {
-  toggleState(
-    x,
-    document.testInboundHold_Unhold.savereportInbound_Hold_Unhold,
-    false,
-    true
-  );
-}
+// function changeInbound(x) {
+//   debugger;
+//   toggleState(
+//     x,
+//     document.testInboundHold_Unhold.savereportInbound_Hold_Unhold,
+//     false,
+//     true
+//   );
+// }
 
 // Timer utility functions
 function convertSec(cnt) {
@@ -1147,7 +1246,6 @@ function handleBusyCall(event) {
 
 // Handle inbound call in alerting state
 async function handleInboundAlertingCall(call) {
-  debugger;
   isInboundCall = true;
   resizeAppDefault();
   viewMainInbound();
@@ -1174,27 +1272,29 @@ async function handleInboundAlertingCall(call) {
 
 // Handle connected call
 async function handleConnectedCall(call) {
-  debugger;
   console.log(`Connected to ${call.number}`);
   console.log("Connected to screen:", isMainActive);
 
   if (!isInboundCall) {
-    start();
-    startTimeCollapse();
+    if (!isTimeStarted) {
+      start();
+      startTimeCollapse();
+    }
 
     if (!isUpdateCallAs7) {
-      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
   }
 
   if (isMainActive && isInboundCall) {
-    startTimeInbound();
-    startTimeInboundListenCollapse();
+    debugger;
+    if (!isTimeStarted) {
+      startTimeInbound();
+      startTimeInboundListenCollapse();
+    }
 
     if (!isUpdateCallAs7) {
-      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
@@ -1205,7 +1305,6 @@ async function handleConnectedCall(call) {
 
 // Handle call ended
 async function handleCallEnded(call) {
-  debugger;
   console.log(`Call to ${call.number} has ended.`);
   console.log("Is main show:", isMainShow);
 
@@ -1215,11 +1314,15 @@ async function handleCallEnded(call) {
   }
   stop();
   if (isMainShow !== "busycall") {
-    $("#mainConnect").css("display", "none");
-    $("#mainContent").css("display", "block");
+    openUI("mainContent");
+    $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "block");
-    $("#mainOutbound").css("display", "none");
-    $("#mainCollapseClickToCall").css("display", "none");
+    $("#menuApp").css("display", "block");
+    // $("#mainConnect").css("display", "none");
+    // $("#mainContent").css("display", "block");
+    // $("#headCourse").css("display", "block");
+    // $("#mainOutbound").css("display", "none");
+    // $("#mainCollapseClickToCall").css("display", "none");
 
     resetText();
     onAppDeactive();
@@ -1248,18 +1351,24 @@ async function getUserData() {
 }
 
 function viewMainBusy() {
-  $("#appTxtServiceBusyCall").text(appTxtService);
+  isMainShow == "mainBusyCall";
+  openUI("mainBusyCall");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "none");
+  renderNameSipExtension("#appTxtService");
+  // $("#appTxtServiceBusyCall").text(appTxtService);
 
-  $("#mainBusyCall").css("display", "block");
-  $("#mainContent").css("display", "none");
-  $("#mainOutbound").css("display", "none");
-  $("#mainCollapseClickToCall").css("display", "none");
-  $("#mainListContacts").css("display", "none");
-  $("#mainListHistoryCall").css("display", "none");
-  $("#mainInbound").css("display", "none");
-  $("#mainInboundCollapse").css("display", "none");
-  $("#mainInboundListen").css("display", "none");
-  $("#mainInboundListenCollapse").css("display", "none");
+  // $("#mainBusyCall").css("display", "block");
+  // $("#mainContent").css("display", "none");
+  // $("#mainOutbound").css("display", "none");
+  // $("#mainCollapseClickToCall").css("display", "none");
+  // $("#mainListContacts").css("display", "none");
+  // $("#mainListHistoryCall").css("display", "none");
+  // $("#mainInbound").css("display", "none");
+  // $("#mainInboundCollapse").css("display", "none");
+  // $("#mainInboundListen").css("display", "none");
+  // $("#mainInboundListenCollapse").css("display", "none");
 }
 // navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
 //   mediaDevices
@@ -1317,7 +1426,8 @@ function openApp() {
 }
 
 function resetText() {
-  $("#appTxtService").text(appTxtService);
+  // $("#appTxtService").text(appTxtService);
+  renderNameSipExtension("#appTxtService");
   // Clear text fields and innerText properties
   const textFields = [
     "appTxtNameContact",
@@ -1841,7 +1951,7 @@ function viewScreenCollapseClickToCall() {
   openUI("mainCollapseClickToCall");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "none");
-  debugger;
+
   // $("#mainCollapseClickToCall").css("display", "block");
   // $("#mainContent").css("display", "none");
   // $("#mainOutbound").css("display", "none");
@@ -1881,33 +1991,6 @@ async function init() {
 
   client.events.on("app.activated", onAppActivate);
   client.events.on("app.deactivated", onAppDeactive);
-}
-
-function showFormLogin() {
-  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
-  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
-  let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
-  if (!initialUserAs7 && !userDevices && !userTerminals) {
-    $("#mainLogin").css("display", "block");
-    $("#mainCourse").css("display", "none");
-    $("#headCourse").css("display", "none");
-    $("#mainContent").css("display", "none");
-    $("#mainOutbound").css("display", "none");
-    $("#mainListMissCall").css("display", "none");
-  } else {
-    $("#mainLogin").css("display", "none");
-    if (!isMainActive) {
-      debugger;
-      $("#mainCourse").css("display", "block");
-      $("#headCourse").css("display", "block");
-      $("#mainContent").css("display", "block");
-
-      renderNameSipExtension("#appTxtService");
-    } else {
-      debugger;
-      $("#mainContent").css("display", "none");
-    }
-  }
 }
 
 function onAppActivate() {
@@ -2292,7 +2375,7 @@ function eventHandlecallDialpad() {
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
-  debugger;
+
   let textElementDialpad = $("#output").val();
   phoneNumberReceiver = textElementDialpad;
   $("#appTextPhone1").text("Correct").attr("class", "correct__number__phone");
@@ -2306,7 +2389,6 @@ function eventHandlecallDialpad() {
   /**click to call as7*/
   // startWebPhoneCall();
   let call = webphone?.calls[0];
-  debugger;
   if (!call) {
     // click without an active call -> start a video call to number 23
     webphone?.makeCall(phoneNumberReceiver, {
@@ -2947,6 +3029,7 @@ function acceptCall() {
 
 function endCall() {
   // startWebPhoneCall();
+  isTimeStarted = false;
   let call = webphone?.calls[0];
   if (call != undefined) {
     call.clearConnection();
@@ -2954,49 +3037,62 @@ function endCall() {
 
   stop();
 
+  openUI("mainContent");
+  renderNameSipExtension("#appTxtService");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
-  $("#mainContent").css("display", "block");
-  $("#mainOutbound").css("display", "none");
-  $("#mainBusyCall").css("display", "none");
-  $("#mainCollapseClickToCall").css("display", "none");
-  $("#mainListContacts").css("display", "none");
-  $("#mainListHistoryCall").css("display", "none");
-  $("#mainListMissCall").css("display", "none");
-  $("#mainInbound").css("display", "none");
-  $("#mainInboundCollapse").css("display", "none");
-  $("#mainInboundListen").css("display", "none");
-  $("#mainInboundListenCollapse").css("display", "none");
-  $("#mainLogin").css("display", "none");
-  $("#mainLogout").css("display", "none");
+  $("#menuApp").css("display", "block");
+
+  // $("#mainCourse").css("display", "block");
+  // $("#headCourse").css("display", "block");
+  // $("#mainContent").css("display", "block");
+  // $("#mainOutbound").css("display", "none");
+  // $("#mainBusyCall").css("display", "none");
+  // $("#mainCollapseClickToCall").css("display", "none");
+  // $("#mainListContacts").css("display", "none");
+  // $("#mainListHistoryCall").css("display", "none");
+  // $("#mainListMissCall").css("display", "none");
+  // $("#mainInbound").css("display", "none");
+  // $("#mainInboundCollapse").css("display", "none");
+  // $("#mainInboundListen").css("display", "none");
+  // $("#mainInboundListenCollapse").css("display", "none");
+  // $("#mainLogin").css("display", "none");
+  // $("#mainLogout").css("display", "none");
 
   onAppDeactive();
   location.reload(true);
 }
 
 function endCallInboundListen() {
-  debugger;
+  isTimeStarted = false;
   let call = webphone?.calls[0];
   if (call != undefined) {
     call.clearConnection();
   }
   stop();
   location.reload(true);
-  document.getElementById("mainCourse").style.display = "block";
-  document.getElementById("headCourse").style.display = "block";
-  document.getElementById("mainContent").style.display = "block";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainLogin").style.display = "none";
-  document.getElementById("mainLogout").style.display = "none";
+
+  openUI("mainContent");
+  renderNameSipExtension("#appTxtService");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "none");
+
+  // document.getElementById("mainCourse").style.display = "block";
+  // document.getElementById("headCourse").style.display = "block";
+  // document.getElementById("mainContent").style.display = "block";
+  // document.getElementById("mainOutbound").style.display = "none";
+  // document.getElementById("mainBusyCall").style.display = "none";
+  // document.getElementById("mainCollapseClickToCall").style.display = "none";
+  // document.getElementById("mainInbound").style.display = "none";
+  // document.getElementById("mainInboundCollapse").style.display = "none";
+  // document.getElementById("mainInboundListen").style.display = "none";
+  // document.getElementById("mainInboundListenCollapse").style.display = "none";
+  // document.getElementById("mainListContacts").style.display = "none";
+  // document.getElementById("mainListHistoryCall").style.display = "none";
+  // document.getElementById("mainListMissCall").style.display = "none";
+  // document.getElementById("mainLogin").style.display = "none";
+  // document.getElementById("mainLogout").style.display = "none";
 
   onAppDeactive();
 }
@@ -3007,18 +3103,25 @@ function showMainInboundListen() {
       resizeAppDefault();
       console.log("vao day k show man nghe inbound");
       //view màn inbound khi nghe máy
-      document.getElementById("mainInboundListen").style.display = "block";
-      document.getElementById("mainContent").style.display = "none";
-      document.getElementById("mainOutbound").style.display = "none";
-      document.getElementById("mainBusyCall").style.display = "none";
-      document.getElementById("mainCollapseClickToCall").style.display = "none";
-      document.getElementById("mainListContacts").style.display = "none";
-      document.getElementById("mainListHistoryCall").style.display = "none";
-      document.getElementById("mainListMissCall").style.display = "none";
-      document.getElementById("mainInbound").style.display = "none";
-      document.getElementById("mainInboundCollapse").style.display = "none";
-      document.getElementById("mainLogin").style.display = "none";
-      document.getElementById("mainLogout").style.display = "none";
+
+      openUI("mainInboundListen");
+      renderNameSipExtension("#appTxtService");
+      $("#mainCourse").css("display", "block");
+      $("#headCourse").css("display", "block");
+      $("#menuApp").css("display", "none");
+
+      // document.getElementById("mainInboundListen").style.display = "block";
+      // document.getElementById("mainContent").style.display = "none";
+      // document.getElementById("mainOutbound").style.display = "none";
+      // document.getElementById("mainBusyCall").style.display = "none";
+      // document.getElementById("mainCollapseClickToCall").style.display = "none";
+      // document.getElementById("mainListContacts").style.display = "none";
+      // document.getElementById("mainListHistoryCall").style.display = "none";
+      // document.getElementById("mainListMissCall").style.display = "none";
+      // document.getElementById("mainInbound").style.display = "none";
+      // document.getElementById("mainInboundCollapse").style.display = "none";
+      // document.getElementById("mainLogin").style.display = "none";
+      // document.getElementById("mainLogout").style.display = "none";
 
       isMainActive = true;
 
@@ -3041,7 +3144,6 @@ function viewScreeInboundListenCollapse() {
   openUI("mainInboundListenCollapse");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "none");
-  debugger;
   // document.getElementById("mainInboundListenCollapse").style.display = "block";
   // document.getElementById("mainInboundCollapse").style.display = "none";
   // document.getElementById("mainContent").style.display = "none";
@@ -3058,6 +3160,7 @@ function viewScreeInboundListenCollapse() {
 }
 
 function viewMainInbound() {
+  isMainShow == "mainInbound";
   isMainInbound = true;
   isMainOutbound = false;
   isMainContactActive = false;
@@ -3104,19 +3207,25 @@ function btShowMainInboundListen() {
     .then(function () {
       resizeAppDefault();
       debugger;
-      $("#mainInboundListen").css("display", "block");
-      $("#mainInboundListenCollapse").css("display", "none");
-      $("#mainContent").css("display", "none");
-      $("#mainOutbound").css("display", "none");
-      $("#mainBusyCall").css("display", "none");
-      $("#mainCollapseClickToCall").css("display", "none");
-      $("#mainListContacts").css("display", "none");
-      $("#mainListHistoryCall").css("display", "none");
-      $("#mainListMissCall").css("display", "none");
-      $("#mainInbound").css("display", "none");
-      $("#mainInboundCollapse").css("display", "none");
-      $("#mainLogin").css("display", "none");
-      $("#mainLogout").css("display", "none");
+      openUI("mainInboundListen");
+      renderNameSipExtension("#appTxtService");
+      $("#mainCourse").css("display", "block");
+      $("#headCourse").css("display", "block");
+      $("#menuApp").css("display", "none");
+
+      // $("#mainInboundListen").css("display", "block");
+      // $("#mainInboundListenCollapse").css("display", "none");
+      // $("#mainContent").css("display", "none");
+      // $("#mainOutbound").css("display", "none");
+      // $("#mainBusyCall").css("display", "none");
+      // $("#mainCollapseClickToCall").css("display", "none");
+      // $("#mainListContacts").css("display", "none");
+      // $("#mainListHistoryCall").css("display", "none");
+      // $("#mainListMissCall").css("display", "none");
+      // $("#mainInbound").css("display", "none");
+      // $("#mainInboundCollapse").css("display", "none");
+      // $("#mainLogin").css("display", "none");
+      // $("#mainLogout").css("display", "none");
     })
     .catch(function (error) {
       console.error("Error: Failed to open the app");
@@ -3177,11 +3286,9 @@ async function createTicket() {
     );
 
     //thu nhỏ màn hình call
-    debugger;
     if (!isInboundCall) {
       viewScreenCollapseClickToCall();
     } else {
-      debugger;
       viewScreeInboundListenCollapse();
     }
     // goToContact(idContact);
@@ -3679,6 +3786,7 @@ function preCall() {
 }
 
 async function toggleEndCallCollapse() {
+  isTimeStarted = false;
   isLogger = true;
   actionDesktopEndCall = true;
   isMainOutbound = false;
@@ -3718,6 +3826,7 @@ async function toggleEndCallCollapse() {
 
 async function toggleEndCall() {
   // await updateTicket(idTicket);
+  isTimeStarted = false;
   isLogger = true;
   actionDesktopEndCall = true;
   isMainOutbound = false;
@@ -3981,7 +4090,6 @@ async function submitLogin() {
   localStorage.clear();
   let userLogin = $("#pbx_username").val();
   let passLogin = $("#pbx_code").val();
-  debugger;
   if (userLogin === "" || !userLogin.match(matchEmail)) {
     $("#pbx_username").attr("error-text", "Pbx username is incorrect");
     $("#pbx_username").attr("state", "error");
@@ -4331,13 +4439,13 @@ function mainCollapseClickToCall() {
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
-  debugger;
 }
 
 function showFormLogout() {
   client.interface.trigger("show", { id: "softphone" }).then(function () {
     openUI("mainLogout");
     isMainShow = "mainLogout";
+    isTimeStarted = false;
     // terminate call and stop session
     agent.stopApplicationSession();
   });
