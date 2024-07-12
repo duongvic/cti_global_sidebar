@@ -1921,6 +1921,7 @@ function resizeAppDefault() {
 }
 
 function viewScreenCollapseClickToCall() {
+  isMainShow = "mainCollapseClickToCall";
   isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
 
@@ -3020,6 +3021,7 @@ function showMainInboundListen() {
 }
 
 function viewScreeInboundListenCollapse() {
+  isMainShow = "mainInboundListenCollapse";
   isMainCollapse = "mainCollapse";
   client.instance.resize({ height: "48px" });
   openUI("mainInboundListenCollapse");
@@ -3057,7 +3059,6 @@ function btShowMainInboundListen() {
     .trigger("show", { id: "softphone" })
     .then(function () {
       resizeAppDefault();
-      debugger;
       openUI("mainInboundListen");
       renderNameSipExtension("#appTxtService");
       $("#mainCourse").css("display", "block");
@@ -4109,7 +4110,18 @@ function fromCharCode() {
 }
 
 $("#btnClose").click(function () {
-  closeApp();
+  debugger;
+  switch (isMainShow) {
+    case "mainCollapseClickToCall":
+      viewScreenCollapseClickToCall();
+      break;
+    case "mainInboundListenCollapse":
+      viewScreeInboundListenCollapse();
+      break;
+    default:
+      closeApp();
+      break;
+  }
 });
 
 $(document).ready(function () {
