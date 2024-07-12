@@ -2562,23 +2562,16 @@ function clickContactCall(elem) {
       .then(function () {
         resizeAppDefault();
         existContact = true;
-
-        $("#mainOutbound").css("display", "block");
-        $("#mainContent").css("display", "none");
-        $("#mainListContacts").css("display", "none");
-        $("#mainBusyCall").css("display", "none");
-        $("#mainCollapseClickToCall").css("display", "none");
-        $("#mainListHistoryCall").css("display", "none");
-        $("#mainInbound").css("display", "none");
-        $("#mainInboundCollapse").css("display", "none");
-        $("#mainInboundListen").css("display", "none");
-        $("#mainInboundListenCollapse").css("display", "none");
-        $("#headCourse").css("display", "none");
+        openUI("mainOutbound");
+        $("#mainCourse").css("display", "block");
+        $("#headCourse").css("display", "block");
+        $("#menuApp").css("display", "none");
+        renderNameSipExtension("#appTxtService");
 
         $("#appTxtNameContact").text(name_contact);
         $("#appTextPhone").text(phone_contact);
 
-        $("#appTxtServiceOutbound").text(appTxtService);
+        // $("#appTxtServiceOutbound").text(appTxtService);
 
         phoneNumberReceiver = phone_contact;
         nameContact = name_contact;
@@ -2626,13 +2619,6 @@ function redirectContactInfo(elem) {
       console.error("Error: Failed to navigate to contact");
       console.error(error);
     });
-
-  // let str = agent_ref;
-  // let sindex = agent_ref?.lastIndexOf(".freshdesk.com");
-  // console.log("Vị trí của chuỗi toidicode trong des là bao nhieu: " + sindex);
-  // let a = str?.slice(0, sindex);
-  // const urlParams = a + ".freshdesk.com/a/contacts/" + contactId;
-  // window.open(urlParams, "_blank");
 }
 
 function loadMoreItemsContact() {
@@ -2682,28 +2668,12 @@ $(document).ready(function () {
 });
 
 async function showHistoryCall() {
-  debugger;
-  // openUI("mainListHistoryCall");
-  // renderNameSipExtension("#appTxtService");
-  // $("#mainCourse").css("display", "block");
-  // $("#headCourse").css("display", "block");
-  // $("#menuApp").css("display", "block");
-
-  document.getElementById("output").innerText = "";
-  document.getElementById("mainCourse").style.display = "block";
-  document.getElementById("headCourse").style.display = "block";
-  document.getElementById("menuApp").style.display = "block";
-  document.getElementById("mainListHistoryCall").style.display = "block";
-
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainListMissCall").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
+  openUI("mainListHistoryCall");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "block");
+  renderNameSipExtension("#appTxtService");
+  $("#output").val("");
 
   var newSvgHisCall = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2734,8 +2704,6 @@ async function showHistoryCall() {
 
   const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
   // lấy data historycall
-  // setTimeout(async () => {
-  // startWebPhoneCall();
   let readCall = await webphone?.readCallDetails(options);
   listHisCall = readCall?.reverse();
   if (
@@ -2755,22 +2723,11 @@ async function showHistoryCall() {
 
 async function showMissCall() {
   openUI("mainListMissCall");
-  renderNameSipExtension("#appTxtService");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "block");
-
-  document.getElementById("output").innerText = "";
-  // document.getElementById("mainListMissCall").style.display = "block";
-  // document.getElementById("mainListHistoryCall").style.display = "none";
-  // document.getElementById("mainContent").style.display = "none";
-  // document.getElementById("mainOutbound").style.display = "none";
-  // document.getElementById("mainBusyCall").style.display = "none";
-  // document.getElementById("mainCollapseClickToCall").style.display = "none";
-  // document.getElementById("mainListContacts").style.display = "none";
-  // document.getElementById("mainInbound").style.display = "none";
-  // document.getElementById("mainInboundCollapse").style.display = "none";
-  // document.getElementById("mainInboundListen").style.display = "none";
+  renderNameSipExtension("#appTxtService");
+  $("#output").val("");
 
   var oldSvgDialap = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2799,8 +2756,6 @@ async function showMissCall() {
   listHisCall = [];
 
   const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
-  // setTimeout(async () => {
-  // startWebPhoneCall();
   let readCall = await webphone?.readCallDetails(options);
   const arr = readCall?.reverse();
 
@@ -3004,31 +2959,17 @@ async function listenCall() {
 
 function acceptCall() {
   //view màn inbound khi nghe máy
-  // document.getElementById("mainInboundListen").style.display = "block";
-  // document.getElementById("mainContent").style.display = "none";
-  // document.getElementById("mainOutbound").style.display = "none";
-  // document.getElementById("mainBusyCall").style.display = "none";
-  // document.getElementById("mainCollapseClickToCall").style.display = "none";
-  // document.getElementById("mainListContacts").style.display = "none";
-  // document.getElementById("mainListHistoryCall").style.display = "none";
-  // document.getElementById("mainListMissCall").style.display = "none";
-  // document.getElementById("mainInbound").style.display = "none";
-  // document.getElementById("mainInboundCollapse").style.display = "none";
-  // document.getElementById("mainLogin").style.display = "none";
-  // document.getElementById("mainLogout").style.display = "none";
   openUI("mainInboundListen");
-  renderNameSipExtension("#appTxtService");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
+  renderNameSipExtension("#appTxtService");
 
   isMainActive = true;
-  debugger;
   listenCall();
 }
 
 function endCall() {
-  // startWebPhoneCall();
   isTimeStarted = false;
   let call = webphone?.calls[0];
   if (call != undefined) {
@@ -3038,27 +2979,10 @@ function endCall() {
   stop();
 
   openUI("mainContent");
-  renderNameSipExtension("#appTxtService");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "block");
-
-  // $("#mainCourse").css("display", "block");
-  // $("#headCourse").css("display", "block");
-  // $("#mainContent").css("display", "block");
-  // $("#mainOutbound").css("display", "none");
-  // $("#mainBusyCall").css("display", "none");
-  // $("#mainCollapseClickToCall").css("display", "none");
-  // $("#mainListContacts").css("display", "none");
-  // $("#mainListHistoryCall").css("display", "none");
-  // $("#mainListMissCall").css("display", "none");
-  // $("#mainInbound").css("display", "none");
-  // $("#mainInboundCollapse").css("display", "none");
-  // $("#mainInboundListen").css("display", "none");
-  // $("#mainInboundListenCollapse").css("display", "none");
-  // $("#mainLogin").css("display", "none");
-  // $("#mainLogout").css("display", "none");
-
+  renderNameSipExtension("#appTxtService");
   onAppDeactive();
   location.reload(true);
 }
@@ -3078,22 +3002,6 @@ function endCallInboundListen() {
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
 
-  // document.getElementById("mainCourse").style.display = "block";
-  // document.getElementById("headCourse").style.display = "block";
-  // document.getElementById("mainContent").style.display = "block";
-  // document.getElementById("mainOutbound").style.display = "none";
-  // document.getElementById("mainBusyCall").style.display = "none";
-  // document.getElementById("mainCollapseClickToCall").style.display = "none";
-  // document.getElementById("mainInbound").style.display = "none";
-  // document.getElementById("mainInboundCollapse").style.display = "none";
-  // document.getElementById("mainInboundListen").style.display = "none";
-  // document.getElementById("mainInboundListenCollapse").style.display = "none";
-  // document.getElementById("mainListContacts").style.display = "none";
-  // document.getElementById("mainListHistoryCall").style.display = "none";
-  // document.getElementById("mainListMissCall").style.display = "none";
-  // document.getElementById("mainLogin").style.display = "none";
-  // document.getElementById("mainLogout").style.display = "none";
-
   onAppDeactive();
 }
 function showMainInboundListen() {
@@ -3109,19 +3017,6 @@ function showMainInboundListen() {
       $("#mainCourse").css("display", "block");
       $("#headCourse").css("display", "block");
       $("#menuApp").css("display", "none");
-
-      // document.getElementById("mainInboundListen").style.display = "block";
-      // document.getElementById("mainContent").style.display = "none";
-      // document.getElementById("mainOutbound").style.display = "none";
-      // document.getElementById("mainBusyCall").style.display = "none";
-      // document.getElementById("mainCollapseClickToCall").style.display = "none";
-      // document.getElementById("mainListContacts").style.display = "none";
-      // document.getElementById("mainListHistoryCall").style.display = "none";
-      // document.getElementById("mainListMissCall").style.display = "none";
-      // document.getElementById("mainInbound").style.display = "none";
-      // document.getElementById("mainInboundCollapse").style.display = "none";
-      // document.getElementById("mainLogin").style.display = "none";
-      // document.getElementById("mainLogout").style.display = "none";
 
       isMainActive = true;
 
@@ -3144,19 +3039,6 @@ function viewScreeInboundListenCollapse() {
   openUI("mainInboundListenCollapse");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "none");
-  // document.getElementById("mainInboundListenCollapse").style.display = "block";
-  // document.getElementById("mainInboundCollapse").style.display = "none";
-  // document.getElementById("mainContent").style.display = "none";
-  // document.getElementById("mainOutbound").style.display = "none";
-  // document.getElementById("mainBusyCall").style.display = "none";
-  // document.getElementById("mainListContacts").style.display = "none";
-  // document.getElementById("mainCollapseClickToCall").style.display = "none";
-  // document.getElementById("mainListHistoryCall").style.display = "none";
-  // document.getElementById("mainListMissCall").style.display = "none";
-  // document.getElementById("mainInboundListen").style.display = "none";
-  // document.getElementById("mainInbound").style.display = "none";
-  // document.getElementById("mainLogin").style.display = "none";
-  // document.getElementById("mainLogout").style.display = "none";
 }
 
 function viewMainInbound() {
@@ -3169,23 +3051,6 @@ function viewMainInbound() {
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
-
-  // $("#mainConnect").css("display", "none");
-  // $("#mainCourse").css("display", "block");
-  // $("#headCourse").css("display", "none");
-  // $("#mainInbound").css("display", "block");
-  // $("#mainContent").css("display", "none");
-  // $("#mainOutbound").css("display", "none");
-  // $("#mainBusyCall").css("display", "none");
-  // $("#mainCollapseClickToCall").css("display", "none");
-  // $("#mainListContacts").css("display", "none");
-  // $("#mainListHistoryCall").css("display", "none");
-  // $("#mainListMissCall").css("display", "none");
-  // $("#mainInboundCollapse").css("display", "none");
-  // $("#mainInboundListen").css("display", "none");
-  // $("#mainInboundListenCollapse").css("display", "none");
-  // $("#mainLogin").css("display", "none");
-  // $("#mainLogout").css("display", "none");
 }
 
 function btnShowMainInbound() {
@@ -3212,20 +3077,6 @@ function btShowMainInboundListen() {
       $("#mainCourse").css("display", "block");
       $("#headCourse").css("display", "block");
       $("#menuApp").css("display", "none");
-
-      // $("#mainInboundListen").css("display", "block");
-      // $("#mainInboundListenCollapse").css("display", "none");
-      // $("#mainContent").css("display", "none");
-      // $("#mainOutbound").css("display", "none");
-      // $("#mainBusyCall").css("display", "none");
-      // $("#mainCollapseClickToCall").css("display", "none");
-      // $("#mainListContacts").css("display", "none");
-      // $("#mainListHistoryCall").css("display", "none");
-      // $("#mainListMissCall").css("display", "none");
-      // $("#mainInbound").css("display", "none");
-      // $("#mainInboundCollapse").css("display", "none");
-      // $("#mainLogin").css("display", "none");
-      // $("#mainLogout").css("display", "none");
     })
     .catch(function (error) {
       console.error("Error: Failed to open the app");
@@ -3419,17 +3270,11 @@ function showMainDialpad() {
   $("#timerInboundListen").text("");
   $("#timerInboundListenCollapse").text("");
 
-  $("#mainContent").css("display", "block");
-  $("#mainListContacts").css("display", "none");
-  $("#mainOutbound").css("display", "none");
-  $("#mainBusyCall").css("display", "none");
-  $("#mainCollapseClickToCall").css("display", "none");
-  $("#mainListHistoryCall").css("display", "none");
-  $("#mainListMissCall").css("display", "none");
-  $("#mainInbound").css("display", "none");
-  $("#mainInboundCollapse").css("display", "none");
-  $("#mainInboundListen").css("display", "none");
-  $("#mainInboundListenCollapse").css("display", "none");
+  openUI("mainContent");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "block");
+  renderNameSipExtension("#appTxtService");
 
   idContact = "";
   nameContact = "";
@@ -3441,19 +3286,6 @@ function showMainDialpad() {
   isMainActive = false;
   isMainContactActive = false;
   isMainOutbound = false;
-
-  const labelMainListHistoryCall = document.querySelector(
-    "#mainContent .appTxtService"
-  );
-  const dropdown = document.querySelector("#mainContent .dropdown--extend");
-
-  if (labelMainListHistoryCall && dropdown) {
-    labelMainListHistoryCall.textContent = appTxtService; // Thiết lập lại giá trị của label
-    labelMainListHistoryCall.style.display = "inline";
-    dropdown.style.display = "none";
-  } else {
-    console.error("Label or Dropdown element not found in mainListHistoryCall");
-  }
 }
 
 function renderListHistoryCall(listHisCall) {
@@ -3640,21 +3472,11 @@ function clickToMissCall(elem) {
   let sdt = $(elem).attr("attr-sdt");
   filteredContactSearch(sdt);
   resizeAppDefault();
-
-  $("#headCourse").css("display", "none");
-  $("#mainOutbound").css("display", "block");
-  $("#mainContent").css("display", "none");
-  $("#mainListContacts").css("display", "none");
-  $("#mainBusyCall").css("display", "none");
-  $("#mainCollapseClickToCall").css("display", "none");
-  $("#mainListHistoryCall").css("display", "none");
-  $("#mainListMissCall").css("display", "none");
-  $("#mainInbound").css("display", "none");
-  $("#mainInboundCollapse").css("display", "none");
-  $("#mainInboundListen").css("display", "none");
-  $("#mainInboundListenCollapse").css("display", "none");
-  $("#mainLogin").css("display", "none");
-  $("#mainLogout").css("display", "none");
+  openUI("mainContent");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "block");
+  renderNameSipExtension("#appTxtService");
 
   $("#appTxtNameContact").val(nameContact);
   $("#appTxtNameContact").text(nameContact);
