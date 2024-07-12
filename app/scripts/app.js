@@ -984,7 +984,6 @@ async function setUpdateCallAs7(value) {
   isUpdateCallAs7 = value;
 }
 
-
 // click start stop action button
 var input = document.testMic.savereportMic;
 async function mic(x) {
@@ -1015,13 +1014,14 @@ async function change(x) {
   x.classList.toggle("change");
   if (input.value === String(false)) {
     input.value = "true";
+    debugger;
     let call = webphone.calls[0];
     call.holdCall();
-
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
     input.value = "false";
+    debugger;
     let call = webphone.calls[0];
     call.retrieveCall();
 
@@ -1380,6 +1380,9 @@ function openApp() {
 
 function resetText() {
   // $("#appTxtService").text(appTxtService);
+  isLogger = false;
+  isLoading = false;
+  isMainShow = "";
   renderNameSipExtension("#appTxtService");
   // Clear text fields and innerText properties
   const textFields = [
@@ -1698,15 +1701,20 @@ async function filteredContactSearch(term) {
     const detail = data?.response ? JSON.parse(data?.response) : [];
     const filteredDataMobile = detail.filter((item) => item.mobile === term);
     const filteredDataPhone = detail.filter((item) => item.phone === term);
-    const matchedContact =
-      filteredDataMobile.length > 0
-        ? filteredDataMobile[0]
-        : filteredDataPhone[0];
+    if (data?.status === 200) {
+      const matchedContact =
+        filteredDataMobile.length > 0
+          ? filteredDataMobile[0]
+          : filteredDataPhone[0];
 
-    if (matchedContact) {
-      handleContactFound(matchedContact, detail);
+      if (matchedContact) {
+        handleContactFound(matchedContact, detail);
+      } else {
+        handleContactNotFound();
+      }
     } else {
-      handleContactNotFound();
+      existContact = false;
+      showNotify("danger", data?.response);
     }
   } catch (error) {
     existContact = false;
@@ -1749,12 +1757,21 @@ function handleContactFound(contact, detail) {
 
 function handleContactNotFound() {
   existContact = false;
-  $("#appTextPhone").css({
-    fontSize: "20px",
-    padding: "10px 0px",
-  });
+  // $("#appTextPhone").css({
+  //   fontSize: "20px",
+  //   padding: "10px 0px",
+  // });
 
-  nameContact = "";
+  // nameContact = "";
+  nameContact = `Unknown Contact - ${phoneNumberReceiver}`;
+  const contactElements = [
+    "appTxtNameContactInbound",
+    "appTxtNameContactInboundListen",
+    "appTxtNameContact",
+  ];
+  contactElements.forEach((elementId) => {
+    $("#" + elementId).text(nameContact);
+  });
   current_page = 1;
   renderListContactEmpty();
 }
@@ -1802,8 +1819,15 @@ function clickToCall() {
 
     let textElementPhone = document.getElementById("appTextPhone");
     isMainOutbound = true;
+    // openUI("mainOutbound");
+    // $("#mainCourse").css("display", "block");
+    // $("#headCourse").css("display", "block");
+    // $("#menuApp").css("display", "none");
+    // renderNameSipExtension("#appTxtService");
+
     $("#mainCourse").css("display", "block");
-    $("#headCourse").css("display", "none");
+    $("#headCourse").css("display", "block");
+    $("#menuApp").css("display", "none");
     $("#mainOutbound").css("display", "block");
 
     $("#mainConnect").css("display", "none");
@@ -1819,8 +1843,8 @@ function clickToCall() {
     $("#mainLogin").css("display", "none");
     $("#mainLogout").css("display", "none");
 
-    renderNameSipExtension("#appTxtServiceOutbound");
-    // $("#appTxtServiceOutbound").text(appTxtService);
+    renderNameSipExtension("#appTxtService");
+    // $("#appTxtService").text(appTxtService);
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
@@ -1832,7 +1856,6 @@ function clickToCall() {
     goToContact(data?.id);
 
     /**click to call as7*/
-    // startWebPhoneCall();
     let call = webphone?.calls[0];
     if (!call) {
       // click without an active call -> start a video call to number 23
@@ -2337,6 +2360,16 @@ function eventHandlecallDialpad() {
 
   if (existContact) {
     goToContact(idContact);
+  } else {
+    nameContact = `Unknown Contact - ${phoneNumberReceiver}`;
+    const contactElements = [
+      "appTxtNameContactInbound",
+      "appTxtNameContactInboundListen",
+      "appTxtNameContact",
+    ];
+    contactElements.forEach((elementId) => {
+      $("#" + elementId).text(nameContact);
+    });
   }
   isMainActive = true;
   /**click to call as7*/
@@ -3425,10 +3458,10 @@ function clickToMissCall(elem) {
   let sdt = $(elem).attr("attr-sdt");
   filteredContactSearch(sdt);
   resizeAppDefault();
-  openUI("mainContent");
+  openUI("mainOutbound");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
-  $("#menuApp").css("display", "block");
+  $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
 
   $("#appTxtNameContact").val(nameContact);
@@ -4222,6 +4255,7 @@ function showFormLogout() {
     isMainShow = "mainLogout";
     isTimeStarted = false;
     // terminate call and stop session
+    resetText();
     agent.stopApplicationSession();
   });
 }
