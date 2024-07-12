@@ -1254,6 +1254,8 @@ async function handleConnectedCall(call) {
   } else if (!isMainActive && !isInboundCall) {
     clearInterval(intervalInbound);
   }
+
+  $(".ac__calling button").prop("disabled", false);
 }
 
 // Handle call ended
@@ -1281,6 +1283,8 @@ async function handleCallEnded(call) {
     onAppDeactive();
     location.reload();
   }
+
+  $(".ac__calling button").prop("disabled", true);
 }
 
 // Utility function to update app text content
@@ -1380,6 +1384,7 @@ function openApp() {
 
 function resetText() {
   // $("#appTxtService").text(appTxtService);
+  $(".ac__calling button").prop("disabled", true);
   isLogger = false;
   isLoading = false;
   isMainShow = "";
@@ -3984,7 +3989,7 @@ async function submitLogin() {
             localStorage.setItem("userDevices", JSON.stringify(userDevices));
           }
 
-          openUI("mainContent");
+          openUI("mainOutbound");
           $("#mainCourse").css("display", "block");
           $("#headCourse").css("display", "block");
           $("#menuApp").css("display", "block");
@@ -4143,6 +4148,8 @@ $(document).ready(function () {
     isLogger = false;
     openUI("mainLogin");
   }
+
+  $(".ac__calling button").prop("disabled", true);
 
   $("#pbx_username").mouseleave(function () {
     if ($(this).val().match(matchEmail)) {
