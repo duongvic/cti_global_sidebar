@@ -983,23 +983,7 @@ var extDataSource = [
 async function setUpdateCallAs7(value) {
   isUpdateCallAs7 = value;
 }
-// Function to toggle mic and hold/unhold states
-// async function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
-//   debugger;
-//   x.classList.toggle(updateCallConfig ? "mic" : "change");
-//   input.value = input.value === "false" ? "true" : "false";
-//   let call = webphone?.calls[0];
 
-//   if (updateCallConfig) {
-//     debugger
-//     call.updateCall({ audio: input.value === "true" ? "false" : "true" });
-//   } else {
-//     input.value === "true" ? call.holdCall() : call.retrieveCall();
-//   }
-
-//   clearAllIntervals();
-//   await setUpdateCallAs7(true);
-// }
 
 // click start stop action button
 var input = document.testMic.savereportMic;
@@ -1010,9 +994,8 @@ async function mic(x) {
     input.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
-      audio: "muted",
+      audio: "false",
     });
-    debugger;
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
@@ -1021,7 +1004,6 @@ async function mic(x) {
     call.updateCall({
       audio: "true",
     });
-    debugger;
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   }
@@ -1032,7 +1014,6 @@ async function change(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
   if (input.value === String(false)) {
-    debugger;
     input.value = "true";
     let call = webphone.calls[0];
     call.holdCall();
@@ -1040,7 +1021,6 @@ async function change(x) {
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
-    debugger;
     input.value = "false";
     let call = webphone.calls[0];
     call.retrieveCall();
@@ -1058,7 +1038,7 @@ async function micInbound(x) {
     input.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
-      audio: "mute",
+      audio: "false",
     });
     // clearAllIntervals();
     await setUpdateCallAs7(true);
@@ -1100,33 +1080,6 @@ function clearAllIntervals() {
   clearInterval(intervalInbound);
   clearInterval(intervalInboundListenCollapse);
 }
-
-// Mic toggle functions
-// function mic(x) {
-//   debugger;
-//   toggleState(x, document.testMic.savereportMic, true, false);
-// }
-
-// function micInbound(x) {
-//   debugger;
-//   toggleState(x, document.testMicInbound.savereportMicInbound, true, false);
-// }
-
-// // Hold/Unhold toggle functions
-// function change(x) {
-//   debugger;
-//   toggleState(x, document.testHold_Unhold.savereportHold_Unhold, false, true);
-// }
-
-// function changeInbound(x) {
-//   debugger;
-//   toggleState(
-//     x,
-//     document.testInboundHold_Unhold.savereportInbound_Hold_Unhold,
-//     false,
-//     true
-//   );
-// }
 
 // Timer utility functions
 function convertSec(cnt) {

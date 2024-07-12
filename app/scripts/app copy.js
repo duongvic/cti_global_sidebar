@@ -893,20 +893,96 @@
 // });
 
 // //----Refactor 2 ---
-// // Function to toggle mic and hold/unhold states
-// function toggleState(x, input, updateCallConfig, holdOrRetrieveCall) {
-//   x.classList.toggle(updateCallConfig ? "mic" : "change");
-//   input.value = input.value === "false" ? "true" : "false";
-//   let call = webphone.calls[0];
-
-//   if (updateCallConfig) {
-//     call.updateCall({ audio: input.value === "true" ? "false" : "true" });
+// click start stop action button
+// var input = document.testMic.savereportMic;
+// async function mic(x) {
+//   isTimeStarted = true;
+//   x.classList.toggle("mic");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "false",
+//     });
+//     debugger;
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
 //   } else {
-//     input.value === "true" ? call.holdCall() : call.retrieveCall();
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "true",
+//     });
+//     debugger;
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
 //   }
+// }
 
-//   clearAllIntervals();
-//   isUpdateCallAs7 = true;
+// var input = document.testHold_Unhold.savereportHold_Unhold;
+// async function change(x) {
+//   isTimeStarted = true;
+//   x.classList.toggle("change");
+//   if (input.value === String(false)) {
+//     debugger;
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.holdCall();
+
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
+//   } else {
+//     debugger;
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.retrieveCall();
+
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
+//   }
+// }
+
+// var input = document.testMicInbound.savereportMicInbound;
+// async function micInbound(x) {
+//   isTimeStarted = true;
+//   x.classList.toggle("mic");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "false",
+//     });
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
+//   } else {
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.updateCall({
+//       audio: "true",
+//     });
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
+//   }
+// }
+// var input = document.testInboundHold_Unhold.savereportInbound_Hold_Unhold;
+// async function changeInbound(x) {
+//   isTimeStarted = true;
+//   x.classList.toggle("change");
+//   if (input.value === String(false)) {
+//     input.value = "true";
+//     let call = webphone.calls[0];
+//     call.holdCall();
+
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
+//   } else {
+//     input.value = "false";
+//     let call = webphone.calls[0];
+//     call.retrieveCall();
+
+//     // clearAllIntervals();
+//     await setUpdateCallAs7(true);
+//   }
 // }
 
 // // Clear all intervals
@@ -915,29 +991,6 @@
 //   clearInterval(intervalOutCollapse);
 //   clearInterval(intervalInbound);
 //   clearInterval(intervalInboundListenCollapse);
-// }
-
-// // Mic toggle functions
-// function mic(x) {
-//   toggleState(x, document.testMic.savereportMic, true, false);
-// }
-
-// function micInbound(x) {
-//   toggleState(x, document.testMicInbound.savereportMicInbound, true, false);
-// }
-
-// // Hold/Unhold toggle functions
-// function change(x) {
-//   toggleState(x, document.testHold_Unhold.savereportHold_Unhold, false, true);
-// }
-
-// function changeInbound(x) {
-//   toggleState(
-//     x,
-//     document.testInboundHold_Unhold.savereportInbound_Hold_Unhold,
-//     false,
-//     true
-//   );
 // }
 
 // // Timer utility functions
@@ -2599,7 +2652,7 @@
 //       return `<li>
 //       <div><p class="lb__character">${contact?.letter}</p></div>
 //         ${contact?.group?.map((item) => {
-//           return ` 
+//           return `
 //           <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
 //           <div class="comments-list">
 //             <div class="media flex-his">
@@ -2610,18 +2663,18 @@
 //                     item?.profiles?.avatar?.avatar_url != null
 //                       ? item?.profiles?.avatar?.avatar_url
 //                       : "./images/icon_profile.png"
-//                   }" 
+//                   }"
 //                     class="avatar-his-call" style="">
 //                 </div>
 //                 <div class="pull-right">
 //                   <fw-tooltip>
-//                     <a class="text-title-his-call" href="#" 
+//                     <a class="text-title-his-call" href="#"
 //                       attr-user-phone="${
 //                         item?.mobile ? item?.mobile : item?.phone
-//                       }" 
+//                       }"
 //                       attr-user-contact="${item?.name ? item?.name : "unknown"}"
 //                       attr-user-email = "${item?.email ? item?.email : ""}"
-//                       attr-user-id ="${item?.id ? item?.id : ""}" 
+//                       attr-user-id ="${item?.id ? item?.id : ""}"
 //                       onclick="clickContactCall(this)" >
 //                         ${item?.name}
 //                     </a>
@@ -2636,7 +2689,7 @@
 //                   </p>
 //                 </div>
 //               </div>
-//               <div class="his-body" style="text-align: right;" 
+//               <div class="his-body" style="text-align: right;"
 //                 attr-id-contact="${item?.id}"
 //                 onclick="redirectContactInfo(this)"
 //               >
@@ -3470,7 +3523,7 @@
 //                     item?.profiles?.avatar != null
 //                       ? item?.profiles?.avatar
 //                       : "./images/icon_profile.png"
-//                   }" 
+//                   }"
 //                     class="avatar-his-call" style="">
 //                 </div>
 //                 <div class="pull-right">
@@ -3483,7 +3536,7 @@
 //                   </p>
 //                 </div>
 //               </div>
-//               <div class="his-body" style="text-align: right;" 
+//               <div class="his-body" style="text-align: right;"
 //                 attr-sdt-inf="${item?.calling ? item.calling : item?.called}"
 //                 onclick="redirectContactInfoMissCall(this)"
 //               >
@@ -3653,7 +3706,7 @@
 //                     item?.profiles != undefined && item?.profiles.avatar != null
 //                       ? item?.profiles.avatar
 //                       : "./images/icon_profile.png"
-//                   }" 
+//                   }"
 //                     class="avatar-his-call" style="">
 //                 </div>
 //                 <div class="pull-right">
@@ -3680,7 +3733,7 @@
 //                   </p>
 //                 </div>
 //               </div>
-//               <div class="his-body" style="text-align: right;" 
+//               <div class="his-body" style="text-align: right;"
 //                 attr-sdt-inf="${item?.calling}"
 //                 onclick="redirectContactInfoMissCall(this)"
 //               >
