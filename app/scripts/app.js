@@ -1014,14 +1014,12 @@ async function change(x) {
   x.classList.toggle("change");
   if (input.value === String(false)) {
     input.value = "true";
-    debugger;
     let call = webphone.calls[0];
     call.holdCall();
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
     input.value = "false";
-    debugger;
     let call = webphone.calls[0];
     call.retrieveCall();
 
@@ -1241,7 +1239,6 @@ async function handleConnectedCall(call) {
   }
 
   if (isMainActive && isInboundCall) {
-    debugger;
     if (!isTimeStarted) {
       startTimeInbound();
       startTimeInboundListenCollapse();
@@ -1976,7 +1973,8 @@ async function init() {
 }
 
 function onAppActivate() {
-  resizeAppDefault();
+  openApp();
+  // resizeAppDefault();
   // openApp();
   client.data.get("loggedInUser").then(
     async function (data) {
@@ -2125,24 +2123,25 @@ function onAppActivate() {
       //   btnClose.addEventListener("fwClick", closeApp);
       // }
 
-      const btnClose1 = document.getElementById("btnClose1");
-      if (btnClose1) {
-        btnClose1.addEventListener("fwClick", closeApp);
-      }
+      // const btnClose1 = document.getElementById("btnClose1");
+      // if (btnClose1) {
+      //   btnClose1.addEventListener("fwClick", closeApp);
+      // }
 
-      const btnCloseHistoryCall = document.getElementById(
-        "btnCloseHistoryCall"
-      );
-      if (btnCloseHistoryCall) {
-        btnCloseHistoryCall.addEventListener("fwClick", closeApp);
-      }
+      // const btnCloseHistoryCall = document.getElementById(
+      //   "btnCloseHistoryCall"
+      // );
+      // if (btnCloseHistoryCall) {
+      //   btnCloseHistoryCall.addEventListener("fwClick", closeApp);
+      // }
 
-      const btnCloseHisMissCall = document.getElementById(
-        "btnCloseHisMissCall"
-      );
-      if (btnCloseHisMissCall) {
-        btnCloseHisMissCall.addEventListener("fwClick", closeApp);
-      }
+      // const btnCloseHisMissCall = document.getElementById(
+      //   "btnCloseHisMissCall"
+      // );
+      // if (btnCloseHisMissCall) {
+      //   btnCloseHisMissCall.addEventListener("fwClick", closeApp);
+      // }
+
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
       }
@@ -3039,7 +3038,6 @@ function viewMainInbound() {
   isMainInbound = true;
   isMainOutbound = false;
   isMainContactActive = false;
-  debugger;
   openUI("mainInbound");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
@@ -3414,7 +3412,7 @@ function renderListMissCall(arrListCall) {
 
       return `
       <li>
-        <div class="history-call" style="padding: 0 10px;">
+        <div class="histrory-call" style="padding-left: 10px;padding-right: 10px;">
           <div class="comments-list">
             <div class="media flex-his">
               <div class="flex-his">
@@ -3422,16 +3420,14 @@ function renderListMissCall(arrListCall) {
                   <img src="${avatarSrc}" class="avatar-his-call">
                 </div>
                 <div class="pull-right">
-                  <h4 class="text-title-his-call">
                     <fw-tooltip>
-                      <a href="#" style="color: red;" attr-sdt="${callingAttr}" onclick="clickToMissCall(this)">
+                      <a href="#" class="text-title-his-call" style="color: red;" attr-sdt="${callingAttr}" onclick="clickToMissCall(this)">
                         ${displayName}
                       </a>
                       <div slot="tooltip-content">
                         Click to call
                       </div>
                     </fw-tooltip>
-                  </h4>
                   <p>
                     <span><img src="./images/icon_miss_call.png"></span>
                     <span>${callTime}</span>
@@ -4115,7 +4111,6 @@ function fromCharCode() {
 }
 
 $("#btnClose").click(function () {
-  debugger;
   switch (isMainShow) {
     case "mainCollapseClickToCall":
       viewScreenCollapseClickToCall();
@@ -4180,6 +4175,10 @@ $(document).ready(function () {
       getContactData(current_page);
     }
   });
+
+  $(".tooltip.bs-tooltip-auto.fade.show").css({
+    "margin-left": "-1rem;",
+  });
 });
 
 // Add click event listeners to all elements with class 'lb-phone digit'
@@ -4190,7 +4189,6 @@ $(".lb-phone.digit").on("click", function () {
 
 // Function to append the digit to the input field
 function appendDigit(digit) {
-  debugger;
   const output = $("#output");
   output.val(output.val() + digit);
   checkPhone();

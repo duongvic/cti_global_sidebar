@@ -3,7 +3,7 @@
   /* width: 290px; */
   color: #fff;
   text-align: center;
-  height: 511px;
+  /* height: 511px; */
   /* border-radius: 20px; */
   /* padding: 10px 0 0 0; */
   border-bottom-right-radius: 3ch;
@@ -17,7 +17,7 @@
   clear: both;
   color: #fff;
   height: 45px;
-  border-bottom-left-radius: 3ch;
+  border-bottom-left-radius: 2ch;
 }
 
 .calling__inbound .hint:hover {
@@ -65,6 +65,8 @@
 
 .btn-bus__inbound {
   display: flex;
+  font-size: 14px;
+  padding-top: 10.5rem;
 }
 
 .calling__inbound .btn-default {
@@ -94,13 +96,14 @@
 .precall__inbound {
   border-radius: 0px 0px 20px 0px !important;
 }
+
 .calling__inbound .hint-green {
   background: #038821;
   border: 0;
   width: 100%;
   clear: both;
   color: #fff;
-  border-bottom-right-radius: 3ch;
+  border-bottom-right-radius: 2ch !important;
 }
 
 .timer-group__inbound {

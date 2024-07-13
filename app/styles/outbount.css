@@ -209,8 +209,9 @@
   clear: both;
   color: #fff;
   height: 52px;
-  border-bottom-left-radius: 3ch;
-  border-bottom-right-radius: 3ch;
+  border-bottom-left-radius: 2ch;
+  border-bottom-right-radius: 2ch;
+  font-size: 14px;
 }
 .precall {
   border-radius: 0px 0px 20px 0px !important;

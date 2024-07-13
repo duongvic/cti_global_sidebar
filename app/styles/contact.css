@@ -11,6 +11,7 @@
   /* margin: 6px; */
   background-color: #f0f3f6;
   border-radius: 20ch;
+  font-size: 13px;
 }
 .txt_search_contact::after {
   display: block;
