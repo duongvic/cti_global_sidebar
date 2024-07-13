@@ -3989,7 +3989,7 @@ async function submitLogin() {
             localStorage.setItem("userDevices", JSON.stringify(userDevices));
           }
 
-          openUI("mainOutbound");
+          openUI("mainContent");
           $("#mainCourse").css("display", "block");
           $("#headCourse").css("display", "block");
           $("#menuApp").css("display", "block");
