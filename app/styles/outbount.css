@@ -107,7 +107,7 @@
   height: 34px;
 } */
 
-.bar1,
+/* .bar1,
 .bar2,
 .bar3 {
   width: 7px;
@@ -128,7 +128,7 @@
 
 .change .bar2 {
   display: none;
-}
+} */
 .ac__calling .mic-un {
   display: none;
 }
@@ -289,8 +289,8 @@
 }
 .icon__calling {
   width: 30px;
-  margin-right: 10px;
 }
+
 .btn-bus {
   display: flex;
 }
@@ -547,7 +547,7 @@
   margin: 10px;
   color: white;
   border-radius: 4px;
- /* float: left; */
+  /* float: left; */
   cursor: pointer;
 }
 #calls .botrow {

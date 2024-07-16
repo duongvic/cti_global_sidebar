@@ -368,8 +368,8 @@
                   <input type="text" name="savereportMic" value="false" />
                 </form>
                 <button class="btn-mic" value="false" id="checkMic" disabled onclick="mic(this)">
-                  <i class="material-icons mic-un">&#xe02b;</i>
-                  <i class="material-icons mic-top">&#xe029;</i>
+                  <img class="mic-un" src="./images/icon_mic_top.svg" />
+                  <img class="mic-top" src="./images/icon_mic_un.svg" />
                 </button>
                 <!-- Mic - UnMic -->
 
@@ -382,10 +382,10 @@
                   <div class="bar2"></div>
                 </button>
                 <!-- Hold - UnHold -->
-                <button class="btn-ac" disabled>
-                  <img class="icon__calling" src="./images/Blind_Transfer.svg" onclick="showMainBlindTransfer()" />
+                <button class="btn-ac" disabled style="opacity: 0.2;" onclick="showMainBlindTransfer()">
+                  <img class="icon__calling" src="./images/Blind_Transfer.svg" />
                 </button>
-                <button class="btn-ac" disabled>
+                <button class="btn-ac" disabled style="opacity: 0.2;">
                   <img class="icon__calling" src="./images/Attend_Transfer.svg" />
                 </button>
               </div>
@@ -445,7 +445,7 @@
           </div>
         </div>
         <!--<div id="dynamicMainCollapseClickToCall"></div> -->
-        <div id="mainCollapseClickToCall" onclick="mainCollapseClickToCall()" class="city" style="display: block;">
+        <div id="mainCollapseClickToCall" onclick="mainCollapseClickToCall()" class="city">
           <div class="waiting__screen">
             <div class="col-6">
               <div class="timer-group">
@@ -560,36 +560,32 @@
             <div><img class="avatar" id="avatarContact" src="./images/avatar_none.png"></div>
             <div style="padding-top: 22%;">
               <div class="ac__calling">
-                <div class="ac__calling">
-                  <button class="btn-ac"><img class="icon__calling" src="./images/DialPad-InCall.svg" />
-                  </button>
-                  <!-- Mic - UnMic -->
-                  <form name="testMicInbound" method="post" style="display: none;">
-                    <input type="text" name="savereportMicInbound" value="false" />
-                  </form>
-                  <button class="btn-mic" value="false" id="checkMicInbound" onclick="micInbound(this)">
-                    <i class="material-icons mic-un">&#xe02b;</i>
-                    <i class="material-icons mic-top">&#xe029;</i>
-                  </button>
-                  <!-- Mic - UnMic -->
+                <button class="btn-ac"><img class="icon__calling" src="./images/DialPad-InCall.svg" />
+                </button>
+                <!-- Mic - UnMic -->
+                <form name="testMicInbound" method="post" style="display: none;">
+                  <input type="text" name="savereportMicInbound" value="false" />
+                </form>
+                <button class="btn-mic" value="false" id="checkMicInbound" onclick="micInbound(this)">
+                  <img class="mic-un" src="./images/icon_mic_top.svg" />
+                  <img class="mic-top" src="./images/icon_mic_un.svg" />
+                </button>
+                <!-- Mic - UnMic -->
 
-                  <!-- Hold - UnHold -->
-                  <form name="testInboundHold_Unhold" method="post" style="display: none;">
-                    <input type="text" name="savereportInbound_Hold_Unhold" value="false" />
-                  </form>
-                  <button class="btn-ac" value="false" id="checkHoldInbound" onclick="changeInbound(this)">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                  </button>
-                  <!-- Hold - UnHold -->
-                  <button class="btn-ac"><img class="icon__calling" src="./images/Blind_Transfer.svg" /></button>
-                  <button class="btn-ac"><img class="icon__calling" src="./images/Attend_Transfer.svg" /></button>
-                </div>
-                <!-- <div class="ct__calling"><span><img class="icon__calling" src="./images/DialPad-InCall.svg" /></span></div>
-                    <div class="ct__calling"><span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span></div>
-                    <div class="ct__calling"><span><img class="icon__calling" src="./images/pauseCall.png" /></span></div>
-                    <div class="ct__calling"><span><img class="icon__calling" src="./images/Attend_Transfer.svg" /></span></div>
-                    <div class="ct__calling"><span><img class="icon__calling" src="./images/Blind_Transfer.svg" /></span></div> -->
+                <!-- Hold - UnHold -->
+                <form name="testInboundHold_Unhold" method="post" style="display: none;">
+                  <input type="text" name="savereportInbound_Hold_Unhold" value="false" />
+                </form>
+                <button class="btn-ac" value="false" id="checkHoldInbound" onclick="changeInbound(this)">
+                  <div class="bar1"></div>
+                  <div class="bar2"></div>
+                </button>
+                <!-- Hold - UnHold -->
+                <button class="btn-ac" disabled style="opacity: 0.2;" onclick="showMainBlindTransfer()"><img
+                    class="icon__calling" src="./images/Blind_Transfer.svg" /></button>
+                <button class="btn-ac" disabled style="opacity: 0.2;">
+                  <img class="icon__calling" src="./images/Attend_Transfer.svg" />
+                </button>
               </div>
             </div>
             <button id="toggleEndCallInboundListen" onclick="endCallInboundListen()" class="hint"
@@ -767,9 +763,8 @@
                   <input type="text" name="savereportMic" value="false" />
                 </form>
                 <button class="btn-mic" value="false" id="checkMic" disabled onclick="mic(this)">
-                  <i class="material-icons mic-un">&#xe02b;</i>
-                  <i class="material-icons mic-top">&#xe029;</i>
-                  <!-- <span><img class="icon__calling" src="./images/Mic-InCall.svg" /></span> -->
+                  <img class="mic-un" src="./images/icon_mic_top.svg" />
+                  <img class="mic-top" src="./images/icon_mic_un.svg" />
                 </button>
                 <!-- Mic - UnMic -->
 

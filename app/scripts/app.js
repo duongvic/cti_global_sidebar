@@ -1314,18 +1314,8 @@ function viewMainBusy() {
   $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
   // $("#appTxtServiceBusyCall").text(appTxtService);
-
-  // $("#mainBusyCall").css("display", "block");
-  // $("#mainContent").css("display", "none");
-  // $("#mainOutbound").css("display", "none");
-  // $("#mainCollapseClickToCall").css("display", "none");
-  // $("#mainListContacts").css("display", "none");
-  // $("#mainListHistoryCall").css("display", "none");
-  // $("#mainInbound").css("display", "none");
-  // $("#mainInboundCollapse").css("display", "none");
-  // $("#mainInboundListen").css("display", "none");
-  // $("#mainInboundListenCollapse").css("display", "none");
 }
+
 // navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
 //   mediaDevices
 //     .filter(({ kind }) => kind == "audioinput")
@@ -1975,9 +1965,9 @@ async function init() {
 }
 
 function onAppActivate() {
-  openApp();
-  // resizeAppDefault();
   // openApp();
+  resizeAppDefault();
+
   client.data.get("loggedInUser").then(
     async function (data) {
       agent_ref = data?.loggedInUser?.availability?.agent_ref

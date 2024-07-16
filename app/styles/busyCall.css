@@ -77,11 +77,12 @@
 .precall {
   border-radius: 0px 0px 20px 0px !important;
 }
-.bar1,
+
+/* .bar1,
 .bar2,
 .bar3 {
-  width: 7px;
-  height: 22px;
+  width: 3px;
+  height: 18px;
   background-color: #aaa;
   margin: 3px 3px;
   transition: 0.4s;
@@ -91,14 +92,14 @@
   width: 0;
   background: none;
   height: 0;
-  border-top: 16px solid transparent;
+  border-top: 14px solid transparent;
   border-bottom: 10px solid transparent;
-  border-left: 19px solid #aaa;
+  border-left: 14px solid #aaa;
 }
 
 .change .bar2 {
   display: none;
-}
+} */
 
 .p10 {
   padding: 10px;
