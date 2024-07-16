@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interface Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      width: 250px;
+      background-color: #363636;
+      color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px auto;
+    }
+
+    .header {
+      padding: 10px;
+      background-color: #1a242f;
+      text-align: center;
+    }
+
+    .header .name {
+      font-size: 16px;
+    }
+
+    .header .number {
+      font-size: 14px;
+      color: #b0bec5;
+    }
+
+    .section {
+      padding: 10px;
+    }
+
+    .section h3 {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .transfer-controls {
+      display: flex;
+      gap: 15px;
+    }
+
+    .transfer-controls button {
+      /* flex: 1; */
+      padding: 8px;
+      background-color: #112123;
+      color: #118686;
+      border: none;
+      border-radius: 1ch;
+      cursor: pointer;
+    }
+
+    .transfer-controls button:active {
+      background-color: #2c3e50;
+    }
+
+    .tab-controls {
+      display: flex;
+      background-color: #2c3e50;
+      border-radius: 5px;
+      margin-top: 10px;
+
+    }
+
+    .tab-controls button {
+      flex: 1;
+      padding: 6px;
+      background-color: #2c3e50;
+      color: #7f8c8d;
+      border: none;
+      cursor: pointer;
+      border-radius: 1ch;
+
+    }
+
+    .tab-controls button.active {
+      background-color: #2979ff;
+      color: white;
+
+    }
+
+    .input-group {
+      display: flex;
+      margin-top: 10px;
+      border-radius: 20ch;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 5px 0 0 5px;
+      background-color: #434343;
+      color: white;
+      outline: none;
+      width: 95%;
+    }
+
+    .input-group button {
+      padding: 8px;
+      border: none;
+      border-radius: 0 5px 5px 0;
+      background-color: #595959;
+      color: #7f8c8d;
+      cursor: pointer;
+    }
+
+    .input-group button:hover {
+      background-color: #34495e;
+      color: white;
+    }
+
+
+    .list {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    .list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    /* .list::-webkit-scrollbar-track {
+      background-color: #434343;
+    } */
+
+    .list::-webkit-scrollbar-thumb {
+      background-color: #8C8C8C;
+      border: 1px solid rgb(92 92 92 / 0%);
+      border-radius: 10px;
+    }
+
+    .list .item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid #34495e;
+    }
+
+    .list .item:hover {
+      background-color: #3a4d61;
+    }
+
+    .list .item .icon {
+      margin-right: 10px;
+    }
+
+    .list .item .number {
+      flex: 1;
+    }
+
+    .footer {
+      padding: 10px;
+      background-color: #e74c3c;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background-color: #2c3e50;
+      border-top: 1px solid #34495e;
+    }
+
+    .button-group button {
+      background-color: #2c3e50;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .button-group button:hover {
+      color: #bdc3c7;
+    }
+
+    .p-blind {
+      margin-block-start: 3px;
+      margin-block-end: 9px;
+      line-height: 22px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="mainBlindTransfer" class="city">
+    <div class="container">
+      <div class="header">
+        <div class="name">SST-QC05 • 1100</div>
+      </div>
+      <div class="section">
+        <p class="p-blind">Blind Transfer</p>
+        <div class="transfer-controls">
+          <button>Anh Phương</button>
+          <button>SST-QC05 • 1000</button>
+        </div>
+
+        <div class="input-group">
+          <input type="text" placeholder="Search">
+          <button>Transfer</button>
+        </div>
+        <div class="tab-controls">
+          <button class="active">Extension</button>
+          <button>Contact</button>
+        </div>
+      </div>
+      <div class="list">
+        <div class="item">
+          <div class="icon">📞</div>
+          <div class="number">SST-QC05 • 1000</div>
+        </div>
+        <div class="item">
+          <div class="icon">📞</div>
+          <div class="number">SST-QC05 • 1200</div>
+        </div>
+        <div class="item">
+          <div class="icon">📞</div>
+          <div class="number">SST-QC05 • 1300</div>
+        </div>
+        <div class="item">
+          <div class="icon">📞</div>
+          <div class="number">SST-QC05 • 1400</div>
+        </div>
+        <div class="item">
+          <div class="icon">📞</div>
+          <div class="number">SST-QC05 • 1500</div>
+        </div>
+      </div>
+      <div class="button-group">
+        <button>⠿</button>
+        <button>🎤</button>
+        <button>⏸</button>
+        <button>➡️</button>
+        <button>🔀</button>
+      </div>
+      <div class="footer">End Call</div>
+    </div>
+  </div>
+</body>
+
+</html>

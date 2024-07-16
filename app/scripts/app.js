@@ -9,6 +9,7 @@ let sip = "";
 let isLogger = false;
 let actionDesktopEndCall = false;
 
+let idAgentFrsdesk = "";
 let idTicket = null;
 let idContact = "";
 let nameContact = "";
@@ -1014,14 +1015,12 @@ async function change(x) {
   x.classList.toggle("change");
   if (input.value === String(false)) {
     input.value = "true";
-    debugger;
     let call = webphone.calls[0];
     call.holdCall();
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
     input.value = "false";
-    debugger;
     let call = webphone.calls[0];
     call.retrieveCall();
 
@@ -1186,7 +1185,7 @@ function isBusyCause(event) {
 // Handle busy call scenario
 function handleBusyCall(event) {
   console.log("Call is busy:", event?.content?.cause);
-  isMainShow = "busycall";
+  isMainShow = "mainBusyCall";
   const phoneNumber = phoneNumberReceiver;
   const contactName = nameContact || phoneNumberReceiver;
 
@@ -1268,7 +1267,7 @@ async function handleCallEnded(call) {
     await insertIdTicketAs7(idTicket);
   }
   stop();
-  if (isMainShow !== "busycall") {
+  if (isMainShow !== "mainBusyCall") {
     openUI("mainContent");
     $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "block");
@@ -1308,7 +1307,7 @@ async function getUserData() {
 }
 
 function viewMainBusy() {
-  isMainShow == "mainBusyCall";
+  // isMainShow == "mainBusyCall";
   openUI("mainBusyCall");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
@@ -1976,7 +1975,8 @@ async function init() {
 }
 
 function onAppActivate() {
-  resizeAppDefault();
+  openApp();
+  // resizeAppDefault();
   // openApp();
   client.data.get("loggedInUser").then(
     async function (data) {
@@ -1998,6 +1998,9 @@ function onAppActivate() {
         ? data?.loggedInUser?.contact?.email
         : undefined;
 
+      idAgentFrsdesk = data?.loggedInUser?.contact?.id
+        ? data?.loggedInUser?.contact?.id
+        : "";
       // const iparams = await getIparamsFreshdesk();
       // const nameDomain = await getDomainName();
 
@@ -2125,24 +2128,24 @@ function onAppActivate() {
       //   btnClose.addEventListener("fwClick", closeApp);
       // }
 
-      const btnClose1 = document.getElementById("btnClose1");
-      if (btnClose1) {
-        btnClose1.addEventListener("fwClick", closeApp);
-      }
+      // const btnClose1 = document.getElementById("btnClose1");
+      // if (btnClose1) {
+      //   btnClose1.addEventListener("fwClick", closeApp);
+      // }
 
-      const btnCloseHistoryCall = document.getElementById(
-        "btnCloseHistoryCall"
-      );
-      if (btnCloseHistoryCall) {
-        btnCloseHistoryCall.addEventListener("fwClick", closeApp);
-      }
+      // const btnCloseHistoryCall = document.getElementById(
+      //   "btnCloseHistoryCall"
+      // );
+      // if (btnCloseHistoryCall) {
+      //   btnCloseHistoryCall.addEventListener("fwClick", closeApp);
+      // }
 
-      const btnCloseHisMissCall = document.getElementById(
-        "btnCloseHisMissCall"
-      );
-      if (btnCloseHisMissCall) {
-        btnCloseHisMissCall.addEventListener("fwClick", closeApp);
-      }
+      // const btnCloseHisMissCall = document.getElementById(
+      //   "btnCloseHisMissCall"
+      // );
+      // if (btnCloseHisMissCall) {
+      //   btnCloseHisMissCall.addEventListener("fwClick", closeApp);
+      // }
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
       }
@@ -3195,7 +3198,7 @@ async function insertIdTicketAs7(idTicket) {
     const url = "https://pbx-stg.oncallcx.vn/rest/service/accountCode?"
       .concat(`terminalId=${userTerminals[0].id}`)
       .concat(`&accountCode=${idTicket}`)
-      .concat(`&accountName=${idContact}`);
+      .concat(`&accountName=${idAgentFrsdesk}`);
     try {
       const response = await fetch(url, requestOptions);
       if (response.status === 200) {
@@ -3579,7 +3582,12 @@ function preCall() {
   const phone_again = document.getElementById("appTextPhoneBusyCall").value;
   phoneNumberReceiver = phone_again;
   openUI("mainOutbound");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "none");
+  renderNameSipExtension("#appTxtService");
 
+  isMainShow = "mainOutbound";
   // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (!call) {
@@ -3888,7 +3896,7 @@ async function renderNameSipExtension(id_app_txt_service) {
     if (userAs7 && userDevices) {
       if ($(`${id_app_txt_service}`).length) {
         $(`${id_app_txt_service}`).text(
-          `${userAs7?.fullName} . ${userDevices[0]?.number}`
+          `${userAs7?.fullName} • ${userDevices[0]?.number}`
         );
       } else {
         $(`${id_app_txt_service}`).text("");
@@ -4115,7 +4123,6 @@ function fromCharCode() {
 }
 
 $("#btnClose").click(function () {
-  debugger;
   switch (isMainShow) {
     case "mainCollapseClickToCall":
       viewScreenCollapseClickToCall();
@@ -4288,3 +4295,15 @@ function submitLogout() {
     // $("#pbx_code").val("");
   });
 }
+
+function showMainBlindTransfer() {
+  openUI("mainBlindTransfer");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "none");
+  renderNameSipExtension("#appTxtService");
+}
+
+$("#endCallBlindTrasfer").on("click", function () {
+  toggleEndCall();
+});

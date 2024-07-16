@@ -19,7 +19,12 @@
 
   <div class="calling">
     <p class="text-algin" style="padding-top: 9%; padding-bottom: 3rem">
-      Outbound Call...
+      Outbound Call
+      <span class="ball-loader">
+        <span class="ball-loader-ball ball1"></span>
+        <span class="ball-loader-ball ball2"></span>
+        <span class="ball-loader-ball ball3"></span>
+      </span>
     </p>
 
     <h4><span id="appTxtNameContact"></span></h4>
@@ -67,12 +72,7 @@
         </button>
       </div>
     </div>
-    <button
-      id="toggleEndCall"
-      onclick="toggleEndCall()"
-      class="hint"
-      type="button"
-    >
+    <button id="toggleEndCall" onclick="toggleEndCall()" class="hint" type="button">
       <span><img class="icon__calling" src="./images/end_call.png" /></span>
       End call
     </button>
