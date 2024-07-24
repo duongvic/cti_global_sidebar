@@ -1386,7 +1386,7 @@ function openApp() {
 function resetText() {
   // $("#appTxtService").text(appTxtService);
   // $(".ac__calling button").prop("disabled", true);
-  isLogger = false;
+  // isLogger = false;
   isLoading = false;
   isMainShow = "";
   renderNameSipExtension("#appTxtService");
@@ -1755,10 +1755,14 @@ function handleContactFound(contact, detail) {
   getContactById(contact.id);
   goToContact(idContact);
 
-  const email_contact = emailContact;
-  console.log("email_contact contact", email_contact);
-  const transformedItems = transformerItems(detail);
-  renderListContact(transformedItems?.data || []);
+  // const email_contact = emailContact;
+  // console.log("email_contact contact", email_contact);
+  const a = $("#search_contact").val();
+  if (isMainContactActive && a != "") {
+    const transformedItems = transformerItems(detail);
+
+    renderListContact(transformedItems?.data || []);
+  }
 }
 
 function handleContactNotFound(val_phone) {
@@ -1798,7 +1802,8 @@ async function getContactById(id_contact) {
       nameContact = detail.name;
       $("#appTxtNameContact").text(nameContact);
 
-      const avatarUrl = detail?.avatar?.avatar_url ?? "./images/icon_profile.png";
+      const avatarUrl =
+        detail?.avatar?.avatar_url ?? "./images/icon_profile.png";
 
       // avtarContact = detail?.avatar?.avatar_url;
       document.getElementById("avatarContact").src = avatarUrl;
@@ -2245,6 +2250,16 @@ function eventHandlecallDialpad() {
 }
 
 function showContact() {
+  openUI("mainListContacts");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "block");
+  renderNameSipExtension("#appTxtService");
+  $("#output").val("");
+  $("#search_contact").val("");
+
+  listContacts = [];
+
   isMainContactActive = true;
   isMainInbound = false;
   isMainOutbound = false;
@@ -2273,19 +2288,17 @@ function showContact() {
   </svg>`;
   $("#btnMissCall").html(olSvgMissCall);
 
-  document.getElementById("output").innerText = "";
-
-  $("#mainListContacts").css("display", "block");
-  $("#mainContent").css("display", "none");
-  $("#mainOutbound").css("display", "none");
-  $("#mainBusyCall").css("display", "none");
-  $("#mainCollapseClickToCall").css("display", "none");
-  $("#mainListHistoryCall").css("display", "none");
-  $("#mainListMissCall").css("display", "none");
-  $("#mainInbound").css("display", "none");
-  $("#mainInboundCollapse").css("display", "none");
-  $("#mainInboundListen").css("display", "none");
-  $("#mainInboundListenCollapse").css("display", "none");
+  // $("#mainListContacts").css("display", "block");
+  // $("#mainContent").css("display", "none");
+  // $("#mainOutbound").css("display", "none");
+  // $("#mainBusyCall").css("display", "none");
+  // $("#mainCollapseClickToCall").css("display", "none");
+  // $("#mainListHistoryCall").css("display", "none");
+  // $("#mainListMissCall").css("display", "none");
+  // $("#mainInbound").css("display", "none");
+  // $("#mainInboundCollapse").css("display", "none");
+  // $("#mainInboundListen").css("display", "none");
+  // $("#mainInboundListenCollapse").css("display", "none");
 
   current_page = 1;
   getContactData(current_page);
@@ -2441,9 +2454,6 @@ function clickContactCall(elem) {
 function redirectContactInfo(elem) {
   let contactId = $(elem).attr("attr-id-contact");
   isMainContactActive = true;
-  console.log("isMainContactActive", isMainContactActive);
-  console.log(contactId);
-  // isMainActive = true;
   client.interface
     .trigger("click", { id: "contact", value: contactId })
     .then(function (data) {
@@ -2457,6 +2467,12 @@ function redirectContactInfo(elem) {
 }
 
 function loadMoreItemsContact() {
+  const txtSearch = $("#search_contact").val();
+  if (txtSearch !== "") {
+    $("#search_contact").val("");
+    $("#loadMoreTxt").text("Load more");
+  }
+
   if (!isLoading) {
     isLoading = true;
 
@@ -2510,6 +2526,8 @@ async function showHistoryCall() {
   renderNameSipExtension("#appTxtService");
   $("#output").val("");
 
+  renderListContactEmpty();
+
   var newSvgHisCall = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M12.0647 7.57292H13.7076V12.2604L17.558 14.6042L16.7366 15.9583L12.0647 13.0938V7.57292ZM6.16071 4.91667C8.11161 2.97222 10.439 2 13.1429 2C15.8467 2 18.157 2.97222 20.0737 4.91667C22.0246 6.86111 23 9.22222 23 12C23 14.7778 22.0246 17.1389 20.0737 19.0833C18.157 21.0278 15.8467 22 13.1429 22C12.0134 22 10.7641 21.7222 9.39509 21.1667C8.06027 20.5764 6.99926 19.8819 6.21205 19.0833L7.75223 17.4688C9.25818 18.9965 11.0551 19.7604 13.1429 19.7604C15.2649 19.7604 17.0789 19.0139 18.5848 17.5208C20.0908 15.9931 20.8438 14.1528 20.8438 12C20.8438 9.84722 20.0908 8.02431 18.5848 6.53125C17.0789 5.00347 15.2649 4.23958 13.1429 4.23958C11.0208 4.23958 9.20685 5.00347 7.70089 6.53125C6.22917 8.02431 5.4933 9.84722 5.4933 12H8.77902L4.36384 16.4792L4.26116 16.3229L0 12H3.28571C3.28571 9.22222 4.24405 6.86111 6.16071 4.91667Z" fill="white"></path>
@@ -2551,7 +2569,6 @@ async function showHistoryCall() {
     await displayItemsHisCall(getItemsForCurrentPageHisCall());
   }
 
-  renderNameSipExtension("#appTxtService");
   console.log("listHisCall", listHisCall);
   // });
 }
@@ -2563,6 +2580,7 @@ async function showMissCall() {
   $("#menuApp").css("display", "block");
   renderNameSipExtension("#appTxtService");
   $("#output").val("");
+  renderListContactEmpty();
 
   var oldSvgDialap = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2691,6 +2709,7 @@ async function searchContactKeyword(term) {
     });
     let detail = data?.response ? JSON.parse(data?.response) : [];
     if (detail?.length > 0) {
+      $("#loadMoreTxt").text("Reset");
       existContact = true;
       const transformedItems = transformerItems(detail);
       return renderListContact(
@@ -2700,7 +2719,7 @@ async function searchContactKeyword(term) {
       existContact = false;
       nameContact = "";
       current_page = 1;
-      renderListContactEmpty;
+      renderListContactEmpty();
     }
   } catch (error) {
     existContact = false;
@@ -3042,34 +3061,38 @@ function showMainDialpad() {
   </svg>`;
   $("#btnContact").html(oldSvgContact);
 
-  $("#callEnter").attr("disabled", true);
-  $("#callEnter").css({ backgroundColor: "darkgray" });
-
-  $("#output").text("");
-  $("#appTextPhone1").text("Correct");
-  $("#appTextPhone1").attr("class", "correct__number__phone");
-
-  stop();
-
-  $("#timerInboundListen").text("");
-  $("#timerInboundListenCollapse").text("");
-
   openUI("mainContent");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "block");
   renderNameSipExtension("#appTxtService");
 
-  idContact = "";
-  nameContact = "";
-  phoneNumberReceiver = "";
-  emailContact = "";
+  resetText();
 
-  isInboundCall = false;
-  existContact = false;
-  isMainActive = false;
-  isMainContactActive = false;
-  isMainOutbound = false;
+  renderListContactEmpty();
+  // $("#callEnter").attr("disabled", true);
+  // $("#callEnter").css({ backgroundColor: "darkgray" });
+
+  // $("#output").val("");
+  // $("#output").text("");
+  // $("#appTextPhone1").text("Correct");
+  // $("#appTextPhone1").attr("class", "correct__number__phone");
+
+  // stop();
+
+  // $("#timerInboundListen").text("");
+  // $("#timerInboundListenCollapse").text("");
+
+  // idContact = "";
+  // nameContact = "";
+  // phoneNumberReceiver = "";
+  // emailContact = "";
+
+  // isInboundCall = false;
+  // existContact = false;
+  // isMainActive = false;
+  // isMainContactActive = false;
+  // isMainOutbound = false;
 }
 
 function renderListHistoryCall(listHisCall) {
@@ -3729,12 +3752,10 @@ async function submitLogin() {
           JSON.stringify(passLogin),
           "encryptAsFsk"
         ).toString();
-        console.log("ciphertext message: ", ciphertext);
 
         // Decrypt
         var bytes = CryptoJS.AES.decrypt(ciphertext, "encryptAsFsk");
         var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        console.log("Decrypted data: ", decryptedData);
 
         const userInfAs7 = resultUserAs7?.users?.map((item) => {
           return {
@@ -4053,6 +4074,7 @@ function showFormLogout() {
     resetText();
     agent.stopApplicationSession();
     localStorage.clear();
+    isLogger = false;
   });
 }
 
