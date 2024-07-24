@@ -1512,6 +1512,18 @@ function transformerItems(listItem) {
       resultData.data.push(letterMap[letter]);
     }
   });
+  if (resultData?.data?.length > 0) {
+    resultData?.data?.sort((a, b) => {
+      if (a.letter < b.letter) {
+        return -1;
+      }
+      if (a.letter > b.letter) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  debugger;
   return resultData;
 }
 
