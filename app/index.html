@@ -382,10 +382,10 @@
                   <div class="bar2"></div>
                 </button>
                 <!-- Hold - UnHold -->
-                <button class="btn-ac" disabled style="opacity: 0.2;" onclick="showMainBlindTransfer()">
+                <button class="btn-ac" style="opacity: 0.2;" disabled  onclick="showMainBlindTransfer()">
                   <img class="icon__calling" src="./images/Blind_Transfer.svg" />
                 </button>
-                <button class="btn-ac" disabled style="opacity: 0.2;">
+                <button class="btn-ac" style="opacity: 0.2;" disabled>
                   <img class="icon__calling" src="./images/Attend_Transfer.svg" />
                 </button>
               </div>
@@ -581,9 +581,9 @@
                   <div class="bar2"></div>
                 </button>
                 <!-- Hold - UnHold -->
-                <button class="btn-ac" disabled style="opacity: 0.2;" onclick="showMainBlindTransfer()"><img
+                <button class="btn-ac" style="opacity: 0.2;" disabled onclick="showMainBlindTransfer()"><img
                     class="icon__calling" src="./images/Blind_Transfer.svg" /></button>
-                <button class="btn-ac" disabled style="opacity: 0.2;">
+                <button class="btn-ac" style="opacity: 0.2;" disabled>
                   <img class="icon__calling" src="./images/Attend_Transfer.svg" />
                 </button>
               </div>
@@ -720,37 +720,19 @@
                 <button>Contact</button>
               </div>
             </div>
-            <div class="list-blind-transfer">
-              <div class="item">
+            <div class="list-blind-transfer" id="list-blind-transfer">
+              <!-- <div class="item">
                 <div class="icon"><img src="./images/avatar_default.svg" /></div>
-                <div class="number">SST-QC05 • 1000</div>
+                <div class="number">An Nguyen • 1217</div>
                 <div class="icon"> <img class="icon__blind__transfer" src="./images/Blind_Transfer.svg"
-                    onclick="showMainBlindTransfer()" /></div>
+                    onclick="transferCall('1217')" /></div>
               </div>
               <div class="item">
                 <div class="icon"><img src="./images/avatar_default.svg" /></div>
-                <div class="number">SST-QC05 • 1200</div>
+                <div class="number">Phú EXT • 1219</div>
                 <div class="icon"> <img class="icon__blind__transfer" src="./images/Blind_Transfer.svg"
-                    onclick="showMainBlindTransfer()" /></div>
-              </div>
-              <div class="item">
-                <div class="icon"><img src="./images/avatar_default.svg" /></div>
-                <div class="number">SST-QC05 • 1300</div>
-                <div class="icon"> <img class="icon__blind__transfer" src="./images/Blind_Transfer.svg"
-                    onclick="showMainBlindTransfer()" /></div>
-              </div>
-              <div class="item">
-                <div class="icon"><img src="./images/avatar_default.svg" /></div>
-                <div class="number">SST-QC05 • 1400</div>
-                <div class="icon"> <img class="icon__blind__transfer" src="./images/Blind_Transfer.svg"
-                    onclick="showMainBlindTransfer()" /></div>
-              </div>
-              <div class="item">
-                <div class="icon"><img src="./images/avatar_default.svg" /></div>
-                <div class="number">SST-QC05 • 1500</div>
-                <div class="icon"> <img class="icon__blind__transfer" src="./images/Blind_Transfer.svg"
-                    onclick="showMainBlindTransfer()" /></div>
-              </div>
+                    onclick="transferCall('1219')" /></div>
+              </div> -->
             </div>
             <div style="padding-top: 0%; background-color: #2c3e50; border-top: 1px solid #34495e;">
               <div class="ac__calling">
@@ -777,10 +759,10 @@
                   <div class="bar2"></div>
                 </button>
                 <!-- Hold - UnHold -->
-                <button class="btn-ac" disabled>
+                <button class="btn-ac" style="opacity: 0.2;" disabled>
                   <img class="icon__calling" src="./images/Blind_Transfer.svg" onclick="showMainBlindTransfer()" />
                 </button>
-                <button class="btn-ac" disabled>
+                <button class="btn-ac" style="opacity: 0.2;" disabled>
                   <img class="icon__calling" src="./images/Attend_Transfer.svg" />
                 </button>
               </div>

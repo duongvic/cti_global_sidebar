@@ -909,6 +909,17 @@ agent.on("applicationsessionstarted", () => {
       userTerminals && userTerminals[0]?.term
     }`
   );
+
+  // get active forwardings
+  webphone?.getForwarding().then((response) => {
+    response.forwardingList.forEach((entry) => {
+      const fwd = entry.forwardingListItem;
+      if (fwd.forwardStatus) {
+        console.log(`active ${fwd.forwardingType} to number ${fwd.forwardDN}`);
+      }
+    });
+  });
+
   console.log("webphone", webphone);
   // tell server that we want to use WebRTC (error handling omitted)
   webphone.monitorStart({ rtc: true });
@@ -938,6 +949,9 @@ agent.on("call", async (event) => {
       handleBusyCall(event);
       return;
     }
+    // else if (isTransferCause(event)) {
+    //   $("#transferingTo").css("display", "block");
+    // }
 
     await handleLocalConnectionInfo(event);
   } catch (error) {
@@ -1146,7 +1160,6 @@ let interval,
 async function handleLocalConnectionInfo(event) {
   const call = event.call;
   const localConnectionInfo = call.localConnectionInfo;
-
   switch (localConnectionInfo) {
     case "alerting":
       await handleInboundAlertingCall(call);
@@ -1176,6 +1189,10 @@ async function handleCallHold(call) {
   console.log(`Holding call to ${call.number}`);
   await setUpdateCallAs7(true);
 }
+// Check if the call is transfer
+function isTransferCause(event) {
+  return event?.content?.cause === "redirected";
+}
 
 // Check if the call is busy
 function isBusyCause(event) {
@@ -1186,11 +1203,6 @@ function isBusyCause(event) {
 function handleBusyCall(event) {
   console.log("Call is busy:", event?.content?.cause);
   isMainShow = "mainBusyCall";
-  const phoneNumber = phoneNumberReceiver;
-  const contactName = nameContact || phoneNumberReceiver;
-
-  updateAppText("appTextPhoneBusyCall", phoneNumber);
-  updateAppText("appTxtNameContactBusyCall", contactName, { color: "#3b3b3b" });
 
   resizeAppDefault();
   viewMainBusy();
@@ -1200,16 +1212,16 @@ function handleBusyCall(event) {
 async function handleInboundAlertingCall(call) {
   isInboundCall = true;
   resizeAppDefault();
-  viewMainInbound();
   await showSoftphone();
+  viewMainInbound();
 
   console.log(`Inbound call from ${call.number} ${call.name}`);
-  console.log("Alerting");
+  console.log("handleInboundAlertingCall", call);
 
-  const userData = await getUserData();
-  const phone = userData?.contact?.phone || userData?.contact?.mobile || null;
+  // const userData = await getUserData();
+  // const phone = userData?.contact?.phone || userData?.contact?.mobile || null;
 
-  window.userPhone = phone;
+  // window.userPhone = phone;
 
   await filteredContactSearch(call?.number);
 
@@ -1226,7 +1238,6 @@ async function handleInboundAlertingCall(call) {
 async function handleConnectedCall(call) {
   console.log(`Connected to ${call.number}`);
   console.log("Connected to screen:", isMainActive);
-
   if (!isInboundCall) {
     if (!isTimeStarted) {
       start();
@@ -1240,7 +1251,6 @@ async function handleConnectedCall(call) {
   }
 
   if (isMainActive && isInboundCall) {
-    debugger;
     if (!isTimeStarted) {
       startTimeInbound();
       startTimeInboundListenCollapse();
@@ -1272,18 +1282,13 @@ async function handleCallEnded(call) {
     $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "block");
     $("#menuApp").css("display", "block");
-    // $("#mainConnect").css("display", "none");
-    // $("#mainContent").css("display", "block");
-    // $("#headCourse").css("display", "block");
-    // $("#mainOutbound").css("display", "none");
-    // $("#mainCollapseClickToCall").css("display", "none");
 
     resetText();
     onAppDeactive();
     location.reload();
   }
 
-  $(".ac__calling button").prop("disabled", true);
+  // $(".ac__calling button").prop("disabled", true);
 }
 
 // Utility function to update app text content
@@ -1313,6 +1318,13 @@ function viewMainBusy() {
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
+
+  const phoneNumber = phoneNumberReceiver;
+  const contactName = nameContact || phoneNumberReceiver;
+
+  updateAppText("appTextPhoneBusyCall", phoneNumber);
+  updateAppText("appTxtNameContactBusyCall", contactName, { color: "#fff" });
+
   // $("#appTxtServiceBusyCall").text(appTxtService);
 }
 
@@ -1373,7 +1385,7 @@ function openApp() {
 
 function resetText() {
   // $("#appTxtService").text(appTxtService);
-  $(".ac__calling button").prop("disabled", true);
+  // $(".ac__calling button").prop("disabled", true);
   isLogger = false;
   isLoading = false;
   isMainShow = "";
@@ -1704,7 +1716,7 @@ async function filteredContactSearch(term) {
       if (matchedContact) {
         handleContactFound(matchedContact, detail);
       } else {
-        handleContactNotFound();
+        handleContactNotFound(term);
       }
     } else {
       existContact = false;
@@ -1749,7 +1761,7 @@ function handleContactFound(contact, detail) {
   renderListContact(transformedItems?.data || []);
 }
 
-function handleContactNotFound() {
+function handleContactNotFound(val_phone) {
   existContact = false;
   // $("#appTextPhone").css({
   //   fontSize: "20px",
@@ -1757,7 +1769,7 @@ function handleContactNotFound() {
   // });
 
   // nameContact = "";
-  nameContact = `Unknown Contact - ${phoneNumberReceiver}`;
+  nameContact = `Unknown Contact`.concat(" - ").concat(`${val_phone}`);
   const contactElements = [
     "appTxtNameContactInbound",
     "appTxtNameContactInboundListen",
@@ -1786,8 +1798,10 @@ async function getContactById(id_contact) {
       nameContact = detail.name;
       $("#appTxtNameContact").text(nameContact);
 
-      avtarContact = detail?.avatar?.avatar_url;
-      document.getElementById("avatarContact").src = avtarContact;
+      const avatarUrl = detail?.avatar?.avatar_url ?? "./images/icon_profile.png";
+
+      // avtarContact = detail?.avatar?.avatar_url;
+      document.getElementById("avatarContact").src = avatarUrl;
     } else {
       existContact = false;
       nameContact = "";
@@ -1806,39 +1820,19 @@ async function getContactById(id_contact) {
 /**
  * To listen to click event for phone numbers in the Freshdesk pages and use the clicked phone number
  */
+
 function clickToCall() {
-  console.log("clickToCall appTxtService", appTxtService);
+  //   console.log("clickToCall appTxtService", appTxtService);
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
 
     let textElementPhone = document.getElementById("appTextPhone");
     isMainOutbound = true;
-    // openUI("mainOutbound");
-    // $("#mainCourse").css("display", "block");
-    // $("#headCourse").css("display", "block");
-    // $("#menuApp").css("display", "none");
-    // renderNameSipExtension("#appTxtService");
-
+    openUI("mainOutbound");
     $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "block");
     $("#menuApp").css("display", "none");
-    $("#mainOutbound").css("display", "block");
-
-    $("#mainConnect").css("display", "none");
-    $("#mainContent").css("display", "none");
-    $("#mainBusyCall").css("display", "none");
-    $("#mainCollapseClickToCall").css("display", "none");
-    $("#mainListContacts").css("display", "none");
-    $("#mainListHistoryCall").css("display", "none");
-    $("#mainInbound").css("display", "none");
-    $("#mainInboundCollapse").css("display", "none");
-    $("#mainInboundListen").css("display", "none");
-    $("#mainInboundListenCollapse").css("display", "none");
-    $("#mainLogin").css("display", "none");
-    $("#mainLogout").css("display", "none");
-
     renderNameSipExtension("#appTxtService");
-    // $("#appTxtService").text(appTxtService);
 
     var data = event.helper.getData();
     console.log("data event.helper :", data);
@@ -1922,18 +1916,6 @@ function viewScreenCollapseClickToCall() {
   openUI("mainCollapseClickToCall");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "none");
-
-  // $("#mainCollapseClickToCall").css("display", "block");
-  // $("#mainContent").css("display", "none");
-  // $("#mainOutbound").css("display", "none");
-  // $("#mainBusyCall").css("display", "none");
-  // $("mainInbound").css("display", "none");
-  // $("mainInboundCollapse").css("display", "none");
-  // $("mainInboundListen").css("display", "none");
-  // $("mainInboundListenCollapse").css("display", "none");
-  // $("mainListContacts").css("display", "none");
-  // $("mainListHistoryCall").css("display", "none");
-  // $("mainListMissCall").css("display", "none");
 }
 
 function viewScreenCollapseClickInBound() {
@@ -1959,9 +1941,8 @@ let client;
 init();
 async function init() {
   client = await app.initialized();
-
   client.events.on("app.activated", onAppActivate);
-  client.events.on("app.deactivated", onAppDeactive);
+  // client.events.on("app.deactivated", onAppDeactive);
 }
 
 function onAppActivate() {
@@ -1993,26 +1974,6 @@ function onAppActivate() {
         : "";
       // const iparams = await getIparamsFreshdesk();
       // const nameDomain = await getDomainName();
-
-      // showFormLogin();
-
-      // var data = {
-      //   nameDomain: "uservisitor89.freshdesk.com",
-      //   email: "user.visitor.89@gmail.com",
-      //   passPPX: "nfcAm%HL7v",
-      // };
-      // Encrypt
-      // var ciphertext = CryptoJS.AES.encrypt(
-      //   JSON.stringify(data),
-      //   "secret key 123"
-      // ).toString();
-      // console.log("ciphertext message: ", ciphertext);
-
-      // // Decrypt
-      // var bytes = CryptoJS.AES.decrypt(ciphertext, "secret key 123");
-      // var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-      // console.log("Decrypted data: ", decryptedData);
 
       var displayEmailLogin = $("#displayValueEmailLogin");
       // Thiết lập giá trị cho thẻ <p>
@@ -2139,119 +2100,8 @@ function onAppActivate() {
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
       }
-      // showMain();
-      // if (!isMainActive) {
-      // showMain();
-      // }
-      // if (isMainContactActive) {
-      //   showContact();
-      // }
-      // document.getElementById("appTextPhone1").innerText = "Correct";
-      // document.getElementById("appTextPhone1").className =
-      //   "correct__number__phone";
-
-      // thu nhỏ màn hinh khi callbtnCollapseClickToCall
-      // const btnCollapseClickToCall = document.getElementById(
-      //   "btnCollapseClickToCall"
-      // );
-      // if (btnCollapseClickToCall) {
-      //   btnCollapseClickToCall.addEventListener(
-      //     "fwClick",
-      //     viewScreenCollapseClickToCall
-      //   );
-      // }
-
-      // document
-      //   .getElementById("btnCollapseClickToCall")
-      //   .addEventListener("fwClick", viewScreenCollapseClickToCall);
-
-      // document
-      //   .getElementById("toggleEndCallBusy")
-      //   .addEventListener("click", () => {
-      //     resizeAppDefault();
-      //     client.interface
-      //       .trigger("hide", { id: "softphone" })
-      //       .then(function () {
-      //         isMainOutbound = false;
-      //         $("#callEnter").attr("disabled", true);
-      //         $("#callEnter").css({ backgroundColor: "darkgray" });
-
-      //         $("#headCourse").css("display", "block");
-
-      //         $("#mainContent").css("display", "block");
-      //         $("#mainOutbound").css("display", "none");
-      //         $("#mainBusyCall").css("display", "none");
-
-      //         $("#mainCollapseClickToCall").css("display", "none");
-      //         $("#mainListContacts").css("display", "none");
-      //         $("#mainListHistoryCall").css("display", "none");
-      //         $("#mainListMissCall").css("display", "none");
-      //         $("#mainInbound").css("display", "none");
-      //         $("#mainInboundCollapse").css("display", "none");
-      //         $("#mainInboundListen").css("display", "none");
-      //         $("#mainInboundListenCollapse").css("display", "none");
-
-      //         $("#output").text("");
-      //         phoneNumberReceiver = $("#output").val("");
-      //         $("#appTextPhone").val("");
-      //         $("#appTextPhone").text("");
-
-      //         /**as7 backend **/
-      //         let call = webphone?.calls[0];
-      //         if (call != undefined) {
-      //           call.clearConnection();
-      //         }
-      //         /**as7 backend **/
-      //         onAppDeactive();
-      //         // location.reload();
-      //       })
-      //       .catch(function (error) {
-      //         console.error("Error: Failed to close the CTI app");
-      //         console.error(error);
-      //       });
-      //   });
-
-      /**End Call **/
-
-      // Xử lý sự kiên liên quan đến Inbound
-      // thu gon màn hinh khi btnCollapseClickInBound
-      // const btnCollapseClickInBound = document.getElementById(
-      //   "btnCollapseClickInBound"
-      // );
-      // if (btnCollapseClickInBound) {
-      //   btnCollapseClickInBound.addEventListener(
-      //     "fwClick",
-      //     viewScreenCollapseClickInBound
-      //   );
-      // }
-
-      // document
-      //   .getElementById("btnCollapseClickInBound")
-      //   .addEventListener("fwClick", viewScreenCollapseClickInBound);
-
-      //thu gọn màn khi agent bắt máy
-      // const btnCollapseInboundListen = document.getElementById(
-      //   "btnCollapseInboundListen"
-      // );
-      // if (btnCollapseInboundListen) {
-      //   btnCollapseInboundListen.addEventListener(
-      //     "fwClick",
-      //     viewScreeInboundListenCollapse
-      //   );
-      // }
-      // document
-      //   .getElementById("btnCollapseInboundListen")
-      //   .addEventListener("fwClick", viewScreeInboundListenCollapse);
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
-
-      console.log("isMainActive", isMainActive);
-
-      // showFormLogin();
-      console.log("isLogger:", isLogger);
-
-      console.log("isMainShow:", isMainShow);
-
       clickToCall();
       console.info("App is activated");
     },
@@ -2372,7 +2222,7 @@ function eventHandlecallDialpad() {
   }
   isMainActive = true;
   /**click to call as7*/
-  // startWebPhoneCall();
+
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -2820,55 +2670,6 @@ async function displayItems(items) {
   renderListMissCall(response);
 }
 
-function showMain() {
-  // Hide all elements by default
-  document.getElementById("mainListContacts").style.display = "none";
-  document.getElementById("mainContent").style.display = "none";
-  document.getElementById("mainOutbound").style.display = "none";
-  document.getElementById("mainInbound").style.display = "none";
-  document.getElementById("mainInboundListen").style.display = "none";
-
-  // Show the appropriate element based on the active state
-  if (isMainContactActive) {
-    document.getElementById("mainListContacts").style.display = "block";
-  } else if (isMainOutbound) {
-    document.getElementById("mainOutbound").style.display = "block";
-  } else if (isMainInbound) {
-    document.getElementById("mainInbound").style.display = "block";
-  } else if (isMainActive) {
-    document.getElementById("mainInboundListen").style.display = "block";
-  } else {
-    // Handle default state
-    document.getElementById("mainContent").style.display = "block";
-
-    // Update UI elements
-    $("#callEnter").attr("disabled", true);
-    $("#callEnter").css({ backgroundColor: "darkgray" });
-    document.getElementById("appTextPhone1").innerText = "Correct";
-    document.getElementById("appTextPhone1").className =
-      "correct__number__phone";
-
-    stop();
-
-    document.getElementById("timerInboundListen").textContent = "";
-    document.getElementById("timerInboundListenCollapse").textContent = "";
-
-    idContact = "";
-    nameContact = "";
-    phoneNumberReceiver = "";
-    isInboundCall = false;
-    existContact = false;
-    isMainActive = false;
-  }
-
-  // Hide other elements
-  document.getElementById("mainBusyCall").style.display = "none";
-  document.getElementById("mainCollapseClickToCall").style.display = "none";
-  document.getElementById("mainListHistoryCall").style.display = "none";
-  document.getElementById("mainInboundCollapse").style.display = "none";
-  document.getElementById("mainInboundListenCollapse").style.display = "none";
-}
-
 function searchContact() {
   const val = document.querySelector('input[name="search_contact"]').value;
   const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
@@ -2915,7 +2716,7 @@ function endCallDecline() {
 // nghe máy từ ngoài gọi vào
 async function listenCall() {
   /**click to call as7*/
-  // startWebPhoneCall();
+
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -2994,9 +2795,8 @@ function showMainInboundListen() {
     .trigger("show", { id: "softphone" })
     .then(function () {
       resizeAppDefault();
-      console.log("vao day k show man nghe inbound");
-      //view màn inbound khi nghe máy
 
+      //view màn inbound khi nghe máy
       openUI("mainInboundListen");
       renderNameSipExtension("#appTxtService");
       $("#mainCourse").css("display", "block");
@@ -3032,7 +2832,6 @@ function viewMainInbound() {
   isMainInbound = true;
   isMainOutbound = false;
   isMainContactActive = false;
-  debugger;
   openUI("mainInbound");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
@@ -3471,7 +3270,6 @@ function clickToMissCall(elem) {
 
   phoneNumberReceiver = sdt;
 
-  // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -3569,7 +3367,8 @@ function openUI(nameMainView) {
 }
 
 function preCall() {
-  const phone_again = document.getElementById("appTextPhoneBusyCall").value;
+  isMainShow = "mainOutbound";
+  const phone_again = document.getElementById("appTextPhoneBusyCall").innerText;
   phoneNumberReceiver = phone_again;
   openUI("mainOutbound");
   $("#mainCourse").css("display", "block");
@@ -3577,8 +3376,6 @@ function preCall() {
   $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
 
-  isMainShow = "mainOutbound";
-  // startWebPhoneCall();
   let call = webphone?.calls[0];
   if (!call) {
     // click without an active call -> start a video call to number 23
@@ -4146,7 +3943,7 @@ $(document).ready(function () {
     openUI("mainLogin");
   }
 
-  $(".ac__calling button").prop("disabled", true);
+  // $(".ac__calling button").prop("disabled", true);
 
   $("#pbx_username").mouseleave(function () {
     if ($(this).val().match(matchEmail)) {
@@ -4187,7 +3984,6 @@ $(".lb-phone.digit").on("click", function () {
 
 // Function to append the digit to the input field
 function appendDigit(digit) {
-  debugger;
   const output = $("#output");
   output.val(output.val() + digit);
   checkPhone();
@@ -4216,30 +4012,13 @@ $("#toggleEndCallBusy").click(function () {
     .trigger("hide", { id: "softphone" })
     .then(function () {
       isMainOutbound = false;
-      $("#callEnter").attr("disabled", true);
-      $("#callEnter").css({ backgroundColor: "darkgray" });
-
+      openUI("mainContent");
+      $("#mainCourse").css("display", "block");
       $("#headCourse").css("display", "block");
+      $("#menuApp").css("display", "block");
+      // renderNameSipExtension("#appTxtService");
 
-      $("#mainContent").css("display", "block");
-
-      $("#mainOutbound").css("display", "none");
-      $("#mainBusyCall").css("display", "none");
-
-      $("#mainCollapseClickToCall").css("display", "none");
-      $("#mainListContacts").css("display", "none");
-      $("#mainListHistoryCall").css("display", "none");
-      $("#mainListMissCall").css("display", "none");
-      $("#mainInbound").css("display", "none");
-      $("#mainInboundCollapse").css("display", "none");
-      $("#mainInboundListen").css("display", "none");
-      $("#mainInboundListenCollapse").css("display", "none");
-
-      $("#output").text("");
-      phoneNumberReceiver = $("#output").val("");
-      $("#appTextPhone").val("");
-      $("#appTextPhone").text("");
-
+      resetText();
       /**as7 backend **/
       let call = webphone?.calls[0];
       if (call != undefined) {
@@ -4273,6 +4052,7 @@ function showFormLogout() {
     // terminate call and stop session
     resetText();
     agent.stopApplicationSession();
+    localStorage.clear();
   });
 }
 
@@ -4286,14 +4066,138 @@ function submitLogout() {
   });
 }
 
-function showMainBlindTransfer() {
+/** Xử lý transfer **/
+
+async function transferCall(val) {
+  $("#transferingTo").css("display", "block");
+  const initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  if (initialUserAs7) {
+    const a = `${initialUserAs7?.fullName}`.concat(" • ").concat(`${val}`);
+    console.log("text transfer", a);
+    $("#transferingTo").text("");
+  }
+
+  try {
+    let call = webphone.calls[0];
+    webphone?.setForwarding("forwardNoAns", true, val);
+    await call?.singleStepTransferCall(val);
+  } catch (error) {
+    console.log("error Transfer Call ", error);
+  }
+}
+
+async function showMainBlindTransfer() {
   openUI("mainBlindTransfer");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
+  await displayExtensions();
 }
 
 $("#endCallBlindTrasfer").on("click", function () {
   toggleEndCall();
 });
+
+async function getPbx() {
+  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  var bytes = CryptoJS.AES.decrypt(
+    `${initialUserAs7?.uidPbFs}`,
+    "encryptAsFsk"
+  );
+  var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  const encodedAuth = btoa(
+    `${initialUserAs7?.email}`.concat(":").concat(`${decryptedData}`)
+  );
+
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  };
+  const url = `https://pbx-stg.oncallcx.vn/rest/orgUnits?where=name.eq('PBX_CRM')`;
+  try {
+    const response = await fetch(url, requestOptions);
+    if (response.status === 200) {
+      const data = await response.json();
+      return data;
+    } else {
+      showNotify("danger", response.statusText);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getPbx:", error);
+    return null;
+  }
+}
+async function getAllExtensionOrgUnit() {
+  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  var bytes = CryptoJS.AES.decrypt(
+    `${initialUserAs7?.uidPbFs}`,
+    "encryptAsFsk"
+  );
+  var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  const encodedAuth = btoa(
+    `${initialUserAs7?.email}`.concat(":").concat(`${decryptedData}`)
+  );
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  };
+  const dataPbx = await getPbx();
+  try {
+    if (dataPbx && dataPbx?.orgUnits?.length > 0) {
+      const url = `https://pbx-stg.oncallcx.vn/rest/orgUnits?where=parentId.eq(${dataPbx.orgUnits[0].id})&limit=100`;
+      const response = await fetch(url, requestOptions);
+      if (response.status === 200) {
+        const data = await response.json();
+        return data;
+      } else {
+        showNotify("danger", response.statusText);
+        return null;
+      }
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+async function displayExtensions() {
+  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+
+  const data = await getAllExtensionOrgUnit();
+  const listContainer = document.getElementById("list-blind-transfer");
+
+  if (data && data?.orgUnits.length > 0) {
+    const htmlContent = data?.orgUnits
+      ?.filter((item) => item.name !== userDevices[0]?.name)
+      ?.map(
+        (item) => `
+      <div class="item">
+        <div class="icon"><img src="./images/avatar_default.svg" /></div>
+        <div class="number">${item.name}</div>
+        <div class="icon">
+          <img class="icon__blind__transfer" src="./images/Blind_Transfer.svg" onclick="transferCall('${item.name}')" />
+        </div>
+      </div>
+    `
+      )
+      .join("");
+
+    listContainer.innerHTML = htmlContent;
+  } else {
+    listContainer.innerHTML = "";
+  }
+}
+
+function matchSip(val) {
+  var regex = /^(.*?):/;
+  var result = val.match(regex)[1].trim();
+  return result;
+}
+/** Xử lý transfer **/
