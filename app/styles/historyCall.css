@@ -2,11 +2,11 @@ html {
   box-sizing: border-box;
 }
 
-*,
+/* *,
 *:after,
 *::before {
   box-sizing: inherit;
-}
+} */
 
 .fw-divider-solid {
   border-bottom: 1px #0e2b61 solid;
@@ -36,6 +36,7 @@ html {
 .histrory-call:hover {
   background: #cccccc38;
 }
+
 .user_name {
   font-size: 14px;
   font-weight: bold;

@@ -1523,7 +1523,6 @@ function transformerItems(listItem) {
       return 0;
     });
   }
-  debugger;
   return resultData;
 }
 
@@ -1839,12 +1838,11 @@ async function getContactById(id_contact) {
  */
 
 function clickToCall() {
-  //   console.log("clickToCall appTxtService", appTxtService);
+  isMainOutbound = true;
+  let textElementPhone = document.getElementById("appTextPhone");
   client.events.on("cti.triggerDialer", function (event) {
     openApp();
 
-    let textElementPhone = document.getElementById("appTextPhone");
-    isMainOutbound = true;
     openUI("mainOutbound");
     $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "block");
@@ -1856,8 +1854,8 @@ function clickToCall() {
     textElementPhone.innerText = data.number;
     phoneNumberReceiver = data.number;
     isInboundCall = false;
-    getContactById(data?.id);
 
+    getContactById(data?.id);
     goToContact(data?.id);
 
     /**click to call as7*/
@@ -3240,12 +3238,12 @@ function renderListMissCall(arrListCall) {
       const callingAttr = item?.calling;
 
       return `
-      <li>
-        <div class="history-call" style="padding: 0 10px;">
+      <li style="border-bottom: 1px dotted #ccc;">
+        <div class="history-call" style="padding: 4px 10px;">
           <div class="comments-list">
             <div class="media flex-his">
               <div class="flex-his">
-                <div class="media-left">
+                <div class="media-left" style="margin-top: 6px;">
                   <img src="${avatarSrc}" class="avatar-his-call">
                 </div>
                 <div class="pull-right">
@@ -3265,7 +3263,7 @@ function renderListMissCall(arrListCall) {
                   </p>
                 </div>
               </div>
-              <div class="his-body" style="text-align: right;" attr-sdt-inf="${callingAttr}" onclick="redirectContactInfoMissCall(this)">
+              <div class="his-body" style="text-align: right; margin-top: 6px;" attr-sdt-inf="${callingAttr}" onclick="redirectContactInfoMissCall(this)">
                 <fw-tooltip>
                   <img src="./images/icon-info.png">
                   <div slot="tooltip-content">
