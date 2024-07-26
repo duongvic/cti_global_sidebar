@@ -1807,7 +1807,7 @@ async function getContactById(id_contact) {
       $("#appTxtNameContact").text(nameContact);
 
       const avatarUrl =
-        detail?.avatar?.avatar_url ?? "./images/icon_profile.png";
+        detail?.avatar?.avatar_url ?? "./images/avatar_none.png";
 
       // avtarContact = detail?.avatar?.avatar_url;
       document.getElementById("avatarContact").src = avatarUrl;
