@@ -1383,10 +1383,25 @@ function openApp() {
     });
 }
 
+function stop() {
+  [
+    "timer",
+    "timerCollapse",
+    "timerInboundListen",
+    "nameNotListen",
+    "timerInboundListenCollapse",
+    "timerInbound",
+  ].forEach((id) => {
+    document.getElementById(id).textContent = "";
+  });
+  clearAllIntervals();
+}
+
 function resetText() {
   // $("#appTxtService").text(appTxtService);
   // $(".ac__calling button").prop("disabled", true);
   // isLogger = false;
+  isTimeStarted = false;
   isLoading = false;
   isMainShow = "";
   renderNameSipExtension("#appTxtService");
@@ -1406,30 +1421,8 @@ function resetText() {
   // Reset call button state
   $("#callEnter").attr("disabled", true).css("background-color", "darkgray");
 
-  // Clear timer and nameNotListen elements
-  document.getElementById("timer").textContent = "";
-  document.getElementById("timerCollapse").textContent = "";
-  document.getElementById("nameNotListen").textContent = "";
-
-  // Clear inbound listen timers
-  document.getElementById("timerInboundListen").textContent = "";
-  document.getElementById("timerInboundListenCollapse").textContent = "";
-
   stop();
 
-  function stop() {
-    [
-      "timer",
-      "timerCollapse",
-      "timerInboundListen",
-      "nameNotListen",
-      "timerInboundListenCollapse",
-      "timerInbound",
-    ].forEach((id) => {
-      document.getElementById(id).textContent = "";
-    });
-    clearAllIntervals();
-  }
   // Reset call and contact variables
   actionDesktopEndCall = false;
   existContact = false;
@@ -2094,24 +2087,6 @@ function onAppActivate() {
       //   btnClose.addEventListener("fwClick", closeApp);
       // }
 
-      // const btnClose1 = document.getElementById("btnClose1");
-      // if (btnClose1) {
-      //   btnClose1.addEventListener("fwClick", closeApp);
-      // }
-
-      // const btnCloseHistoryCall = document.getElementById(
-      //   "btnCloseHistoryCall"
-      // );
-      // if (btnCloseHistoryCall) {
-      //   btnCloseHistoryCall.addEventListener("fwClick", closeApp);
-      // }
-
-      // const btnCloseHisMissCall = document.getElementById(
-      //   "btnCloseHisMissCall"
-      // );
-      // if (btnCloseHisMissCall) {
-      //   btnCloseHisMissCall.addEventListener("fwClick", closeApp);
-      // }
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
       }
@@ -2298,18 +2273,6 @@ function showContact() {
   </svg>`;
   $("#btnMissCall").html(olSvgMissCall);
 
-  // $("#mainListContacts").css("display", "block");
-  // $("#mainContent").css("display", "none");
-  // $("#mainOutbound").css("display", "none");
-  // $("#mainBusyCall").css("display", "none");
-  // $("#mainCollapseClickToCall").css("display", "none");
-  // $("#mainListHistoryCall").css("display", "none");
-  // $("#mainListMissCall").css("display", "none");
-  // $("#mainInbound").css("display", "none");
-  // $("#mainInboundCollapse").css("display", "none");
-  // $("#mainInboundListen").css("display", "none");
-  // $("#mainInboundListenCollapse").css("display", "none");
-
   current_page = 1;
   getContactData(current_page);
 }
@@ -2428,8 +2391,6 @@ function clickContactCall(elem) {
 
         $("#appTxtNameContact").text(name_contact);
         $("#appTextPhone").text(phone_contact);
-
-        // $("#appTxtServiceOutbound").text(appTxtService);
 
         phoneNumberReceiver = phone_contact;
         nameContact = name_contact;
@@ -2755,6 +2716,7 @@ async function listenCall() {
       video: false,
       // subjectOfCall: "PredictiveCall",
     });
+    // thực hiện ghi âm as7
     let recordedMessage;
     call.recordMessage().then((response) => {
       console.log("goi từ inbound", response);
@@ -2790,34 +2752,26 @@ function endCall() {
   if (call != undefined) {
     call.clearConnection();
   }
-
   stop();
+  location.reload(true);
 
   openUI("mainContent");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "block");
   renderNameSipExtension("#appTxtService");
-  onAppDeactive();
-  location.reload(true);
+  // onAppDeactive();
 }
 
-function endCallInboundListen() {
-  isTimeStarted = false;
-  let call = webphone?.calls[0];
-  if (call != undefined) {
-    call.clearConnection();
+async function endCallInboundListen() {
+  isLogger = true;
+  openApp();
+  resetText();
+  actionDesktopEndCall = true;
+  endCall();
+  if (idTicket != null) {
+    await insertIdTicketAs7(idTicket);
   }
-  stop();
-  location.reload(true);
-
-  openUI("mainContent");
-  renderNameSipExtension("#appTxtService");
-  $("#mainCourse").css("display", "block");
-  $("#headCourse").css("display", "block");
-  $("#menuApp").css("display", "none");
-
-  onAppDeactive();
 }
 function showMainInboundListen() {
   client.interface
@@ -3030,22 +2984,6 @@ async function insertIdTicketAs7(idTicket) {
       console.error("data insertIdTicketAs7", error);
     }
   }
-
-  // try {
-  //   var result = await client.request.invokeTemplate("insertIdTicketAs7", {
-  //     context: {
-  //       // terminalId: 115,
-  //       accountCode: idTicket,
-  //       accountName: idContact,
-  //     },
-  //   });
-
-  //   var data = result?.response ? JSON.parse(result?.response) : [];
-  //   console.info("Successfully created insertIdTicketAs7 in Freshdesk", data);
-  //   console.log("detail insertIdTicketAs7", data);
-  // } catch (error) {
-  //   console.error("data insertIdTicketAs7", error);
-  // }
 }
 
 function showMainDialpad() {
@@ -3080,29 +3018,6 @@ function showMainDialpad() {
   resetText();
 
   renderListContactEmpty();
-  // $("#callEnter").attr("disabled", true);
-  // $("#callEnter").css({ backgroundColor: "darkgray" });
-
-  // $("#output").val("");
-  // $("#output").text("");
-  // $("#appTextPhone1").text("Correct");
-  // $("#appTextPhone1").attr("class", "correct__number__phone");
-
-  // stop();
-
-  // $("#timerInboundListen").text("");
-  // $("#timerInboundListenCollapse").text("");
-
-  // idContact = "";
-  // nameContact = "";
-  // phoneNumberReceiver = "";
-  // emailContact = "";
-
-  // isInboundCall = false;
-  // existContact = false;
-  // isMainActive = false;
-  // isMainContactActive = false;
-  // isMainOutbound = false;
 }
 
 function renderListHistoryCall(listHisCall) {
@@ -3428,58 +3343,29 @@ function preCall() {
 }
 
 async function toggleEndCallCollapse() {
-  isTimeStarted = false;
   isLogger = true;
-  actionDesktopEndCall = true;
   isMainOutbound = false;
+  openApp();
+  resetText();
+  actionDesktopEndCall = true;
+  endCall();
   if (idTicket != null) {
     await insertIdTicketAs7(idTicket);
   }
-  resizeAppDefault();
-  client.interface
-    .trigger("hide", { id: "softphone" })
-    .then(function () {
-      $("#headCourse").css("display", "block");
-      $("#mainContent").css("display", "block");
-      $("#mainOutbound").css("display", "none");
-      $("#mainBusyCall").css("display", "none");
-      $("#mainCollapseClickToCall").css("display", "none");
-      $("#mainListContacts").css("display", "none");
-      $("#mainListHistoryCall").css("display", "none");
-      $("#mainListMissCall").css("display", "none");
-      $("#mainInbound").css("display", "none");
-      $("#mainInboundCollapse").css("display", "none");
-      $("#mainInboundListen").css("display", "none");
-      $("#mainInboundListenCollapse").css("display", "none");
-      $("#mainLogin").css("display", "none");
-      $("#mainLogout").css("display", "none");
-
-      phoneNumberReceiver = $("#output").val("");
-      $("#appTextPhone").val("");
-      $("#appTextPhone").text("");
-
-      endCall();
-    })
-    .catch(function (error) {
-      console.error("Error: Failed to close the CTI app");
-      console.error(error);
-    });
 }
 
 async function toggleEndCall() {
-  // await updateTicket(idTicket);
-  isTimeStarted = false;
   isLogger = true;
-  actionDesktopEndCall = true;
   isMainOutbound = false;
-  if (idTicket != null) {
-    await insertIdTicketAs7(idTicket);
-  }
   client.interface
-    .trigger("hide", { id: "softphone" })
+    .trigger("show", { id: "softphone" })
     .then(async function () {
       resetText();
+      actionDesktopEndCall = true;
       endCall();
+      if (idTicket != null) {
+        await insertIdTicketAs7(idTicket);
+      }
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
@@ -3519,162 +3405,6 @@ function capitalizeFirstLetter(string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
-
-// document.querySelector(".appTxtService").addEventListener("click", function () {
-//   const dropdown = document.querySelector(".dropdown--extend");
-//   const label = document.querySelector(".appTxtService");
-//   label.style.display = "none"; // Hide the label when clicked
-//   dropdown.style.display = "block"; // Show the dropdown
-// });
-
-// document
-//   .querySelector(".dropdown--extend")
-//   .addEventListener("change", function () {
-//     const dropdown = document.querySelector(".dropdown--extend");
-//     const selectedOption = dropdown.options[dropdown.selectedIndex].text;
-//     const label = document.querySelector(".appTxtService");
-//     label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
-//     label.style.display = "inline"; // Show the label with the new text
-//     dropdown.style.display = "none"; // Hide the dropdown after selection
-//   });
-
-// document
-//   .querySelector(".dropdown--extend")
-//   .addEventListener("mouseleave", function () {
-//     const dropdown = document.querySelector(".dropdown--extend");
-//     const label = document.querySelector(".appTxtService");
-//     label.style.display = "inline"; // Show the label with the initial text
-//     dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
-//   });
-
-// document.addEventListener("DOMContentLoaded", () => {
-//   document.querySelectorAll(".appTxtService").forEach((label) => {
-//     label.addEventListener("click", () => {
-//       // Get the associated select element
-//       debugger;
-//       const select = label.nextElementSibling;
-//       if (select && select.tagName === "SELECT") {
-//         // Toggle the display of the select element
-//         if (select.style.display === "none" || select.style.display === "") {
-//           select.style.display = "inline";
-//           label.style.display = "none";
-//           // Focus on the select element to show the options
-//           select.focus();
-//         } else {
-//           select.style.display = "none";
-//           label.style.display = "inline";
-//         }
-//       }
-//     });
-//   });
-
-//   document.querySelectorAll(".dropdown--extend").forEach((select) => {
-//     select.addEventListener("change", () => {
-//       // Hide the select element when an option is selected
-//       select.style.display = "none";
-//       // Show the label again
-//       const label = select.previousElementSibling;
-//       if (label && label.tagName === "LABEL") {
-//         const selectedText = select.options[select.selectedIndex].text;
-//         label.textContent = selectedText;
-//         label.style.display = "inline";
-//         appTxtService = selectedText;
-//       }
-//     });
-
-//     // Optional: Hide the select and show the label again if the select loses focus without changing
-//     select.addEventListener("mouseleave", () => {
-//       // Hide the select element when it loses focus
-//       select.style.display = "none";
-//       // Show the label again
-//       const label = select.previousElementSibling;
-//       if (label && label.tagName === "LABEL") {
-//         const selectedText = select.options[select.selectedIndex].text;
-//         label.textContent = selectedText;
-//         label.style.display = "inline";
-//         appTxtService = selectedText;
-//       }
-//     });
-//   });
-
-//   document.addEventListener("DOMContentLoaded", function () {
-//     const labelMainContent = document.querySelector(
-//       "#mainContent .appTxtService"
-//     );
-
-//     if (labelMainContent) {
-//       appTxtService = labelMainContent.textContent.trim(); // Lưu giá trị ban đầu của label
-//     } else {
-//       console.error("Label element not found in mainContent");
-//     }
-
-//     const label = document.querySelector(".appTxtService");
-//     const dropdown = document.querySelector(".dropdown--extend");
-
-//     if (label && dropdown) {
-//       const selectedOption = dropdown.options[dropdown.selectedIndex].text;
-//       label.textContent = `EXT ${selectedOption}`;
-//       label.style.display = "inline";
-//       appTxtService = label.textContent;
-//       dropdown.style.display = "none";
-//     } else {
-//       console.error("Label or Dropdown element not found");
-//     }
-//   });
-// });
-
-// document
-//   .getElementById("appTxtService")
-//   .addEventListener("click", function () {
-//     const dropdown = document.getElementById(".dropdown--extend");
-//     const label = document.getElementById(".appTxtService");
-//     label.style.display = "none"; // Hide the label when clicked
-//     dropdown.style.display = "block"; // Show the dropdown
-//   });
-
-// document
-//   .getElementById(".dropdown--extend")
-//   .addEventListener("change", function () {
-//     const dropdown = document.getElementById(".dropdown--extend");
-//     const selectedOption = dropdown.options[dropdown.selectedIndex].text;
-//     const label = document.getElementById(".appTxtService");
-//     label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
-//     label.style.display = "inline"; // Show the label with the new text
-//     dropdown.style.display = "none"; // Hide the dropdown after selection
-//   });
-
-// document
-//   .getElementById(".dropdown--extend")
-//   .addEventListener("mouseleave", function () {
-//     const dropdown = document.getElementById(".dropdown--extend");
-//     const label = document.getElementById(".appTxtService");
-//     label.style.display = "inline"; // Show the label with the initial text
-//     dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
-//   });
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const label = document.getElementById("appTxtService");
-//   const dropdown = document.getElementById("dropdown--extend");
-
-//   if (label && dropdown) {
-//     label.addEventListener("click", function () {
-//       label.style.display = "none"; // Hide the label when clicked
-//       dropdown.style.display = "block"; // Show the dropdown
-//     });
-
-//     dropdown.addEventListener("change", function () {
-//       const selectedOption = dropdown.options[dropdown.selectedIndex].text;
-//       label.textContent = `SST-QC05 . ${selectedOption}`; // Update the label text
-//       label.style.display = "inline"; // Show the label with the new text
-//       dropdown.style.display = "none"; // Hide the dropdown after selection
-//     });
-
-//     dropdown.addEventListener("mouseleave", function () {
-//       label.style.display = "inline"; // Show the label with the initial text
-//       dropdown.style.display = "none"; // Hide the dropdown when mouse leaves
-//     });
-//   }
-// });
 
 async function goToOncallCX() {
   $("#mainConnect").css("display", "none");
