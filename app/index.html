@@ -370,6 +370,8 @@
                 <button class="btn-mic" value="false" id="checkMic" disabled onclick="mic(this)">
                   <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" />
+                  <!-- <i class="material-icons mic-un">&#xe02b;</i>
+                  <i class="material-icons mic-top">&#xe029;</i> -->
                 </button>
                 <!-- Mic - UnMic -->
 
@@ -423,7 +425,7 @@
           <p id="appTextPhoneBusyCall"></p>
           <p>Người dùng bận</p>
           <div><img class="avatar__busy" id="avatarContact" src="./images/avatar_none.png"></div>
-          <div class="ac__calling__busy">
+          <!-- <div class="ac__calling__busy">
             <button class="btn-ac__busy" onclick="openCity('calls')"><img class="icon__calling tablinks"
                 src="./images/DialPad-InCall.svg"></button>
             <button class="btn-ac__busy" onclick="recordaudio()"><img class="icon__calling tablinks"
@@ -436,7 +438,40 @@
                 src="./images/Blind_Transfer.svg"></button>
             <button class="btn-ac__busy" onclick="openCity('busycall')"><img class="icon__calling tablinks"
                 src="./images/Attend_Transfer.svg"></button>
+          </div> -->
+
+          <div class="ac__calling">
+            <button class="btn-ac" id="dialPadOutbound" disabled>
+              <img class="icon__calling" src="./images/DialPad-InCall.svg" />
+            </button>
+            <!-- Mic - UnMic -->
+            <form name="testMicMainBusy" method="post" style="display: none;">
+              <input type="text" name="savereportMicMainBusy" value="false" />
+            </form>
+            <button class="btn-mic" value="false" id="checkMicMainBusy" disabled onclick="micMainBusy(this)">
+              <img class="mic-un" src="./images/icon_mic_top.svg" />
+              <img class="mic-top" src="./images/icon_mic_un.svg" />
+              <!-- <i class="material-icons mic-un">&#xe02b;</i>
+              <i class="material-icons mic-top">&#xe029;</i> -->
+            </button>
+            <!-- Mic - UnMic -->
+
+            <!-- Hold - UnHold -->
+            <form name="testMainBusyHold_Unhold" method="post" style="display: none;">
+              <input type="text" name="savereportMainBusy_Hold_Unhold" value="false" />
+            </form>
+            <button class="btn-ac" value="false" id="checkHoldMainBusy" disabled onclick="changeHoldMainBusy(this)">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+            </button>
+            <!-- Hold - UnHold -->
+            <button class="btn-ac" style="opacity: 0.2;" disabled onclick="showMainBlindTransfer()"><img
+                class="icon__calling" src="./images/Blind_Transfer.svg" /></button>
+            <button class="btn-ac" style="opacity: 0.2;" disabled>
+              <img class="icon__calling" src="./images/Attend_Transfer.svg" />
+            </button>
           </div>
+
           <div class="btn-bus">
             <button id="toggleEndCallBusy" class="hint" type="button"><span><img class="icon__calling"
                   src="./images/end_call.png" /></span> Cancel</button>
@@ -569,6 +604,8 @@
                 <button class="btn-mic" value="false" id="checkMicInbound" onclick="micInbound(this)">
                   <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" />
+                  <!-- <i class="material-icons mic-un">&#xe02b;</i>
+                  <i class="material-icons mic-top">&#xe029;</i> -->
                 </button>
                 <!-- Mic - UnMic -->
 
@@ -741,20 +778,22 @@
                   <img class="icon__calling" src="./images/DialPad-InCall.svg" />
                 </button>
                 <!-- Mic - UnMic -->
-                <form name="testMic" method="post" style="display: none">
-                  <input type="text" name="savereportMic" value="false" />
+                <form name="testMicBlindTransfer" method="post" style="display: none">
+                  <input type="text" name="savereportMicBlindTransfer" value="false" />
                 </form>
-                <button class="btn-mic" value="false" id="checkMic" disabled onclick="mic(this)">
+                <button class="btn-mic" value="false" id="checkMicBlindTransfer" disabled onclick="micBlindTransfer(this)">
                   <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" />
+                  <!-- <i class="material-icons mic-un">&#xe02b;</i>
+                  <i class="material-icons mic-top">&#xe029;</i> -->
                 </button>
                 <!-- Mic - UnMic -->
 
                 <!-- Hold - UnHold -->
-                <form name="testHold_Unhold" method="post" style="display: none">
-                  <input type="text" name="savereportHold_Unhold" value="false" />
+                <form name="testBlindTransferHold_Unhold" method="post" style="display: none">
+                  <input type="text" name="savereportBlindTransferHold_Unhold" value="false" />
                 </form>
-                <button class="btn-ac" value="false" id="checkHold" disabled onclick="change(this)">
+                <button class="btn-ac" value="false" id="checkHoldBlindTransfer" disabled onclick="changeHoldBlindTransfer(this)">
                   <div class="bar1"></div>
                   <div class="bar2"></div>
                 </button>

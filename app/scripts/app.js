@@ -1086,6 +1086,93 @@ async function changeInbound(x) {
   }
 }
 
+var input = document.testMicMainBusy.savereportMicMainBusy;
+async function micMainBusy(x) {
+  isTimeStarted = true;
+  x.classList.toggle("mic");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "false",
+    });
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
+}
+var input = document.testMainBusyHold_Unhold.savereportMainBusy_Hold_Unhold;
+async function changeHoldMainBusy(x) {
+  isTimeStarted = true;
+  x.classList.toggle("change");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.holdCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.retrieveCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
+}
+
+var input = document.testMicBlindTransfer.savereportMicBlindTransfer;
+async function micBlindTransfer(x) {
+  isTimeStarted = true;
+  x.classList.toggle("mic");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "false",
+    });
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.updateCall({
+      audio: "true",
+    });
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
+}
+var input =
+  document.testBlindTransferHold_Unhold.savereportBlindTransferHold_Unhold;
+async function changeHoldBlindTransfer(x) {
+  isTimeStarted = true;
+  x.classList.toggle("change");
+  if (input.value === String(false)) {
+    input.value = "true";
+    let call = webphone.calls[0];
+    call.holdCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  } else {
+    input.value = "false";
+    let call = webphone.calls[0];
+    call.retrieveCall();
+
+    // clearAllIntervals();
+    await setUpdateCallAs7(true);
+  }
+}
+
 // Clear all intervals
 function clearAllIntervals() {
   clearInterval(interval);
