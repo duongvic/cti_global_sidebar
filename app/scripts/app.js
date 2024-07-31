@@ -1490,7 +1490,8 @@ function resetText() {
   // isLogger = false;
   isTimeStarted = false;
   isLoading = false;
-  isMainShow = "";
+  isMainCollapse = "";
+
   renderNameSipExtension("#appTxtService");
   // Clear text fields and innerText properties
   const textFields = [
@@ -2003,6 +2004,7 @@ function resizeAppDefault() {
   client.instance.resize({ height: "560px" });
 }
 
+// thu nho man hinh outbound
 function viewScreenCollapseClickToCall() {
   isMainShow = "mainCollapseClickToCall";
   isMainCollapse = "mainCollapse";
@@ -2176,6 +2178,8 @@ function onAppActivate() {
 
       if (isMainCollapse == "mainCollapse") {
         client.instance.resize({ height: "48px" });
+      } else {
+        resizeAppDefault();
       }
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
@@ -2925,6 +2929,8 @@ function btShowMainInboundListen() {
   client.interface
     .trigger("show", { id: "softphone" })
     .then(function () {
+      isMainShow = "mainInboundListen";
+      isMainCollapse = "";
       resizeAppDefault();
       openUI("mainInboundListen");
       renderNameSipExtension("#appTxtService");
@@ -2948,7 +2954,7 @@ async function createTicket() {
     }
   } else {
     if (isInboundCall) {
-      _subject = ` Answered Inbound Call - ${phoneNumberReceiver}`;
+      _subject = `Answered Inbound Call - ${phoneNumberReceiver}`;
     } else {
       _subject = `Served Outbound Call - ${phoneNumberReceiver}`;
     }
@@ -3435,13 +3441,13 @@ async function toggleEndCallCollapse() {
   openApp();
   resetText();
   actionDesktopEndCall = true;
-  endCall();
   if (idTicket != null) {
     await insertIdTicketAs7(idTicket);
   }
+  endCall();
 }
 
-async function toggleEndCall() {
+function toggleEndCall() {
   isLogger = true;
   isMainOutbound = false;
   client.interface
@@ -3449,10 +3455,10 @@ async function toggleEndCall() {
     .then(async function () {
       resetText();
       actionDesktopEndCall = true;
-      endCall();
       if (idTicket != null) {
         await insertIdTicketAs7(idTicket);
       }
+      endCall();
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
@@ -3760,10 +3766,12 @@ function fromCharCode() {
 $("#btnClose").click(function () {
   switch (isMainShow) {
     case "mainCollapseClickToCall":
+    case "mainOutbound":
       viewScreenCollapseClickToCall();
       break;
     case "mainInboundListenCollapse":
-      viewScreeInboundListenCollapse();
+    case "mainInboundListen":
+      viewScreenInboundListenCollapse();
       break;
     default:
       closeApp();
@@ -3838,20 +3846,30 @@ function appendDigit(digit) {
 }
 
 $("#mainCollapseClickToCall").click(function () {
+  debugger;
+  isMainOutbound = true;
+  isMainCollapse = "";
+  isMainShow = "mainOutbound";
   resizeAppDefault();
-  $("#mainOutbound").css("display", "block");
-  $("#mainCollapseClickToCall").css("display", "none");
-  $("#mainContent").css("display", "none");
-  $("#mainBusyCall").css("display", "none");
-  $("#mainListContacts").css("display", "none");
-  $("#mainListMissCall").css("display", "none");
-  $("#mainListHistoryCall").css("display", "none");
-  $("#mainInbound").css("display", "none");
-  $("#mainInboundCollapse").css("display", "none");
-  $("#mainInboundListen").css("display", "none");
-  $("#mainInboundListenCollapse").css("display", "none");
-  $("#mainLogin").css("display", "none");
-  $("#mainLogout").css("display", "none");
+
+  openUI("mainOutbound");
+  $("#mainCourse").css("display", "block");
+  $("#headCourse").css("display", "block");
+  $("#menuApp").css("display", "none");
+
+  // $("#mainOutbound").css("display", "block");
+  // $("#mainCollapseClickToCall").css("display", "none");
+  // $("#mainContent").css("display", "none");
+  // $("#mainBusyCall").css("display", "none");
+  // $("#mainListContacts").css("display", "none");
+  // $("#mainListMissCall").css("display", "none");
+  // $("#mainListHistoryCall").css("display", "none");
+  // $("#mainInbound").css("display", "none");
+  // $("#mainInboundCollapse").css("display", "none");
+  // $("#mainInboundListen").css("display", "none");
+  // $("#mainInboundListenCollapse").css("display", "none");
+  // $("#mainLogin").css("display", "none");
+  // $("#mainLogout").css("display", "none");
 });
 
 $("#toggleEndCallBusy").click(function () {
@@ -3882,9 +3900,11 @@ $("#toggleEndCallBusy").click(function () {
     });
 });
 
-// mo rong man hinh click to call
+// mo rong man hinh call outbound
 function mainCollapseClickToCall() {
   resizeAppDefault();
+  isMainShow = "mainOutbound";
+  isMainCollapse = "";
   openUI("mainOutbound");
   $("#mainOutbound").css("display", "block");
   $("#mainCourse").css("display", "block");
