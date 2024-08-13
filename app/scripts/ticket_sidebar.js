@@ -147,9 +147,13 @@ async function getFileS3(crFileName) {
         name_url_s3: crFileName,
       },
     });
-    var link_record = result?.response ? result?.response : null;
-    console.log("chay vao bc 2 getFileS3", link_record);
-    return link_record;
+    if (result?.status === 200) {
+      var data = JSON.parse(result?.response);
+      var link_record = data.url;
+      // var link_record = link_record.replace(/^"|"$/g, "");
+      console.log("chay vao bc 2 getFileS3", link_record);
+      return link_record;
+    }
   } catch (error) {
     console.log(error);
     return null;
@@ -197,11 +201,9 @@ async function updateTicket(idTicket, idContact, url_record) {
 
 async function createNoteTicket() {
   $("#btn_upload_record").attr({ disabled: true, loading: true });
-
-  var url = null;
+  const dataUserLoginFrsdesk = await getUserDataLoginFrsdesk();
   const link_record = await getLinkRecord();
   if (link_record !== null) {
-    url = link_record;
     let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px" id="file_record_user">
                   <div></div>  <br />
                   <div dir="ltr">
@@ -210,7 +212,7 @@ async function createNoteTicket() {
                     </span>
                     <br />
                     <audio controls preload="auto" style="height: 30px;margin-top: 10px;">
-                      <source src="${url}" />
+                      <source src="${link_record}" />
                     </audio>
                   </div>
                 </div>`;
@@ -218,6 +220,7 @@ async function createNoteTicket() {
       const properties = JSON.stringify({
         private: false,
         body: html,
+        // user_id: dataUserLoginFrsdesk && dataUserLoginFrsdesk?.id,
       });
       var result = await client.request.invokeTemplate("createNoteTicket", {
         context: {
@@ -226,7 +229,10 @@ async function createNoteTicket() {
         body: properties,
       });
       if (result?.status === 200 || result?.status === 201) {
-        showNotify("success", `Audio recording file has been loaded in a ticket note.`);
+        showNotify(
+          "success",
+          `Audio recording file has been loaded in a ticket note.`
+        );
       } else {
         showNotify(
           "danger",
@@ -236,10 +242,15 @@ async function createNoteTicket() {
     } catch (err) {
       if (err) {
         console.error("Error - ", err);
+        var data = JSON.parse(err?.response);
+        showNotify("danger", data?.message);
       }
     }
   } else {
-    showNotify("danger", `Audio recording file does not exist. Please check the system or the storage terms and conditions`);
+    showNotify(
+      "danger",
+      `Audio recording file does not exist. Please check the system or the storage terms and conditions`
+    );
   }
   $("#btn_upload_record").attr({ disabled: false, loading: false });
 }
@@ -248,7 +259,8 @@ async function getLinkRecord() {
   try {
     const resultDataCsv = await getFileCsvTicket(idTicket);
     if (resultDataCsv.length > 0) {
-      var crFileName = "cr_" + resultDataCsv[0]?.CallID + ".wav";
+      // var crFileName = "cr_" + resultDataCsv[0]?.CallID + ".wav";
+      var crFileName = resultDataCsv[0]?.CallID;
       // B2. get file từ s3
       const resultDataS3 = await getFileS3(crFileName);
       return resultDataS3;
@@ -260,4 +272,10 @@ async function getLinkRecord() {
     }
     return null;
   }
+}
+
+// Utility function to get user data
+async function getUserDataLoginFrsdesk() {
+  const userData = await client.data.get("loggedInUser");
+  return userData?.loggedInUser || {};
 }
