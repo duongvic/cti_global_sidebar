@@ -866,6 +866,9 @@ let isMainActive = false;
 let isMainContactActive = false;
 
 let isMainShow = "";
+
+let isClickToCallInitialized = false;
+
 /**as7 backend **/
 let agent = anCti.newAgent();
 let webphone;
@@ -875,91 +878,6 @@ audio.autoplay = true;
 const options = {
   avatars: true,
 };
-
-function functionPass() {
-  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
-  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
-  let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
-
-  if (initialUserAs7 && userDevices && userTerminals) {
-    var bytes = CryptoJS.AES.decrypt(
-      `${initialUserAs7?.uidPbFs}`,
-      "encryptAsFsk"
-    );
-    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    return decryptedData;
-  }
-}
-
-agent.startApplicationSession({
-  // username: "anntp2@fpt.com",
-  // password: "nfcAm%HL7v",
-  username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
-  password: functionPass(),
-});
-
-// handler is called if application-session was successfully started
-agent.on("applicationsessionstarted", () => {
-  // webphone = agent.getDevice("sip:1217@term.498");
-  const userDevices = JSON.parse(localStorage.getItem("userDevices"));
-  const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
-
-  webphone = agent.getDevice(
-    `${userDevices && userDevices[0]?.sip}${
-      userTerminals && userTerminals[0]?.term
-    }`
-  );
-
-  // get active forwardings
-  webphone?.getForwarding().then((response) => {
-    response.forwardingList.forEach((entry) => {
-      const fwd = entry.forwardingListItem;
-      if (fwd.forwardStatus) {
-        console.log(`active ${fwd.forwardingType} to number ${fwd.forwardDN}`);
-      }
-    });
-  });
-
-  console.log("webphone", webphone);
-  // tell server that we want to use WebRTC (error handling omitted)
-  webphone.monitorStart({ rtc: true });
-});
-
-// handler is called if application-session could not be started
-agent.on("applicationsessionterminated", (event) => {
-  if (event.reason == "invalidApplicationInfo") {
-    console.log("Please check your credentials and try again");
-  }
-});
-
-// if WebRTC creates a media-stream we bind it to the corresponding elements
-agent.on("localstream", (event) => {
-  document.getElementById("localView").srcObject = event.stream;
-});
-
-agent.on("remotestream", (event) => {
-  document.getElementById("remoteView").srcObject = event.stream;
-  audio.srcObject = event.stream;
-});
-
-// Event handler for call events
-agent.on("call", async (event) => {
-  try {
-    if (isBusyCause(event)) {
-      handleBusyCall(event);
-      return;
-    }
-    // else if (isTransferCause(event)) {
-    //   $("#transferingTo").css("display", "block");
-    // }
-
-    await handleLocalConnectionInfo(event);
-  } catch (error) {
-    isInboundCall = false;
-    console.error("Error: Failed to handle call event");
-    console.error(error);
-  }
-});
 
 var extDataSource = [
   {
@@ -1324,7 +1242,7 @@ async function handleInboundAlertingCall(call) {
 // Handle connected call
 async function handleConnectedCall(call) {
   console.log(`Connected to ${call.number}`);
-  console.log("Connected to screen:", isMainActive);
+  console.log("Màn hinh dang hien thi:", isMainActive);
   if (!isInboundCall) {
     if (!isTimeStarted) {
       start();
@@ -1332,6 +1250,7 @@ async function handleConnectedCall(call) {
     }
 
     if (!isUpdateCallAs7) {
+      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
@@ -1344,6 +1263,7 @@ async function handleConnectedCall(call) {
     }
 
     if (!isUpdateCallAs7) {
+      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
@@ -1608,6 +1528,7 @@ function transformerItems(listItem) {
 }
 
 async function getContactData(page) {
+  debugger;
   $("#loadingImg").css("display", "block");
   $("#loadMoreTxt").css("display", "none");
 
@@ -1796,10 +1717,11 @@ async function filteredContactSearch(term) {
       context: { term },
     });
 
-    const detail = data?.response ? JSON.parse(data?.response) : [];
-    const filteredDataMobile = detail.filter((item) => item.mobile === term);
-    const filteredDataPhone = detail.filter((item) => item.phone === term);
+    debugger;
     if (data?.status === 200) {
+      const detail = data?.response ? JSON.parse(data?.response) : [];
+      const filteredDataMobile = detail.filter((item) => item.mobile === term);
+      const filteredDataPhone = detail.filter((item) => item.phone === term);
       const matchedContact =
         filteredDataMobile.length > 0
           ? filteredDataMobile[0]
@@ -1821,10 +1743,12 @@ async function filteredContactSearch(term) {
 }
 
 function handleContactFound(contact, detail) {
+  debugger;
   existContact = true;
   idContact = contact.id;
   nameContact = contact.name;
 
+  getContactById(idContact);
   const contactElements = [
     "appTxtNameContactInbound",
     "appTxtNameContactInboundListen",
@@ -1844,7 +1768,6 @@ function handleContactFound(contact, detail) {
     });
   });
 
-  getContactById(contact.id);
   goToContact(idContact);
 
   // const email_contact = emailContact;
@@ -1892,7 +1815,7 @@ async function getContactById(id_contact) {
       idContact = id_contact;
       emailContact = detail.email;
       nameContact = detail.name;
-      $("#appTxtNameContact").text(nameContact);
+      $("#appTxtNameContact").text(detail.name);
 
       const avatarUrl =
         detail?.avatar?.avatar_url ?? "./images/avatar_none.png";
@@ -1919,6 +1842,31 @@ async function getContactById(id_contact) {
  */
 
 function clickToCall() {
+  const userDevicesString = localStorage.getItem("userDevices");
+  const userDevices = JSON.parse(userDevicesString);
+  const userAs7String = localStorage.getItem("initialUserAs7");
+  const userAs7 = JSON.parse(userAs7String);
+  const userTerminalsString = localStorage.getItem("userTerminals");
+  const userTerminals = JSON.parse(userTerminalsString);
+  if (
+    userAs7 === null ||
+    userDevices === null ||
+    userDevices?.length === 0 ||
+    userTerminals === null ||
+    userTerminals?.length === 0
+  ) {
+    showNotify(
+      "info",
+      "Please login OncallCx. Contact the administrator to check the SIP number"
+    );
+    return submitLogout();
+  }
+
+  if (isClickToCallInitialized) {
+    return;
+  }
+  isClickToCallInitialized = true;
+
   isMainOutbound = true;
   let textElementPhone = document.getElementById("appTextPhone");
   client.events.on("cti.triggerDialer", function (event) {
@@ -1936,28 +1884,10 @@ function clickToCall() {
     phoneNumberReceiver = data.number;
     isInboundCall = false;
 
-    getContactById(data?.id);
     goToContact(data?.id);
+    getContactById(data?.id);
 
-    /**click to call as7*/
-    let call = webphone?.calls[0];
-    if (!call) {
-      // click without an active call -> start a video call to number 23
-      webphone?.makeCall(phoneNumberReceiver, {
-        autoOriginate: "doNotPrompt",
-        audio: true,
-        video: false,
-        // subjectOfCall: "PredictiveCall",
-      });
-    } else if (call.localConnectionInfo == "alerting") {
-      // click while we have an alerting call -> accept it
-      call.answerCall({ audio: true, video: false });
-    } else {
-      // otherwise we release the call
-      call.clearConnection();
-      onAppDeactive();
-    }
-    /**end click to call as7*/
+    actionClickToCall();
   });
 }
 
@@ -2044,7 +1974,7 @@ async function init() {
 
 function onAppActivate() {
   // openApp();
-  resizeAppDefault();
+  // resizeAppDefault();
 
   client.data.get("loggedInUser").then(
     async function (data) {
@@ -2183,7 +2113,12 @@ function onAppActivate() {
       }
 
       /* Click-to-call event should be called inside the app.activated life-cycle event to always listen to the event */
-      clickToCall();
+
+      // Gọi clickToCall chỉ một lần khi chưa được khởi tạo
+      if (!isClickToCallInitialized) {
+        clickToCall();
+        isClickToCallInitialized = true; // Đánh dấu đã khởi tạo
+      }
       console.info("App is activated");
     },
     function (error) {
@@ -2288,6 +2223,7 @@ function eventHandlecallDialpad() {
   $("#appTextPhone").val(phoneNumberReceiver).text(phoneNumberReceiver);
   $("#appTextPhoneBusyCall").val(phoneNumberReceiver).text(phoneNumberReceiver);
 
+  debugger;
   if (existContact) {
     goToContact(idContact);
   } else {
@@ -2379,6 +2315,7 @@ function renderListContact(listContacts) {
 }
 
 function renderContact(contact) {
+  debugger;
   return `
     <li>
       <div><p class="lb__character">${contact?.letter}</p></div>
@@ -2388,6 +2325,7 @@ function renderContact(contact) {
 }
 
 function renderGroupItem(item) {
+  debugger;
   const avatarUrl =
     item?.profiles?.avatar?.avatar_url ?? "./images/icon_profile.png";
   const userPhone = item?.mobile ?? item?.phone;
@@ -2462,10 +2400,12 @@ function enableCharacterContact(elem) {
 function clickContactCall(elem) {
   let phone_contact = $(elem).attr("attr-user-phone");
   let name_contact = $(elem).attr("attr-user-contact");
-  let email_contact = $(elem).attr("attr-user-email");
+  // const email_contact = $(elem).attr("attr-user-email");
   idContact = $(elem).attr("attr-user-id");
   nameContact = name_contact;
-  emailContact = email_contact ? email_contact : emailContact;
+  getContactById(idContact);
+  // emailContact = email_contact ? email_contact : emailContact;
+  debugger;
   isInboundCall = false;
   if (phone_contact !== "null") {
     //show app
@@ -2488,22 +2428,23 @@ function clickContactCall(elem) {
         if (existContact) {
           goToContact(idContact);
         }
-        let call = webphone?.calls[0];
-        if (!call) {
-          // click without an active call -> start a video call to number 23
-          webphone?.makeCall(phoneNumberReceiver, {
-            autoOriginate: "doNotPrompt",
-            audio: true,
-            video: false,
-          });
-        } else if (call.localConnectionInfo == "alerting") {
-          // click while we have an alerting call -> accept it
-          call.answerCall({ audio: true, video: true });
-        } else {
-          // otherwise we release the call
-          call.clearConnection();
-          onAppDeactive();
-        }
+        // let call = webphone?.calls[0];
+        // if (!call) {
+        //   // click without an active call -> start a video call to number 23
+        //   webphone?.makeCall(phoneNumberReceiver, {
+        //     autoOriginate: "doNotPrompt",
+        //     audio: true,
+        //     video: false,
+        //   });
+        // } else if (call.localConnectionInfo == "alerting") {
+        //   // click while we have an alerting call -> accept it
+        //   call.answerCall({ audio: true, video: true });
+        // } else {
+        //   // otherwise we release the call
+        //   call.clearConnection();
+        //   onAppDeactive();
+        // }
+        actionClickToCall();
         /**Call tu man hinh dialpad **/
       })
       .catch(function (error) {
@@ -2751,6 +2692,7 @@ async function displayItems(items) {
 }
 
 function searchContact() {
+  debugger;
   const val = document.querySelector('input[name="search_contact"]').value;
   const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
   const phone = /^\d{10}$/;
@@ -2763,6 +2705,7 @@ function searchContact() {
 }
 
 async function searchContactKeyword(term) {
+  debugger;
   try {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
       context: {
@@ -2972,6 +2915,7 @@ async function createTicket() {
         } - ${phoneNumberReceiver} 👋, created ticket!</span></div>`,
         status: 2,
         source: 3, // phone
+        // responder_id: parseInt(idAgentFrsdesk),
       });
     } else {
       ticketDetails = JSON.stringify({
@@ -2981,9 +2925,11 @@ async function createTicket() {
         description: `<div id="origin_ticket"><span>Hey "Unknown Contact" - ${phoneNumberReceiver} 👋, created ticket!</span></div>`,
         status: 2,
         source: 3, // phone
+        // responder_id: parseInt(idAgentFrsdesk),
       });
     }
 
+    debugger;
     // Send request
     const dataTicket = await client.request.invokeTemplate("createTicket", {
       body: ticketDetails,
@@ -3006,8 +2952,7 @@ async function createTicket() {
     goToTicket(idTicket);
   } catch (error) {
     idContact = "";
-    console.error("Error: Failed to create a ticket");
-    console.error(error);
+    console.error("Failed to create a ticket", error);
     showNotify("danger", "Failed to create a ticket.");
   }
 }
@@ -3164,6 +3109,8 @@ function renderListHistoryCall(listHisCall) {
 
 function dateFormat(timeStamp) {
   const date = new Date(timeStamp);
+  const now = new Date();
+
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
@@ -3171,7 +3118,16 @@ function dateFormat(timeStamp) {
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  // Kiểm tra xem ngày có phải là ngày hiện tại không
+  if (
+    date.getDate() === now.getDate() &&
+    date.getMonth() + 1 === now.getMonth() + 1 &&
+    date.getFullYear() === now.getFullYear()
+  ) {
+    return `Today ${hours}:${minutes}:${seconds}`;
+  } else {
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
 }
 
 function durationFormat(duration) {
@@ -3215,7 +3171,7 @@ function renderTextHistoryCall(item) {
   const renderTooltip = (contact, style = "") => {
     const name = item?.profiles?.name || contact;
     return `<fw-tooltip>
-              <a class="text-title-his-call" href="#" style="${style}" attr-sdt="${contact}" onclick="clickToMissCall(this)">
+              <a class="text-title-his-call" href="#" style="${style}" attr-id="${item?.profiles?.id}" attr-sdt="${contact}" onclick="clickToMissCall(this)">
                 ${name}
               </a>
               <div slot="tooltip-content">
@@ -3295,7 +3251,13 @@ function clickToMissCall(elem) {
   isInboundCall = false;
   isMainShow == "miss_call";
   let sdt = $(elem).attr("attr-sdt");
-  filteredContactSearch(sdt);
+  idContact = $(elem).attr("attr-id");
+  getContactById(idContact);
+  debugger;
+  if (existContact) {
+    goToContact(idContact);
+  }
+  // filteredContactSearch(sdt);
   resizeAppDefault();
   openUI("mainOutbound");
   $("#mainCourse").css("display", "block");
@@ -3311,22 +3273,23 @@ function clickToMissCall(elem) {
 
   phoneNumberReceiver = sdt;
 
-  let call = webphone?.calls[0];
-  if (!call) {
-    // click without an active call -> start a video call to number 23
-    webphone?.makeCall(phoneNumberReceiver, {
-      autoOriginate: "doNotPrompt",
-      audio: true,
-      video: false,
-    });
-  } else if (call.localConnectionInfo == "alerting") {
-    // click while we have an alerting call -> accept it
-    call.answerCall({ audio: true, video: true });
-  } else {
-    // otherwise we release the call
-    call.clearConnection();
-    onAppDeactive();
-  }
+  actionClickToCall();
+  // let call = webphone?.calls[0];
+  // if (!call) {
+  //   // click without an active call -> start a video call to number 23
+  //   webphone?.makeCall(phoneNumberReceiver, {
+  //     autoOriginate: "doNotPrompt",
+  //     audio: true,
+  //     video: false,
+  //   });
+  // } else if (call.localConnectionInfo == "alerting") {
+  //   // click while we have an alerting call -> accept it
+  //   call.answerCall({ audio: true, video: true });
+  // } else {
+  //   // otherwise we release the call
+  //   call.clearConnection();
+  //   onAppDeactive();
+  // }
 }
 
 function redirectContactInfoMissCall(elem) {
@@ -3417,22 +3380,23 @@ function preCall() {
   $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
 
-  let call = webphone?.calls[0];
-  if (!call) {
-    // click without an active call -> start a video call to number 23
-    webphone?.makeCall(phoneNumberReceiver, {
-      autoOriginate: "doNotPrompt",
-      audio: true,
-      video: false,
-    });
-  } else if (call.localConnectionInfo == "alerting") {
-    // click while we have an alerting call -> accept it
-    call.answerCall({ audio: true, video: true });
-  } else {
-    // otherwise we release the call
-    call.clearConnection();
-    onAppDeactive();
-  }
+  actionClickToCall();
+  // let call = webphone?.calls[0];
+  // if (!call) {
+  //   // click without an active call -> start a video call to number 23
+  //   webphone?.makeCall(phoneNumberReceiver, {
+  //     autoOriginate: "doNotPrompt",
+  //     audio: true,
+  //     video: false,
+  //   });
+  // } else if (call.localConnectionInfo == "alerting") {
+  //   // click while we have an alerting call -> accept it
+  //   call.answerCall({ audio: true, video: true });
+  // } else {
+  //   // otherwise we release the call
+  //   call.clearConnection();
+  //   onAppDeactive();
+  // }
 }
 
 async function toggleEndCallCollapse() {
@@ -3579,7 +3543,9 @@ async function submitLogin() {
 
     try {
       const resultUserAs7 = await getUserInfoAs7(userLogin, passLogin);
-      if (resultUserAs7 !== null && resultUserAs7 !== undefined) {
+      if (resultUserAs7?.users === undefined)
+        return $("#btn_sub_login").attr({ disabled: false, loading: false });
+      if (resultUserAs7?.users?.length > 0) {
         // Encrypt
         var ciphertext = CryptoJS.AES.encrypt(
           JSON.stringify(passLogin),
@@ -3587,8 +3553,8 @@ async function submitLogin() {
         ).toString();
 
         // Decrypt
-        var bytes = CryptoJS.AES.decrypt(ciphertext, "encryptAsFsk");
-        var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        // var bytes = CryptoJS.AES.decrypt(ciphertext, "encryptAsFsk");
+        // var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
         const userInfAs7 = resultUserAs7?.users?.map((item) => {
           return {
@@ -3599,7 +3565,6 @@ async function submitLogin() {
         });
         const initialUserAs7 = userInfAs7 && userInfAs7[0];
         localStorage.setItem("initialUserAs7", JSON.stringify(initialUserAs7));
-
         agent.startApplicationSession({
           username: userLogin,
           password: passLogin,
@@ -3638,16 +3603,20 @@ async function submitLogin() {
             localStorage.setItem("userDevices", JSON.stringify(userDevices));
           }
 
+          isClickToCallInitialized = false;
           openUI("mainContent");
           $("#mainCourse").css("display", "block");
           $("#headCourse").css("display", "block");
           $("#menuApp").css("display", "block");
-          renderNameSipExtension("#appTxtService");
-
+          // renderNameSipExtension("#appTxtService");
+          resetText();
+          showMainDialpad();
           isLogger = true;
         } catch (error) {
           console.error("Error in fetching terminals or devices: ", error);
         }
+      } else {
+        showNotify("info", "Cannot find user credentials. Please try again.");
       }
     } catch (error) {
       console.error("Error in fetching user info: ", error);
@@ -3677,9 +3646,7 @@ async function getUserInfoAs7(param_email_as7, param_code_as7) {
 
       return data;
     } else {
-      showNotify("danger", response.statusText);
-
-      return null;
+      return showNotify("danger", response.statusText);
     }
   } catch (error) {
     console.error("Error:", error);
@@ -3846,7 +3813,6 @@ function appendDigit(digit) {
 }
 
 $("#mainCollapseClickToCall").click(function () {
-  debugger;
   isMainOutbound = true;
   isMainCollapse = "";
   isMainShow = "mainOutbound";
@@ -3856,20 +3822,6 @@ $("#mainCollapseClickToCall").click(function () {
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
-
-  // $("#mainOutbound").css("display", "block");
-  // $("#mainCollapseClickToCall").css("display", "none");
-  // $("#mainContent").css("display", "none");
-  // $("#mainBusyCall").css("display", "none");
-  // $("#mainListContacts").css("display", "none");
-  // $("#mainListMissCall").css("display", "none");
-  // $("#mainListHistoryCall").css("display", "none");
-  // $("#mainInbound").css("display", "none");
-  // $("#mainInboundCollapse").css("display", "none");
-  // $("#mainInboundListen").css("display", "none");
-  // $("#mainInboundListenCollapse").css("display", "none");
-  // $("#mainLogin").css("display", "none");
-  // $("#mainLogout").css("display", "none");
 });
 
 $("#toggleEndCallBusy").click(function () {
@@ -3930,8 +3882,8 @@ function submitLogout() {
     localStorage.clear();
     openUI("mainLogin");
     isMainShow = "mainLogin";
-    // $("#pbx_username").val("");
-    // $("#pbx_code").val("");
+    $("#pbx_username").val("");
+    $("#pbx_code").val("");
   });
 }
 
@@ -4070,3 +4022,109 @@ function matchSip(val) {
   return result;
 }
 /** Xử lý transfer **/
+
+function actionClickToCall() {
+  /**click to call as7*/
+  let call = webphone?.calls[0];
+  if (!call) {
+    // click without an active call -> start a video call to number 23
+    webphone?.makeCall(phoneNumberReceiver, {
+      autoOriginate: "doNotPrompt",
+      audio: true,
+      video: false,
+      // subjectOfCall: "PredictiveCall",
+    });
+  } else if (call.localConnectionInfo == "alerting") {
+    // click while we have an alerting call -> accept it
+    call.answerCall({ audio: true, video: false });
+  } else {
+    // otherwise we release the call
+    call.clearConnection();
+    onAppDeactive();
+  }
+  /**end click to call as7*/
+}
+
+function functionPass() {
+  let initialUserAs7 = JSON.parse(localStorage.getItem("initialUserAs7"));
+  let userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  let userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
+
+  if (initialUserAs7 && userDevices && userTerminals) {
+    var bytes = CryptoJS.AES.decrypt(
+      `${initialUserAs7?.uidPbFs}`,
+      "encryptAsFsk"
+    );
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedData;
+  }
+}
+
+agent.startApplicationSession({
+  // username: "anntp2@fpt.com",
+  // password: "nfcAm%HL7v",
+  username: JSON.parse(localStorage.getItem("initialUserAs7"))?.email,
+  password: functionPass(),
+});
+
+// handler is called if application-session was successfully started
+agent.on("applicationsessionstarted", () => {
+  // webphone = agent.getDevice("sip:1217@term.498");
+  const userDevices = JSON.parse(localStorage.getItem("userDevices"));
+  const userTerminals = JSON.parse(localStorage.getItem("userTerminals"));
+
+  webphone = agent.getDevice(
+    `${userDevices && userDevices[0]?.sip}${
+      userTerminals && userTerminals[0]?.term
+    }`
+  );
+
+  // get active forwardings
+  webphone?.getForwarding().then((response) => {
+    response.forwardingList.forEach((entry) => {
+      const fwd = entry.forwardingListItem;
+      if (fwd.forwardStatus) {
+        console.log(`active ${fwd.forwardingType} to number ${fwd.forwardDN}`);
+      }
+    });
+  });
+
+  console.log("webphone", webphone);
+  // tell server that we want to use WebRTC (error handling omitted)
+  webphone.monitorStart({ rtc: true });
+});
+// handler is called if application-session could not be started
+agent.on("applicationsessionterminated", (event) => {
+  if (event.reason == "invalidApplicationInfo") {
+    console.log("Please check your credentials and try again");
+  }
+});
+
+// if WebRTC creates a media-stream we bind it to the corresponding elements
+agent.on("localstream", (event) => {
+  document.getElementById("localView").srcObject = event.stream;
+});
+
+agent.on("remotestream", (event) => {
+  document.getElementById("remoteView").srcObject = event.stream;
+  audio.srcObject = event.stream;
+});
+
+// Event handler for call events
+agent.on("call", async (event) => {
+  try {
+    if (isBusyCause(event)) {
+      handleBusyCall(event);
+      return;
+    }
+    // else if (isTransferCause(event)) {
+    //   $("#transferingTo").css("display", "block");
+    // }
+
+    await handleLocalConnectionInfo(event);
+  } catch (error) {
+    isInboundCall = false;
+    console.error("Error: Failed to handle call event");
+    console.error(error);
+  }
+});
