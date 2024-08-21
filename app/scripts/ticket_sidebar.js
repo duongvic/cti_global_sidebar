@@ -149,10 +149,10 @@ async function getFileS3(crFileName) {
     });
     if (result?.status === 200) {
       var data = JSON.parse(result?.response);
-      var link_record = data.url;
+      // var link_record = data[0].url;
       // var link_record = link_record.replace(/^"|"$/g, "");
-      console.log("chay vao bc 2 getFileS3", link_record);
-      return link_record;
+      console.log("chay vao bc 2 getFileS3", data);
+      return data;
     }
   } catch (error) {
     console.log(error);
@@ -201,19 +201,19 @@ async function updateTicket(idTicket, idContact, url_record) {
 
 async function createNoteTicket() {
   $("#btn_upload_record").attr({ disabled: true, loading: true });
-  const dataUserLoginFrsdesk = await getUserDataLoginFrsdesk();
-  const link_record = await getLinkRecord();
-  if (link_record !== null) {
+  // const dataUserLoginFrsdesk = await getUserDataLoginFrsdesk();
+
+  var dataRecord = await getLinkRecord();
+  if (dataRecord && dataRecord?.data && dataRecord?.data?.length > 0) {
     let html = `<div style="font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size:14px" id="file_record_user">
-                  <div></div>  <br />
+                  <div></div><br />
                   <div dir="ltr">
-                    <span>
-                      file record
-                    </span>
-                    <br />
-                    <audio controls preload="auto" style="height: 30px;margin-top: 10px;">
-                      <source src="${link_record}" />
-                    </audio>
+                    <span>file record</span><br />
+                    ${dataRecord.data.map(item => `
+                      <audio controls preload="auto" style="height: 30px; margin-top: 10px;">
+                        <source src="${item.url}" />
+                      </audio>
+                    `).join('')}
                   </div>
                 </div>`;
     try {
