@@ -1069,8 +1069,7 @@ async function micBlindTransfer(x) {
     await setUpdateCallAs7(true);
   }
 }
-var input =
-  document.testBlindTransferHold_Unhold.savereportBlindTransferHold_Unhold;
+var input = document.testBlindTransferHold_Unhold.savereportBlindTransferHold_Unhold;
 async function changeHoldBlindTransfer(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
@@ -1100,33 +1099,69 @@ function clearAllIntervals() {
 }
 
 // Timer utility functions
+// function convertSec(cnt) {
+//   let sec = cnt % 60;
+//   let min = Math.floor(cnt / 60);
+//   return `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
+// }
+
+// // Timer control functions
+// function startTimer(elementId, counterRef) {
+//   return setInterval(() => {
+//     document.getElementById(elementId).textContent = convertSec(counterRef++);
+//   }, 1000);
+// }
+
+// // Timer start functions
+// function start() {
+//   interval = startTimer("timer", counter);
+// }
+
+// function startTimeCollapse() {
+//   intervalOutCollapse = startTimer("timerCollapse", counter_time_collapse);
+// }
+
+// function startTimeInbound() {
+//   intervalInbound = startTimer("timerInboundListen", counter_time_inbound);
+// }
+
+// function startTimeInboundListenCollapse() {
+//   intervalInboundListenCollapse = startTimer(
+//     "timerInboundListenCollapse",
+//     counter_time_inbound_listen_collapse
+//   );
+// }
+
 function convertSec(cnt) {
   let sec = cnt % 60;
   let min = Math.floor(cnt / 60);
   return `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
 }
 
-// Timer control functions
-function startTimer(elementId, counterRef) {
+function startTimer(elementId, startTime) {
   return setInterval(() => {
-    document.getElementById(elementId).textContent = convertSec(counterRef++);
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000); // Thêm 1 giây vào thời gian trôi qua
+    document.getElementById(elementId).textContent = convertSec(elapsedTime);
   }, 1000);
 }
 
-// Timer start functions
 function start() {
-  interval = startTimer("timer", counter);
+  const startTime = Date.now(); // Lưu lại thời điểm bắt đầu
+  interval = startTimer("timer", startTime);
 }
 
 function startTimeCollapse() {
+  const counter_time_collapse = Date.now();
   intervalOutCollapse = startTimer("timerCollapse", counter_time_collapse);
 }
 
 function startTimeInbound() {
+  const counter_time_inbound = Date.now(); // Lưu lại thời điểm bắt đầu
   intervalInbound = startTimer("timerInboundListen", counter_time_inbound);
 }
 
 function startTimeInboundListenCollapse() {
+  const counter_time_inbound_listen_collapse = Date.now(); // Lưu lại thời điểm bắt đầu
   intervalInboundListenCollapse = startTimer(
     "timerInboundListenCollapse",
     counter_time_inbound_listen_collapse
@@ -1215,6 +1250,8 @@ function handleBusyCall(event) {
 
 // Handle inbound call in alerting state
 async function handleInboundAlertingCall(call) {
+  debugger;
+  // notifyOnActionCall();
   isInboundCall = true;
   resizeAppDefault();
   await showSoftphone();
@@ -1250,7 +1287,6 @@ async function handleConnectedCall(call) {
     }
 
     if (!isUpdateCallAs7) {
-      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
@@ -1263,7 +1299,6 @@ async function handleConnectedCall(call) {
     }
 
     if (!isUpdateCallAs7) {
-      debugger;
       await (existContact ? createTicket() : createContact());
       await setUpdateCallAs7(true);
     }
@@ -1528,7 +1563,6 @@ function transformerItems(listItem) {
 }
 
 async function getContactData(page) {
-  debugger;
   $("#loadingImg").css("display", "block");
   $("#loadMoreTxt").css("display", "none");
 
@@ -1717,7 +1751,6 @@ async function filteredContactSearch(term) {
       context: { term },
     });
 
-    debugger;
     if (data?.status === 200) {
       const detail = data?.response ? JSON.parse(data?.response) : [];
       const filteredDataMobile = detail.filter((item) => item.mobile === term);
@@ -1743,7 +1776,6 @@ async function filteredContactSearch(term) {
 }
 
 function handleContactFound(contact, detail) {
-  debugger;
   existContact = true;
   idContact = contact.id;
   nameContact = contact.name;
@@ -1816,7 +1848,7 @@ async function getContactById(id_contact) {
       emailContact = detail.email;
       nameContact = detail.name;
       $("#appTxtNameContact").text(detail.name);
-
+      debugger;
       const avatarUrl =
         detail?.avatar?.avatar_url ?? "./images/avatar_none.png";
 
@@ -2120,6 +2152,7 @@ function onAppActivate() {
         isClickToCallInitialized = true; // Đánh dấu đã khởi tạo
       }
       console.info("App is activated");
+      console.info("isClickToCallInitialized:", isClickToCallInitialized);
     },
     function (error) {
       console.error("Failed to get logged in user data");
@@ -2223,7 +2256,6 @@ function eventHandlecallDialpad() {
   $("#appTextPhone").val(phoneNumberReceiver).text(phoneNumberReceiver);
   $("#appTextPhoneBusyCall").val(phoneNumberReceiver).text(phoneNumberReceiver);
 
-  debugger;
   if (existContact) {
     goToContact(idContact);
   } else {
@@ -2315,7 +2347,6 @@ function renderListContact(listContacts) {
 }
 
 function renderContact(contact) {
-  debugger;
   return `
     <li>
       <div><p class="lb__character">${contact?.letter}</p></div>
@@ -2325,7 +2356,6 @@ function renderContact(contact) {
 }
 
 function renderGroupItem(item) {
-  debugger;
   const avatarUrl =
     item?.profiles?.avatar?.avatar_url ?? "./images/icon_profile.png";
   const userPhone = item?.mobile ?? item?.phone;
@@ -2405,7 +2435,7 @@ function clickContactCall(elem) {
   nameContact = name_contact;
   getContactById(idContact);
   // emailContact = email_contact ? email_contact : emailContact;
-  debugger;
+
   isInboundCall = false;
   if (phone_contact !== "null") {
     //show app
@@ -2692,7 +2722,6 @@ async function displayItems(items) {
 }
 
 function searchContact() {
-  debugger;
   const val = document.querySelector('input[name="search_contact"]').value;
   const phone12 = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,5}$/;
   const phone = /^\d{10}$/;
@@ -2705,7 +2734,6 @@ function searchContact() {
 }
 
 async function searchContactKeyword(term) {
-  debugger;
   try {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
       context: {
@@ -2929,7 +2957,6 @@ async function createTicket() {
       });
     }
 
-    debugger;
     // Send request
     const dataTicket = await client.request.invokeTemplate("createTicket", {
       body: ticketDetails,
@@ -3253,7 +3280,6 @@ function clickToMissCall(elem) {
   let sdt = $(elem).attr("attr-sdt");
   idContact = $(elem).attr("attr-id");
   getContactById(idContact);
-  debugger;
   if (existContact) {
     goToContact(idContact);
   }
@@ -3884,6 +3910,7 @@ function submitLogout() {
     isMainShow = "mainLogin";
     $("#pbx_username").val("");
     $("#pbx_code").val("");
+    isClickToCallInitialized = false;
   });
 }
 
@@ -4128,3 +4155,73 @@ agent.on("call", async (event) => {
     console.error(error);
   }
 });
+
+// function playNotificationSound() {
+//   const audio = new Audio(
+//     "https://drive.google.com/uc?export=download&id=1ghnMZXZCdphRGy89OusQqFeBpFJDsuJ4"
+//   );
+//   audio.play();
+// }
+
+// // Hàm để hiển thị Web Notification
+// function showNotification() {
+//   if (Notification.permission === "granted") {
+//     const notification = new Notification("Có cuộc gọi mới!", {
+//       body: "Bấm vào đây để xem chi tiết.",
+//       icon: "https://yourdomain.com/path/to/icon.png", // Thay thế icon nếu cần
+//     });
+
+//     notification.onclick = function () {
+//       window.focus(); // Đưa tab này lên trên cùng
+//       playNotificationSound(); // Phát âm thanh khi người dùng nhấp vào thông báo
+//     };
+//   } else if (Notification.permission !== "denied") {
+//     Notification.requestPermission().then((permission) => {
+//       if (permission === "granted") {
+//         showNotification();
+//       }
+//     });
+//   }
+// }
+
+// // Hàm chính được gọi khi có sự kiện
+// function notifyOnActionCall() {
+//   if (document.hidden) {
+//     // Nếu tab không đang được xem
+//     showNotification(); // Hiển thị thông báo
+//     notifyWhenTabInactive("Bạn có thông báo mới!"); // Thay đổi tiêu đề tab
+//     playNotificationSound(); // Phát âm thanh
+//   } else {
+//     // Nếu tab đang hoạt động
+//     if (confirm("Có sự kiện mới xảy ra! Bạn có muốn xem chi tiết không?")) {
+//       // Thực hiện hành động nếu người dùng chọn "OK"
+//       alert("Bạn đã chọn xem chi tiết.");
+//     } else {
+//       // Thực hiện hành động nếu người dùng chọn "Cancel"
+//       alert("Bạn đã chọn không xem chi tiết.");
+//     }
+//     playNotificationSound(); // Phát âm thanh
+//   }
+// }
+
+// // Hàm để thay đổi tiêu đề tab khi tab không hoạt động
+// function notifyWhenTabInactive(message) {
+//   if (document.hidden) {
+//     const originalTitle = document.title;
+//     document.title = message;
+
+//     // Khôi phục lại tiêu đề khi tab trở lại
+//     document.addEventListener("visibilitychange", function () {
+//       if (!document.hidden) {
+//         document.title = originalTitle;
+//       }
+//     });
+//   }
+// }
+
+// // Yêu cầu quyền thông báo khi trang web được tải
+// document.addEventListener("DOMContentLoaded", function () {
+//   if (Notification.permission !== "granted") {
+//     Notification.requestPermission();
+//   }
+// });
