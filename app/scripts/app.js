@@ -1069,7 +1069,8 @@ async function micBlindTransfer(x) {
     await setUpdateCallAs7(true);
   }
 }
-var input = document.testBlindTransferHold_Unhold.savereportBlindTransferHold_Unhold;
+var input =
+  document.testBlindTransferHold_Unhold.savereportBlindTransferHold_Unhold;
 async function changeHoldBlindTransfer(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
@@ -1889,7 +1890,7 @@ function clickToCall() {
   ) {
     showNotify(
       "info",
-      "Please login OncallCx. Contact the administrator to check the SIP number"
+      "Please log in OnCallCX Webphone to use calling functions."
     );
     return submitLogout();
   }
@@ -3630,13 +3631,35 @@ async function submitLogin() {
           }
 
           isClickToCallInitialized = false;
-          openUI("mainContent");
-          $("#mainCourse").css("display", "block");
-          $("#headCourse").css("display", "block");
-          $("#menuApp").css("display", "block");
-          // renderNameSipExtension("#appTxtService");
+          debugger;
+          if (
+            resultTerminals !== null &&
+            resultTerminals !== undefined &&
+            resultTerminals?.terminals?.length > 0 &&
+            resultDeviceid !== null &&
+            resultDeviceid !== undefined &&
+            resultDeviceid?.addresses?.length > 0
+          ) {
+            openUI("mainContent");
+            $("#mainCourse").css("display", "block");
+            $("#headCourse").css("display", "block");
+            $("#menuApp").css("display", "block");
+            showMainDialpad();
+          }
+          if (
+            resultTerminals === null ||
+            resultTerminals === undefined ||
+            resultTerminals?.terminals?.length === 0 ||
+            resultDeviceid === null ||
+            resultDeviceid === undefined ||
+            resultDeviceid?.addresses?.length === 0
+          ) {
+            openUI("mainNoSipDevice");
+            $("#mainCourse").css("display", "block");
+            $("#headCourse").css("display", "block");
+            $("#menuApp").css("display", "none");
+          }
           resetText();
-          showMainDialpad();
           isLogger = true;
         } catch (error) {
           console.error("Error in fetching terminals or devices: ", error);

@@ -251,6 +251,34 @@
 
       <div id="includedContent">
 
+        <div id="mainNoSipDevice" class="city" style="display: none">
+          <div class="row menu-app" style="background: #12344d">
+            <div class="col-sm-3 muted">
+              <img src="./images/icon_dialpad.svg" />
+            </div>
+            <div class="col-sm-3 muted">
+              <img src="./images/icon_history.png" />
+            </div>
+            <div class="col-sm-3 muted">
+              <img src="./images/icon_missCall.png" />
+            </div>
+            <div class="col-sm-3 muted">
+              <img src="./images/icon_contactCall.png" />
+            </div>
+          </div>
+
+          <div class="text-center" style="padding-top: 2.5rem">
+            <img src="./images/connectivity.svg" />
+          </div>
+          <div class="text-center" style="padding: 15px 0px;">
+            <img src="./images/warning.svg" style="height: 24px" />
+          </div>
+          <div class="text-center">
+            <p style="font-size: 14px;color: black;font-weight: 500;">Unable to connect SIP Device.</p>
+            <p>Please contact OnCallCX Administrator.</p>
+          </div>
+        </div>
+
         <!-- Placeholder divs where HTML content will be loaded -->
         <!-- <div id="dynamicMainContent"></div> -->
         <div id="mainContent" class="city">
@@ -781,7 +809,8 @@
                 <form name="testMicBlindTransfer" method="post" style="display: none">
                   <input type="text" name="savereportMicBlindTransfer" value="false" />
                 </form>
-                <button class="btn-mic" value="false" id="checkMicBlindTransfer" disabled onclick="micBlindTransfer(this)">
+                <button class="btn-mic" value="false" id="checkMicBlindTransfer" disabled
+                  onclick="micBlindTransfer(this)">
                   <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" />
                   <!-- <i class="material-icons mic-un">&#xe02b;</i>
@@ -793,7 +822,8 @@
                 <form name="testBlindTransferHold_Unhold" method="post" style="display: none">
                   <input type="text" name="savereportBlindTransferHold_Unhold" value="false" />
                 </form>
-                <button class="btn-ac" value="false" id="checkHoldBlindTransfer" disabled onclick="changeHoldBlindTransfer(this)">
+                <button class="btn-ac" value="false" id="checkHoldBlindTransfer" disabled
+                  onclick="changeHoldBlindTransfer(this)">
                   <div class="bar1"></div>
                   <div class="bar2"></div>
                 </button>

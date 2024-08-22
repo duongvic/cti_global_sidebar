@@ -437,3 +437,7 @@ html {
 .change .bar2 {
   display: none;
 }
+
+.text-center {
+  text-align: center;
+}
