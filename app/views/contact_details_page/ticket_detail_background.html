@@ -1,26 +1,96 @@
-<!DOCTYPE html>
+<html>
 
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="{{{appclient}}}"></script>
-    <script defer src="../../scripts/ticket_detail_background.js"></script>
-    <script
-      async
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.esm.js"
-    ></script>
-    <script
-      async
-      nomodule
-      src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.js"
-    ></script>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
-    <title>Ticket Background</title>
-  </head>
 
-  <body></body>
+<body>
+
+  <button onclick="notifyMe()">Notify Me</button>
+
+  <!-- <audio id="myAudio">
+    <source src="../../images/sound.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio> -->
+
+
+  <audio id="myAudio" autoplay muted>
+    <source src="./images/sound.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <br><br>
+
+  <button onclick="playAudio()">Play Audio</button>
+  <button onclick="pauseAudio()">Pause Audio</button>
+
+  <script>
+
+
+    $(document).ready(function () {
+      if (Notification.permission !== "granted") Notification.requestPermission();
+    });
+    function notifyMe() {
+      if (!window.Notification) {
+        console.log("Browser does not support notifications.");
+        console.log("ten biens", Notification.permission);
+      } else {
+        console.log("Browser supports notifications.");
+        console.log("ten biens", Notification.permission);
+        // kiểm tra quyền được gửi notification
+        if (Notification.permission === "granted") {
+          console.log("Permission already granted.");
+          // hiển thị thông báo khi đã cấp quyền
+          var notify = new Notification("Xin chào!", {
+            body: "Bạn vừa mới cấp quyền gửi thông báo!",
+            icon: "https://agitech.com.vn/images/logo-agitech.png",
+          });
+        } else {
+          console.log("Requesting permission...");
+          // Kiểm tra quyền trước khi được gửi thông báo
+          Notification.requestPermission()
+            .then(function (p) {
+              if (p === "granted") {
+                console.log("Permission granted.");
+                // hiển thị thông báo
+                var notify = new Notification("Xin chào!", {
+                  body: "Bạn cần hỗ trợ gì?",
+                  icon: "https://agitech.com.vn/images/logo-agitech.png",
+                });
+              } else {
+                console.log("User blocked notifications.");
+              }
+            })
+            .catch(function (err) {
+              console.error(err);
+            });
+        }
+      }
+    }
+  </script>
+
+  <!-- <script>
+    var x = document.getElementById("myAudio");
+
+    function playAudio() {
+      x.play();
+    }
+
+    function pauseAudio() {
+      x.pause();
+    }
+  </script> -->
+  <script>
+    window.addEventListener('load', function () {
+      var audio = document.getElementById("myAudio");
+      audio.muted = false;  // Tắt chế độ mute sau khi phát âm thanh
+      audio.play().catch(error => {
+        console.log("Playback failed: " + error);
+      });
+    });
+  </script>
+</body>
+
 </html>

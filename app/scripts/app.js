@@ -1836,37 +1836,41 @@ function handleContactNotFound(val_phone) {
 //---- refactor filteredContactSearch---//
 
 async function getContactById(id_contact) {
-  try {
-    const data = await client.request.invokeTemplate("getContactById", {
-      context: {
-        id: parseInt(id_contact),
-      },
-    });
-    var detail = data?.response ? JSON.parse(data?.response) : [];
-    if (Object.keys(detail).length > 0) {
-      existContact = true;
-      idContact = id_contact;
-      emailContact = detail.email;
-      nameContact = detail.name;
-      $("#appTxtNameContact").text(detail.name);
-      debugger;
-      const avatarUrl =
-        detail?.avatar?.avatar_url ?? "./images/avatar_none.png";
-
-      // avtarContact = detail?.avatar?.avatar_url;
-      document.getElementById("avatarContact").src = avatarUrl;
-    } else {
-      existContact = false;
-      nameContact = "";
-      emailContact = "";
-      $("#appTextPhone").css({
-        fontSize: "20px",
-        padding: "10px 0px",
+  if (id_contact !== "undefined" || id_contact !== undefined) {
+    try {
+      const data = await client.request.invokeTemplate("getContactById", {
+        context: {
+          id: parseInt(id_contact),
+        },
       });
+      var detail = data?.response ? JSON.parse(data?.response) : [];
+      if (Object.keys(detail).length > 0) {
+        existContact = true;
+        idContact = id_contact;
+        emailContact = detail.email;
+        nameContact = detail.name;
+        $("#appTxtNameContact").text(detail.name);
+        debugger;
+        const avatarUrl =
+          detail?.avatar?.avatar_url ?? "./images/avatar_none.png";
+
+        // avtarContact = detail?.avatar?.avatar_url;
+        document.getElementById("avatarContact").src = avatarUrl;
+      } else {
+        existContact = false;
+        nameContact = "";
+        emailContact = "";
+        $("#appTextPhone").css({
+          fontSize: "20px",
+          padding: "10px 0px",
+        });
+      }
+      return detail;
+    } catch (error) {
+      console.log(error);
     }
-    return detail;
-  } catch (error) {
-    console.log(error);
+  } else {
+    existContact = false;
   }
 }
 
@@ -1881,6 +1885,12 @@ function clickToCall() {
   const userAs7 = JSON.parse(userAs7String);
   const userTerminalsString = localStorage.getItem("userTerminals");
   const userTerminals = JSON.parse(userTerminalsString);
+
+  if (isClickToCallInitialized) {
+    return;
+  }
+  isClickToCallInitialized = true;
+
   if (
     userAs7 === null ||
     userDevices === null ||
@@ -1895,15 +1905,17 @@ function clickToCall() {
     return submitLogout();
   }
 
-  if (isClickToCallInitialized) {
-    return;
-  }
-  isClickToCallInitialized = true;
-
   isMainOutbound = true;
   let textElementPhone = document.getElementById("appTextPhone");
-  client.events.on("cti.triggerDialer", function (event) {
+  client.events.on("cti.triggerDialer", async function (event) {
     openApp();
+
+    var data = event.helper.getData();
+    console.log("data event.helper :", data);
+    await getContactById(data?.id);
+    textElementPhone.innerText = data.number;
+    phoneNumberReceiver = data.number;
+    isInboundCall = false;
 
     openUI("mainOutbound");
     $("#mainCourse").css("display", "block");
@@ -1911,14 +1923,7 @@ function clickToCall() {
     $("#menuApp").css("display", "none");
     renderNameSipExtension("#appTxtService");
 
-    var data = event.helper.getData();
-    console.log("data event.helper :", data);
-    textElementPhone.innerText = data.number;
-    phoneNumberReceiver = data.number;
-    isInboundCall = false;
-
     goToContact(data?.id);
-    getContactById(data?.id);
 
     actionClickToCall();
   });
@@ -2241,6 +2246,7 @@ function ResetTxtPhone() {
  * call dialpad events
  **/
 function eventHandlecallDialpad() {
+  notifyMe();
   openApp();
   openUI("mainOutbound");
   // renderNameSipExtension("#appTxtServiceOutbound");
@@ -2874,6 +2880,7 @@ function viewScreeInboundListenCollapse() {
 }
 
 function viewMainInbound() {
+  debugger;
   isMainShow == "mainInbound";
   isMainInbound = true;
   isMainOutbound = false;
@@ -2882,6 +2889,7 @@ function viewMainInbound() {
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
+  playAudio;
 }
 
 function btnShowMainInbound() {
@@ -3283,6 +3291,15 @@ function clickToMissCall(elem) {
   getContactById(idContact);
   if (existContact) {
     goToContact(idContact);
+    $("#appTxtNameContact").val(nameContact);
+    $("#appTxtNameContact").text(nameContact);
+  } else {
+    $("#appTxtNameContact").val(
+      `Unknown Contact`.concat(" - ").concat(`${sdt}`)
+    );
+    $("#appTxtNameContact").text(
+      `Unknown Contact`.concat(" - ").concat(`${sdt}`)
+    );
   }
   // filteredContactSearch(sdt);
   resizeAppDefault();
@@ -3291,9 +3308,6 @@ function clickToMissCall(elem) {
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
   renderNameSipExtension("#appTxtService");
-
-  $("#appTxtNameContact").val(nameContact);
-  $("#appTxtNameContact").text(nameContact);
 
   $("#appTextPhone").val(sdt);
   $("#appTextPhone").text(sdt);
@@ -4248,3 +4262,53 @@ agent.on("call", async (event) => {
 //     Notification.requestPermission();
 //   }
 // });
+
+$(document).ready(function () {
+  if (Notification.permission !== "granted") Notification.requestPermission();
+});
+function notifyMe() {
+  if (!window.Notification) {
+    console.log("Browser does not support notifications.");
+    console.log("ten biens", Notification.permission);
+  } else {
+    console.log("Browser supports notifications.");
+    console.log("ten biens", Notification.permission);
+    // kiểm tra quyền được gửi notification
+    if (Notification.permission === "granted") {
+      console.log("Permission already granted.");
+      // hiển thị thông báo khi đã cấp quyền
+      var notify = new Notification("Xin chào!", {
+        body: "Bạn vừa mới cấp quyền gửi thông báo!",
+        icon: "https://agitech.com.vn/images/logo-agitech.png",
+      });
+    } else {
+      console.log("Requesting permission...");
+      // Kiểm tra quyền trước khi được gửi thông báo
+      Notification.requestPermission()
+        .then(function (p) {
+          if (p === "granted") {
+            console.log("Permission granted.");
+            // hiển thị thông báo
+            var notify = new Notification("Xin chào!", {
+              body: "Bạn cần hỗ trợ gì?",
+              icon: "https://agitech.com.vn/images/logo-agitech.png",
+            });
+          } else {
+            console.log("User blocked notifications.");
+          }
+        })
+        .catch(function (err) {
+          console.error(err);
+        });
+    }
+  }
+}
+
+var x = document.getElementById("myAudio");
+function playAudio() {
+  // x.play();
+  x.muted = false; // Tắt chế độ mute sau khi phát âm thanh
+  x.play().catch((error) => {
+    console.log("Playback failed: " + error);
+  });
+}

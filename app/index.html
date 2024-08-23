@@ -4,8 +4,8 @@
 
 <head>
   <title>CTI App</title>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- <meta charset="UTF-8" /> -->
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script async src="{{{appclient}}}"></script>
@@ -40,6 +40,16 @@
 </head>
 
 <body>
+  <!-- <audio id="myAudio">
+    <source src="./images/sound.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio> -->
+
+
+  <audio id="myAudio" autoplay muted>
+    <source src="./images/sound.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="fw-widget-wrapper">
     <video id="localView" style="display: none" playsinline autoplay muted></video>
     <video id="remoteView" style="display: none" playsinline autoplay muted></video>
@@ -863,6 +873,17 @@
       // $( "#includedContent" ).load( "mainListHistoryCall.html" );
       // $( "#includedContent" ).load( "mainListMissCall.html" );
     </script>
+
+
+    <!-- <script>
+      window.addEventListener('load', function () {
+        var audio = document.getElementById("myAudio");
+        audio.muted = false;  // Tắt chế độ mute sau khi phát âm thanh
+        audio.play().catch(error => {
+          console.log("Playback failed: " + error);
+        });
+      });
+    </script> -->
 
 </body>
 
