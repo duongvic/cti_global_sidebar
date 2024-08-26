@@ -56,17 +56,25 @@
 
     <div id="mainLogin" class="background-login city" style="display: none">
       <div class="content-login">
-        <div class="ph-10 pb-10">
-          <fw-input id="pbx_username" label="PBX username" placeholder="example@gmail.com" required clear-input>
+        <div class="ph-10">
+          <fw-input id="pbx_username" label="PBX username" placeholder="example@gmail.com" required clear-input
+            style="width: 98%;">
           </fw-input>
         </div>
-        <div class="ph-10 pb-10">
-          <fw-input label="PBX code" id="pbx_code" placeholder="Enter code" required clear-input type="password"
+        <div class="ph-10">
+          <!-- <fw-input label="PBX code" id="pbx_code" placeholder="Enter code" required clear-input type="password"
             icon-right="visible">
-          </fw-input>
+          </fw-input> -->
+          <div><label class="pbx-label">PBX code &nbsp;<span style="color: red;">*</span></label></div>
+          <div class="input-container-pbx">
+            <input type="password" class="pbx-input" placeholder="Enter code" id="pbx_code">
+            <button class="clear-input" id="clearInput">x</button>
+            <button class="toggle-password" id="togglePassword">👁</button>
+          </div>
+
         </div>
-        <div class="ph-10 pt-10">
-          <fw-button style="width: 100%" onclick="submitLogin()" id="btn_sub_login">Login</fw-button>
+        <div class="ph-10 pt-16">
+          <fw-button style="width: 98%" onclick="submitLogin()" id="btn_sub_login">Login</fw-button>
         </div>
       </div>
     </div>
@@ -291,7 +299,7 @@
 
         <!-- Placeholder divs where HTML content will be loaded -->
         <!-- <div id="dynamicMainContent"></div> -->
-        <div id="mainContent" class="city">
+        <div id="mainContent" class="city" style="display: none">
           <!-- chèn đoạn code từ file dropDownExtendSST.html vào -->
           <div id="mainDialpad">
             <div class="txt-phone">
@@ -378,7 +386,7 @@
 
         <!-- màn hình đang gọi -->
         <!-- <div id="dynamicMainOutbound"></div> -->
-        <div id="mainOutbound" class="city">
+        <div id="mainOutbound" class="city" style="display: none">
           <div class="calling">
             <p class="text-algin" style="padding-top: 9%; padding-bottom: 3rem">Outbound Call
               <span class="ball-loader">
@@ -439,7 +447,7 @@
 
         <!-- màn hình bận -->
         <!-- <div id="dynamicMainBusyCall"></div>-->
-        <div id="mainBusyCall" class="busy__call city">
+        <div id="mainBusyCall" class="busy__call city" style="display: none">
           <!-- <div class="container-main">
             <div class="left-content-main">
               <label class="appTxtService" id="appTxtServiceBusyCall"></label>
@@ -518,7 +526,7 @@
           </div>
         </div>
         <!--<div id="dynamicMainCollapseClickToCall"></div> -->
-        <div id="mainCollapseClickToCall" onclick="mainCollapseClickToCall()" class="city">
+        <div id="mainCollapseClickToCall" onclick="mainCollapseClickToCall()" class="city" style="display: none">
           <div class="waiting__screen">
             <div class="col-6">
               <div class="timer-group">
@@ -536,7 +544,7 @@
 
         <!-- Inbound -->
         <!-- <div id="dynamicMainInbound"></div> -->
-        <div id="mainInbound" class="city">
+        <div id="mainInbound" class="city" style="display: none">
           <!-- <div style="background: #12344D;">
           
               <fw-button class="action-buttons flr" id="btnCollapseClickInBound" size="small" color="primary">__
@@ -594,7 +602,7 @@
 
         <!-- thu gon màn hình agent call chưa bắt máy -->
         <!-- <div id="dynamicMainInboundCollapse"></div> -->
-        <div id="mainInboundCollapse" class="city">
+        <div id="mainInboundCollapse" class="city" style="display: none">
           <div class="waiting__screen">
             <div class="col-6" onclick="btnShowMainInbound()">
               <div class="timer-group">
@@ -615,7 +623,7 @@
         </div>
         <!-- màn agent bắt máy  -->
         <!-- <div id="dynamicMainInboundListen"></div> -->
-        <div id="mainInboundListen" class="city">
+        <div id="mainInboundListen" class="city" style="display: none">
           <div class="calling">
             <p class="text-algin" style="padding-top: 5% ; padding-bottom: 3rem;">Inbound Call
               <span class="ball-loader">
@@ -670,7 +678,7 @@
         <!--thu gọn màn agent bắt máy  -->
         <!-- <div id="dynamicMainInboundListenCollapse"></div> -->
         <!--thu gọn màn agent bắt máy  -->
-        <div id="mainInboundListenCollapse" onclick="btShowMainInboundListen()" class="city">
+        <div id="mainInboundListenCollapse" onclick="btShowMainInboundListen()" class="city" style="display: none">
           <div class="waiting__screen">
             <div class="col-6">
               <div class="timer-group">
@@ -687,7 +695,7 @@
         </div>
         <!-- Contact -->
         <!-- <div id="dynamicMainListContacts"></div> -->
-        <div id="mainListContacts" class="city">
+        <div id="mainListContacts" class="city" style="display: none">
           <div class="menuContact">
             <div>
               <p class="lb__contact">Danh bạ</p>
@@ -754,7 +762,7 @@
         </div>
         <!-- History Call -->
         <!-- <div id="dynamicMainListHistoryCall"></div> -->
-        <div id="mainListHistoryCall" class="city">
+        <div id="mainListHistoryCall" class="city" style="display: none">
           <div class="wap-his-call">
             <ol id="listHistoryCall"></ol>
             <div class="loadMore">
@@ -764,7 +772,7 @@
         </div>
         <!-- History Miss Call -->
         <!-- <div id="dynamicMainListMissCall"></div> -->
-        <div id="mainListMissCall" class="city ">
+        <div id="mainListMissCall" class="city" style="display: none">
           <!-- <div class="scrollpane-his-call"> -->
           <div class="wap-his-call">
             <ol id="listHisMissCall"></ol>
@@ -777,7 +785,7 @@
         </div>
 
         <!-- transfer -->
-        <div id="mainBlindTransfer" class="city">
+        <div id="mainBlindTransfer" class="city" style="display: none">
           <div class="container-bil-transfer">
             <div class="section-bil-transfer">
               <p class="p-blind">Blind Transfer</p>

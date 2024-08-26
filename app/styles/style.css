@@ -441,3 +441,97 @@ html {
 .text-center {
   text-align: center;
 }
+
+/* Base style for the input field */
+.pbx-input {
+  border-radius: 5px;
+  padding: 7px 11px;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.3s ease;
+  border: 1px solid #cfd7df;
+}
+
+/* Change color for the placeholder */
+.pbx-input::placeholder {
+  color: #92a2b1;
+  /* opacity: 1; */
+}
+
+/* Placeholder style for WebKit browsers (Chrome, Safari, etc.) */
+.pbx-input::-webkit-input-placeholder {
+  color: #92a2b1;
+}
+
+/* Placeholder style for Mozilla Firefox */
+.pbx-input::-moz-placeholder {
+  color: #92a2b1;
+}
+
+/* Placeholder style for Internet Explorer */
+.pbx-input:-ms-input-placeholder {
+  color: #92a2b1;
+}
+
+/* Placeholder style for Microsoft Edge */
+.pbx-input::-ms-input-placeholder {
+  color: #92a2b1;
+}
+
+/* Style for the hover effect */
+.pbx-input:hover {
+  border-color: black;
+}
+
+/* Style for the focus effect */
+.pbx-input:focus {
+  border: 2px solid #2268c3;
+  border-radius: 5px;
+}
+
+/* Optional: Style for the visibility toggle button (eye icon) */
+.toggle-password {
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 16px;
+}
+
+/* Optional: Style for the clear button (X icon) */
+.clear-input {
+  cursor: pointer;
+  position: absolute;
+  right: 32px;
+  top: 46%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  display: none;
+}
+
+/* Container to hold the input field and buttons */
+.input-container-pbx {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.pbx-label {
+  display: block;
+  font-size: 12px;
+  color: var(--fw-label-color, #475867);
+  font-weight: 600;
+  margin-block-end: 4px;
+  padding-inline-start: 2px;
+  line-height: 20px;
+}
+
+.pt-16 {
+  padding-top: 16px;
+}

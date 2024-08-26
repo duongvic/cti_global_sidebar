@@ -1099,40 +1099,6 @@ function clearAllIntervals() {
   clearInterval(intervalInboundListenCollapse);
 }
 
-// Timer utility functions
-// function convertSec(cnt) {
-//   let sec = cnt % 60;
-//   let min = Math.floor(cnt / 60);
-//   return `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
-// }
-
-// // Timer control functions
-// function startTimer(elementId, counterRef) {
-//   return setInterval(() => {
-//     document.getElementById(elementId).textContent = convertSec(counterRef++);
-//   }, 1000);
-// }
-
-// // Timer start functions
-// function start() {
-//   interval = startTimer("timer", counter);
-// }
-
-// function startTimeCollapse() {
-//   intervalOutCollapse = startTimer("timerCollapse", counter_time_collapse);
-// }
-
-// function startTimeInbound() {
-//   intervalInbound = startTimer("timerInboundListen", counter_time_inbound);
-// }
-
-// function startTimeInboundListenCollapse() {
-//   intervalInboundListenCollapse = startTimer(
-//     "timerInboundListenCollapse",
-//     counter_time_inbound_listen_collapse
-//   );
-// }
-
 function convertSec(cnt) {
   let sec = cnt % 60;
   let min = Math.floor(cnt / 60);
@@ -1850,7 +1816,6 @@ async function getContactById(id_contact) {
         emailContact = detail.email;
         nameContact = detail.name;
         $("#appTxtNameContact").text(detail.name);
-        debugger;
         const avatarUrl =
           detail?.avatar?.avatar_url ?? "./images/avatar_none.png";
 
@@ -1908,8 +1873,6 @@ function clickToCall() {
   isMainOutbound = true;
   let textElementPhone = document.getElementById("appTextPhone");
   client.events.on("cti.triggerDialer", async function (event) {
-    openApp();
-
     var data = event.helper.getData();
     console.log("data event.helper :", data);
     await getContactById(data?.id);
@@ -1917,12 +1880,15 @@ function clickToCall() {
     phoneNumberReceiver = data.number;
     isInboundCall = false;
 
+    $("#mainContent").css("display", "none");
+    $("#headCourse").css("display", "none");
     openUI("mainOutbound");
     $("#mainCourse").css("display", "block");
     $("#headCourse").css("display", "block");
     $("#menuApp").css("display", "none");
     renderNameSipExtension("#appTxtService");
 
+    openApp();
     goToContact(data?.id);
 
     actionClickToCall();
@@ -2246,7 +2212,7 @@ function ResetTxtPhone() {
  * call dialpad events
  **/
 function eventHandlecallDialpad() {
-  notifyMe();
+  // notifyMe();
   openApp();
   openUI("mainOutbound");
   // renderNameSipExtension("#appTxtServiceOutbound");
@@ -4312,3 +4278,33 @@ function playAudio() {
     console.log("Playback failed: " + error);
   });
 }
+
+const clearButton = document.getElementById("clearInput");
+const pbxInput = document.getElementById("pbx_code");
+const togglePasswordButton = document.getElementById("togglePassword");
+
+// Show or hide the "X" button based on input value
+pbxInput.addEventListener("input", function () {
+  clearButton.style.display = pbxInput.value ? "block" : "none";
+});
+
+// Clear the input when the "X" button is clicked
+clearButton.addEventListener("click", function () {
+  pbxInput.value = "";
+  clearButton.style.display = "none";
+  pbxInput.focus(); // Optionally refocus the input field
+});
+
+// Toggle the password visibility when the "eye" button is clicked
+togglePasswordButton.addEventListener("click", function () {
+  const type =
+    pbxInput.getAttribute("type") === "password" ? "text" : "password";
+  pbxInput.setAttribute("type", type);
+  this.textContent = type === "password" ? "👁" : "👁️‍🗨️"; // Change the icon to an eye with a slash
+});
+
+// Change the input type back to password when the mouse leaves the input field
+pbxInput.addEventListener("mouseleave", function () {
+  pbxInput.setAttribute("type", "password");
+  togglePasswordButton.textContent = "👁"; // Reset the icon to eye
+});
