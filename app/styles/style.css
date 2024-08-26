@@ -535,3 +535,10 @@ html {
 .pt-16 {
   padding-top: 16px;
 }
+
+.pbx-span {
+  font-size: 14px;
+  color: rgb(215, 45, 48);
+  padding-inline-start: 2px;
+  font-weight: 700;
+}

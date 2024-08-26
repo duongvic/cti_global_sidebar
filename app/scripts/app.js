@@ -1217,7 +1217,8 @@ function handleBusyCall(event) {
 
 // Handle inbound call in alerting state
 async function handleInboundAlertingCall(call) {
-  debugger;
+  // debugger;
+  // notifyMe();
   // notifyOnActionCall();
   isInboundCall = true;
   resizeAppDefault();
@@ -2846,7 +2847,7 @@ function viewScreeInboundListenCollapse() {
 }
 
 function viewMainInbound() {
-  debugger;
+  // debugger;
   isMainShow == "mainInbound";
   isMainInbound = true;
   isMainOutbound = false;
@@ -2855,7 +2856,7 @@ function viewMainInbound() {
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
   $("#menuApp").css("display", "none");
-  playAudio;
+  // playAudio;
 }
 
 function btnShowMainInbound() {
@@ -3611,7 +3612,7 @@ async function submitLogin() {
           }
 
           isClickToCallInitialized = false;
-          debugger;
+          // debugger;
           if (
             resultTerminals !== null &&
             resultTerminals !== undefined &&
