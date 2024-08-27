@@ -3527,132 +3527,143 @@ async function submitLogin() {
   localStorage.clear();
   let userLogin = $("#pbx_username").val();
   let passLogin = $("#pbx_code").val();
+
+  // Kiểm tra tên người dùng
   if (userLogin === "" || !userLogin.match(matchEmail)) {
     $("#pbx_username").attr("error-text", "Pbx username is incorrect");
     $("#pbx_username").attr("state", "error");
-
-    return console.log("PBX username không được để trống");
-  }
-
-  if (userLogin.match(matchEmail) && passLogin === "") {
+    return console.log("PBX username cannot be blank");
+  } else {
     $("#pbx_username").removeAttr("error-text").removeAttr("state");
-    $("#pbx_code").attr("error-text", "PBX code is incorrect");
-    $("#pbx_code").attr("state", "error");
-    return console.log("PBX username correct");
   }
+  // Kiểm tra mật khẩu
+  // if (userLogin.match(matchEmail) && passLogin === "") {
+  //   $("#pbx_username").removeAttr("error-text").removeAttr("state");
+  //   // $("#pbx_code").attr("error-text", "PBX code is incorrect");
+  //   // $("#pbx_code").attr("state", "error");
+  //   return showNotify("error", "PBX code correct");
+  // }
+
   if (passLogin === "") {
-    $("#pbx_code").attr("error-text", "PBX code is incorrect");
-    $("#pbx_code").attr("state", "error");
-    return console.log("PBX code không được để trống");
+    // $("#pbx_username").removeAttr("error-text").removeAttr("state");
+    // $("#pbx_code").attr("error-text", "PBX code is incorrect");
+    // $("#pbx_code").attr("state", "error");
+    showNotify("danger", "PBX code cannot be blank");
+    return;
   }
+  // Xóa trạng thái lỗi nếu thông tin hợp lệ
   if (userLogin !== "" && userLogin.match(matchEmail) && passLogin !== "") {
     $("#pbx_username").removeAttr("error-text").removeAttr("state");
-    $("#pbx_code").removeAttr("error-text").removeAttr("state");
+    // $("#pbx_code").removeAttr("error-text").removeAttr("state");
 
     try {
       const resultUserAs7 = await getUserInfoAs7(userLogin, passLogin);
-      if (resultUserAs7?.users === undefined)
-        return $("#btn_sub_login").attr({ disabled: false, loading: false });
-      if (resultUserAs7?.users?.length > 0) {
-        // Encrypt
-        var ciphertext = CryptoJS.AES.encrypt(
-          JSON.stringify(passLogin),
-          "encryptAsFsk"
-        ).toString();
 
-        // Decrypt
-        // var bytes = CryptoJS.AES.decrypt(ciphertext, "encryptAsFsk");
-        // var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-        const userInfAs7 = resultUserAs7?.users?.map((item) => {
-          return {
-            ...item,
-            uidPbFs: ciphertext,
-            fullName: item.firstName + " " + item.lastName,
-          };
-        });
-        const initialUserAs7 = userInfAs7 && userInfAs7[0];
-        localStorage.setItem("initialUserAs7", JSON.stringify(initialUserAs7));
-        agent.startApplicationSession({
-          username: userLogin,
-          password: passLogin,
-        });
-
-        try {
-          const [resultTerminals, resultDeviceid] = await Promise.all([
-            getTerminalsByUserId(initialUserAs7),
-            getDeviceidByUserId(initialUserAs7),
-          ]);
-
-          if (resultTerminals !== null && resultTerminals !== undefined) {
-            const userTerminals =
-              resultTerminals &&
-              resultTerminals?.terminals?.map((item) => {
-                return {
-                  ...item,
-                  term: "@term.".concat(item.id),
-                };
-              });
-            localStorage.setItem(
-              "userTerminals",
-              JSON.stringify(userTerminals)
-            );
-          }
-
-          if (resultDeviceid !== null && resultDeviceid !== undefined) {
-            const userDevices =
-              resultDeviceid &&
-              resultDeviceid?.addresses?.map((item) => {
-                return {
-                  ...item,
-                  sip: "sip:".concat(item.number),
-                };
-              });
-            localStorage.setItem("userDevices", JSON.stringify(userDevices));
-          }
-
-          isClickToCallInitialized = false;
-          // debugger;
-          if (
-            resultTerminals !== null &&
-            resultTerminals !== undefined &&
-            resultTerminals?.terminals?.length > 0 &&
-            resultDeviceid !== null &&
-            resultDeviceid !== undefined &&
-            resultDeviceid?.addresses?.length > 0
-          ) {
-            openUI("mainContent");
-            $("#mainCourse").css("display", "block");
-            $("#headCourse").css("display", "block");
-            $("#menuApp").css("display", "block");
-            showMainDialpad();
-          }
-          if (
-            resultTerminals === null ||
-            resultTerminals === undefined ||
-            resultTerminals?.terminals?.length === 0 ||
-            resultDeviceid === null ||
-            resultDeviceid === undefined ||
-            resultDeviceid?.addresses?.length === 0
-          ) {
-            openUI("mainNoSipDevice");
-            $("#mainCourse").css("display", "block");
-            $("#headCourse").css("display", "block");
-            $("#menuApp").css("display", "none");
-          }
-          resetText();
-          isLogger = true;
-        } catch (error) {
-          console.error("Error in fetching terminals or devices: ", error);
-        }
-      } else {
+      if (!resultUserAs7?.users || resultUserAs7?.users.length === 0) {
         showNotify("info", "Cannot find user credentials. Please try again.");
+        $("#btn_sub_login").attr({ disabled: false, loading: false });
+        return;
       }
+
+      // if (resultUserAs7?.users === undefined)
+      //   return $("#btn_sub_login").attr({ disabled: false, loading: false });
+
+      // if (resultUserAs7?.users?.length > 0) {
+
+      // Mã hóa mật khẩu
+      var ciphertext = CryptoJS.AES.encrypt(
+        JSON.stringify(passLogin),
+        "encryptAsFsk"
+      ).toString();
+
+      // Decrypt
+      // var bytes = CryptoJS.AES.decrypt(ciphertext, "encryptAsFsk");
+      // var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+      const userInfAs7 = resultUserAs7?.users?.map((item) => {
+        return {
+          ...item,
+          uidPbFs: ciphertext,
+          fullName: item.firstName + " " + item.lastName,
+        };
+      });
+
+      const initialUserAs7 = userInfAs7 && userInfAs7[0];
+      localStorage.setItem("initialUserAs7", JSON.stringify(initialUserAs7));
+
+      // Bắt đầu phiên ứng dụng
+      agent.startApplicationSession({
+        username: userLogin,
+        password: passLogin,
+      });
+
+      try {
+        const [resultTerminals, resultDeviceid] = await Promise.all([
+          getTerminalsByUserId(initialUserAs7),
+          getDeviceidByUserId(initialUserAs7),
+        ]);
+
+        if (resultTerminals !== null && resultTerminals !== undefined) {
+          const userTerminals =
+            resultTerminals &&
+            resultTerminals?.terminals?.map((item) => {
+              return {
+                ...item,
+                term: "@term.".concat(item.id),
+              };
+            });
+          localStorage.setItem("userTerminals", JSON.stringify(userTerminals));
+        }
+
+        if (resultDeviceid !== null && resultDeviceid !== undefined) {
+          const userDevices =
+            resultDeviceid &&
+            resultDeviceid?.addresses?.map((item) => {
+              return {
+                ...item,
+                sip: "sip:".concat(item.number),
+              };
+            });
+          localStorage.setItem("userDevices", JSON.stringify(userDevices));
+        }
+
+        isClickToCallInitialized = false;
+        // debugger;
+
+        // Kiểm tra và mở giao diện UI tương ứng
+        if (
+          resultTerminals?.terminals?.length > 0 &&
+          resultDeviceid?.addresses?.length > 0
+        ) {
+          openUI("mainContent");
+          $("#mainCourse").css("display", "block");
+          $("#headCourse").css("display", "block");
+          $("#menuApp").css("display", "block");
+          showMainDialpad();
+        } else {
+          openUI("mainNoSipDevice");
+          $("#mainCourse").css("display", "block");
+          $("#headCourse").css("display", "block");
+          $("#menuApp").css("display", "none");
+        }
+        resetText();
+        isLogger = true;
+      } catch (error) {
+        console.error("Error in fetching terminals or devices: ", error);
+        showNotify("error", "Error in fetching devices or terminals.");
+      }
+      // }
+
+      // else {
+      //   showNotify("info", "Cannot find user credentials. Please try again.");
+      // }
     } catch (error) {
       console.error("Error in fetching user info: ", error);
+      showNotify("error", "Security violation or incorrect user credentials.");
+    } finally {
+      $("#btn_sub_login").attr({ disabled: false, loading: false });
     }
   }
-  $("#btn_sub_login").attr({ disabled: false, loading: false });
 }
 
 async function getUserInfoAs7(param_email_as7, param_code_as7) {
