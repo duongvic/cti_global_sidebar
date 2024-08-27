@@ -3425,12 +3425,12 @@ function toggleEndCall() {
   client.interface
     .trigger("show", { id: "softphone" })
     .then(async function () {
-      resetText();
       actionDesktopEndCall = true;
       if (idTicket != null) {
         await insertIdTicketAs7(idTicket);
       }
       endCall();
+      resetText();
     })
     .catch(function (error) {
       console.error("Error: Failed to close the CTI app");
