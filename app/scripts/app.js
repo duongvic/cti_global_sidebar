@@ -1247,7 +1247,6 @@ async function handleInboundAlertingCall(call) {
 // Handle connected call
 async function handleConnectedCall(call) {
   console.log(`Connected to ${call.number}`);
-  console.log("Màn hinh dang hien thi:", isMainActive);
   if (!isInboundCall) {
     if (!isTimeStarted) {
       start();
@@ -1845,6 +1844,7 @@ async function getContactById(id_contact) {
  */
 
 function clickToCall() {
+
   const userDevicesString = localStorage.getItem("userDevices");
   const userDevices = JSON.parse(userDevicesString);
   const userAs7String = localStorage.getItem("initialUserAs7");
@@ -4081,8 +4081,11 @@ function actionClickToCall() {
     call.answerCall({ audio: true, video: false });
   } else {
     // otherwise we release the call
-    call.clearConnection();
-    onAppDeactive();
+    // call.clearConnection();
+    // onAppDeactive();
+    showNotify("info", "You are on another call.");
+    isMainCollapse = "";
+    resizeAppDefault();
   }
   /**end click to call as7*/
 }
@@ -4241,55 +4244,55 @@ agent.on("call", async (event) => {
 //   }
 // });
 
-$(document).ready(function () {
-  if (Notification.permission !== "granted") Notification.requestPermission();
-});
-function notifyMe() {
-  if (!window.Notification) {
-    console.log("Browser does not support notifications.");
-    console.log("ten biens", Notification.permission);
-  } else {
-    console.log("Browser supports notifications.");
-    console.log("ten biens", Notification.permission);
-    // kiểm tra quyền được gửi notification
-    if (Notification.permission === "granted") {
-      console.log("Permission already granted.");
-      // hiển thị thông báo khi đã cấp quyền
-      var notify = new Notification("Xin chào!", {
-        body: "Bạn vừa mới cấp quyền gửi thông báo!",
-        icon: "https://agitech.com.vn/images/logo-agitech.png",
-      });
-    } else {
-      console.log("Requesting permission...");
-      // Kiểm tra quyền trước khi được gửi thông báo
-      Notification.requestPermission()
-        .then(function (p) {
-          if (p === "granted") {
-            console.log("Permission granted.");
-            // hiển thị thông báo
-            var notify = new Notification("Xin chào!", {
-              body: "Bạn cần hỗ trợ gì?",
-              icon: "https://agitech.com.vn/images/logo-agitech.png",
-            });
-          } else {
-            console.log("User blocked notifications.");
-          }
-        })
-        .catch(function (err) {
-          console.error(err);
-        });
-    }
-  }
-}
+// $(document).ready(function () {
+//   if (Notification.permission !== "granted") Notification.requestPermission();
+// });
+// function notifyMe() {
+//   if (!window.Notification) {
+//     console.log("Browser does not support notifications.");
+//     console.log("ten biens", Notification.permission);
+//   } else {
+//     console.log("Browser supports notifications.");
+//     console.log("ten biens", Notification.permission);
+//     // kiểm tra quyền được gửi notification
+//     if (Notification.permission === "granted") {
+//       console.log("Permission already granted.");
+//       // hiển thị thông báo khi đã cấp quyền
+//       var notify = new Notification("Xin chào!", {
+//         body: "Bạn vừa mới cấp quyền gửi thông báo!",
+//         icon: "https://agitech.com.vn/images/logo-agitech.png",
+//       });
+//     } else {
+//       console.log("Requesting permission...");
+//       // Kiểm tra quyền trước khi được gửi thông báo
+//       Notification.requestPermission()
+//         .then(function (p) {
+//           if (p === "granted") {
+//             console.log("Permission granted.");
+//             // hiển thị thông báo
+//             var notify = new Notification("Xin chào!", {
+//               body: "Bạn cần hỗ trợ gì?",
+//               icon: "https://agitech.com.vn/images/logo-agitech.png",
+//             });
+//           } else {
+//             console.log("User blocked notifications.");
+//           }
+//         })
+//         .catch(function (err) {
+//           console.error(err);
+//         });
+//     }
+//   }
+// }
 
-var x = document.getElementById("myAudio");
-function playAudio() {
-  // x.play();
-  x.muted = false; // Tắt chế độ mute sau khi phát âm thanh
-  x.play().catch((error) => {
-    console.log("Playback failed: " + error);
-  });
-}
+// var x = document.getElementById("myAudio");
+// function playAudio() {
+//   // x.play();
+//   x.muted = false; // Tắt chế độ mute sau khi phát âm thanh
+//   x.play().catch((error) => {
+//     console.log("Playback failed: " + error);
+//   });
+// }
 
 const clearButton = document.getElementById("clearInput");
 const pbxInput = document.getElementById("pbx_code");
