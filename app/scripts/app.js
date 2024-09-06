@@ -1217,13 +1217,9 @@ function handleBusyCall(event) {
 
 // Handle inbound call in alerting state
 async function handleInboundAlertingCall(call) {
-  // debugger;
-  // notifyMe();
-  // notifyOnActionCall();
   isInboundCall = true;
   resizeAppDefault();
   await showSoftphone();
-  viewMainInbound();
 
   console.log(`Inbound call from ${call.number} ${call.name}`);
   console.log("handleInboundAlertingCall", call);
@@ -1242,6 +1238,7 @@ async function handleInboundAlertingCall(call) {
   if (existContact) {
     goToContact(idContact);
   }
+  viewMainInbound();
 }
 
 // Handle connected call
@@ -2789,7 +2786,6 @@ function endCall() {
   }
   stop();
   location.reload(true);
-
   openUI("mainContent");
   $("#mainCourse").css("display", "block");
   $("#headCourse").css("display", "block");
@@ -3411,7 +3407,8 @@ function preCall() {
 async function toggleEndCallCollapse() {
   isLogger = true;
   isMainOutbound = false;
-  openApp();
+  // openApp();
+  closeApp();
   resetText();
   actionDesktopEndCall = true;
   if (idTicket != null) {
@@ -4174,126 +4171,6 @@ agent.on("call", async (event) => {
     console.error(error);
   }
 });
-
-// function playNotificationSound() {
-//   const audio = new Audio(
-//     "https://drive.google.com/uc?export=download&id=1ghnMZXZCdphRGy89OusQqFeBpFJDsuJ4"
-//   );
-//   audio.play();
-// }
-
-// // Hàm để hiển thị Web Notification
-// function showNotification() {
-//   if (Notification.permission === "granted") {
-//     const notification = new Notification("Có cuộc gọi mới!", {
-//       body: "Bấm vào đây để xem chi tiết.",
-//       icon: "https://yourdomain.com/path/to/icon.png", // Thay thế icon nếu cần
-//     });
-
-//     notification.onclick = function () {
-//       window.focus(); // Đưa tab này lên trên cùng
-//       playNotificationSound(); // Phát âm thanh khi người dùng nhấp vào thông báo
-//     };
-//   } else if (Notification.permission !== "denied") {
-//     Notification.requestPermission().then((permission) => {
-//       if (permission === "granted") {
-//         showNotification();
-//       }
-//     });
-//   }
-// }
-
-// // Hàm chính được gọi khi có sự kiện
-// function notifyOnActionCall() {
-//   if (document.hidden) {
-//     // Nếu tab không đang được xem
-//     showNotification(); // Hiển thị thông báo
-//     notifyWhenTabInactive("Bạn có thông báo mới!"); // Thay đổi tiêu đề tab
-//     playNotificationSound(); // Phát âm thanh
-//   } else {
-//     // Nếu tab đang hoạt động
-//     if (confirm("Có sự kiện mới xảy ra! Bạn có muốn xem chi tiết không?")) {
-//       // Thực hiện hành động nếu người dùng chọn "OK"
-//       alert("Bạn đã chọn xem chi tiết.");
-//     } else {
-//       // Thực hiện hành động nếu người dùng chọn "Cancel"
-//       alert("Bạn đã chọn không xem chi tiết.");
-//     }
-//     playNotificationSound(); // Phát âm thanh
-//   }
-// }
-
-// // Hàm để thay đổi tiêu đề tab khi tab không hoạt động
-// function notifyWhenTabInactive(message) {
-//   if (document.hidden) {
-//     const originalTitle = document.title;
-//     document.title = message;
-
-//     // Khôi phục lại tiêu đề khi tab trở lại
-//     document.addEventListener("visibilitychange", function () {
-//       if (!document.hidden) {
-//         document.title = originalTitle;
-//       }
-//     });
-//   }
-// }
-
-// // Yêu cầu quyền thông báo khi trang web được tải
-// document.addEventListener("DOMContentLoaded", function () {
-//   if (Notification.permission !== "granted") {
-//     Notification.requestPermission();
-//   }
-// });
-
-// $(document).ready(function () {
-//   if (Notification.permission !== "granted") Notification.requestPermission();
-// });
-// function notifyMe() {
-//   if (!window.Notification) {
-//     console.log("Browser does not support notifications.");
-//     console.log("ten biens", Notification.permission);
-//   } else {
-//     console.log("Browser supports notifications.");
-//     console.log("ten biens", Notification.permission);
-//     // kiểm tra quyền được gửi notification
-//     if (Notification.permission === "granted") {
-//       console.log("Permission already granted.");
-//       // hiển thị thông báo khi đã cấp quyền
-//       var notify = new Notification("Xin chào!", {
-//         body: "Bạn vừa mới cấp quyền gửi thông báo!",
-//         icon: "https://agitech.com.vn/images/logo-agitech.png",
-//       });
-//     } else {
-//       console.log("Requesting permission...");
-//       // Kiểm tra quyền trước khi được gửi thông báo
-//       Notification.requestPermission()
-//         .then(function (p) {
-//           if (p === "granted") {
-//             console.log("Permission granted.");
-//             // hiển thị thông báo
-//             var notify = new Notification("Xin chào!", {
-//               body: "Bạn cần hỗ trợ gì?",
-//               icon: "https://agitech.com.vn/images/logo-agitech.png",
-//             });
-//           } else {
-//             console.log("User blocked notifications.");
-//           }
-//         })
-//         .catch(function (err) {
-//           console.error(err);
-//         });
-//     }
-//   }
-// }
-
-// var x = document.getElementById("myAudio");
-// function playAudio() {
-//   // x.play();
-//   x.muted = false; // Tắt chế độ mute sau khi phát âm thanh
-//   x.play().catch((error) => {
-//     console.log("Playback failed: " + error);
-//   });
-// }
 
 const clearButton = document.getElementById("clearInput");
 const pbxInput = document.getElementById("pbx_code");
