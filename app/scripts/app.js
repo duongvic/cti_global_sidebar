@@ -2362,7 +2362,7 @@ function renderGroupItem(item) {
           <div class="his-body" style="text-align: right;" attr-id-contact="${userId}" onclick="redirectContactInfo(this)">
             <fw-tooltip>
               <img src="./images/icon-info.png">
-              <div slot="tooltip-content">Chi tiết liên hệ</div>
+              <div slot="tooltip-content">Contact Details</div>
             </fw-tooltip>
           </div>
         </div>
@@ -3094,7 +3094,7 @@ function renderListHistoryCall(listHisCall) {
               <fw-tooltip>
                 <img src="./images/icon-info.png">
                 <div slot="tooltip-content">
-                  Chi tiết liên hệ
+                  Contact Details
                 </div>
               </fw-tooltip>
                 <p class="his-call-txt-time" style="margin-top: 14px; line-height: 13px;">${
@@ -3233,7 +3233,7 @@ function renderListMissCall(arrListCall) {
                 <fw-tooltip>
                   <img src="./images/icon-info.png">
                   <div slot="tooltip-content">
-                    Chi tiết liên hệ
+                    Contact Details
                   </div>
                 </fw-tooltip>
                 <p style="margin-top: 14px; line-height: 13px;">--:--</p>
