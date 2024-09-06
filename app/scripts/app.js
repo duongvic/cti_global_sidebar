@@ -1581,8 +1581,8 @@ async function getContactData(page) {
     $("#loadingImg").css("display", "none");
     $("#loadMoreTxt").css("display", "block");
   } catch (error) {
-    // Failure operation
     console.log(error);
+    showNotify("danger", error?.message);
   }
 }
 
@@ -1844,7 +1844,6 @@ async function getContactById(id_contact) {
  */
 
 function clickToCall() {
-
   const userDevicesString = localStorage.getItem("userDevices");
   const userDevices = JSON.parse(userDevicesString);
   const userAs7String = localStorage.getItem("initialUserAs7");
@@ -3249,25 +3248,27 @@ function renderListMissCall(arrListCall) {
   listContainer.innerHTML = listItems;
 }
 
-function clickToMissCall(elem) {
+async function clickToMissCall(elem) {
   isMainOutbound = true;
   isInboundCall = false;
   isMainShow == "miss_call";
   let sdt = $(elem).attr("attr-sdt");
-  idContact = $(elem).attr("attr-id");
-  getContactById(idContact);
-  if (existContact) {
-    goToContact(idContact);
-    $("#appTxtNameContact").val(nameContact);
-    $("#appTxtNameContact").text(nameContact);
-  } else {
-    $("#appTxtNameContact").val(
-      `Unknown Contact`.concat(" - ").concat(`${sdt}`)
-    );
-    $("#appTxtNameContact").text(
-      `Unknown Contact`.concat(" - ").concat(`${sdt}`)
-    );
-  }
+  await filteredContactSearch(sdt);
+
+  // idContact = $(elem).attr("attr-id");
+  // getContactById(idContact);
+  // if (existContact) {
+  //   // goToContact(idContact);
+  //   $("#appTxtNameContact").val(nameContact);
+  //   $("#appTxtNameContact").text(nameContact);
+  // } else {
+  //   $("#appTxtNameContact").val(
+  //     `Unknown Contact`.concat(" - ").concat(`${sdt}`)
+  //   );
+  //   $("#appTxtNameContact").text(
+  //     `Unknown Contact`.concat(" - ").concat(`${sdt}`)
+  //   );
+  // }
   // filteredContactSearch(sdt);
   resizeAppDefault();
   openUI("mainOutbound");
