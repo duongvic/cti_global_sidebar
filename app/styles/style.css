@@ -29,6 +29,7 @@ html {
   padding-top: 12px;
   padding-bottom: 12px;
   margin: 0;
+  cursor: pointer;
 }
 
 /* .card {

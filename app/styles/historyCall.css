@@ -67,6 +67,7 @@ html {
 }
 .his-body {
   text-align: center;
+  cursor: pointer;
 }
 .his-body p {
   margin: 0;
