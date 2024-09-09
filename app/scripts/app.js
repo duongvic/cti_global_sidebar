@@ -1841,54 +1841,54 @@ async function getContactById(id_contact) {
  */
 
 function clickToCall() {
-  const userDevicesString = localStorage.getItem("userDevices");
-  const userDevices = JSON.parse(userDevicesString);
-  const userAs7String = localStorage.getItem("initialUserAs7");
-  const userAs7 = JSON.parse(userAs7String);
-  const userTerminalsString = localStorage.getItem("userTerminals");
-  const userTerminals = JSON.parse(userTerminalsString);
-
-  if (isClickToCallInitialized) {
-    return;
-  }
-  isClickToCallInitialized = true;
-
-  if (
-    userAs7 === null ||
-    userDevices === null ||
-    userDevices?.length === 0 ||
-    userTerminals === null ||
-    userTerminals?.length === 0
-  ) {
-    showNotify(
-      "info",
-      "Please log in OnCallCX Webphone to use calling functions."
-    );
-    return submitLogout();
-  }
-
   isMainOutbound = true;
   let textElementPhone = document.getElementById("appTextPhone");
   client.events.on("cti.triggerDialer", async function (event) {
     var data = event.helper.getData();
     console.log("data event.helper :", data);
-    await getContactById(data?.id);
-    textElementPhone.innerText = data.number;
-    phoneNumberReceiver = data.number;
-    isInboundCall = false;
+    var userDevicesString = localStorage.getItem("userDevices");
+    var userDevices = JSON.parse(userDevicesString);
+    var userAs7String = localStorage.getItem("initialUserAs7");
+    var userAs7 = JSON.parse(userAs7String);
+    var userTerminalsString = localStorage.getItem("userTerminals");
+    var userTerminals = JSON.parse(userTerminalsString);
+    debugger;
 
-    $("#mainContent").css("display", "none");
-    $("#headCourse").css("display", "none");
-    openUI("mainOutbound");
-    $("#mainCourse").css("display", "block");
-    $("#headCourse").css("display", "block");
-    $("#menuApp").css("display", "none");
-    renderNameSipExtension("#appTxtService");
+    if (
+      userAs7 === null ||
+      userDevices === null ||
+      userDevices?.length === 0 ||
+      userTerminals === null ||
+      userTerminals?.length === 0
+    ) {
+      showNotify(
+        "info",
+        "Please log in OnCallCX Webphone to use calling functions."
+      );
+      return submitLogout();
+    } else {
+      if (isClickToCallInitialized) {
+        return (isClickToCallInitialized = false);
+      }
+      isClickToCallInitialized = true;
+      await getContactById(data?.id);
+      textElementPhone.innerText = data.number;
+      phoneNumberReceiver = data.number;
+      isInboundCall = false;
 
-    openApp();
-    goToContact(data?.id);
+      $("#mainContent").css("display", "none");
+      $("#headCourse").css("display", "none");
+      openUI("mainOutbound");
+      $("#mainCourse").css("display", "block");
+      $("#headCourse").css("display", "block");
+      $("#menuApp").css("display", "none");
+      renderNameSipExtension("#appTxtService");
 
-    actionClickToCall();
+      openApp();
+      goToContact(data?.id);
+
+      actionClickToCall();
+    }
   });
 }
 
