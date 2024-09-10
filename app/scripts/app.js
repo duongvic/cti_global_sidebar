@@ -889,7 +889,7 @@ async function filteredContactSearch(term) {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
       context: { term },
     });
-
+    disableCallButton();
     if (data?.status === 200) {
       const detail = data?.response ? JSON.parse(data?.response) : [];
       const filteredDataMobile = detail.filter((item) => item.mobile === term);
@@ -908,6 +908,7 @@ async function filteredContactSearch(term) {
       existContact = false;
       showNotify("danger", data?.response);
     }
+    enableCallButton();
   } catch (error) {
     existContact = false;
     console.log(error);
@@ -3296,20 +3297,29 @@ agent.on("applicationsessionstarted", () => {
     }`
   );
 
-  // get active forwardings
-  webphone?.getForwarding().then((response) => {
-    response.forwardingList.forEach((entry) => {
-      const fwd = entry.forwardingListItem;
-      if (fwd.forwardStatus) {
-        console.log(`active ${fwd.forwardingType} to number ${fwd.forwardDN}`);
-      }
-    });
+  // tell server that we want to use WebRTC (error handling omitted)
+  webphone.monitorStart({
+    monitorObject: {
+      deviceObject: `${userDevices && userDevices[0]?.sip}${
+        userTerminals && userTerminals[0]?.term
+      }`,
+    },
+    rtc: true,
   });
 
   console.log("webphone", webphone);
-  // tell server that we want to use WebRTC (error handling omitted)
-  webphone.monitorStart({ rtc: true });
 });
+
+// get active forwardings
+webphone?.getForwarding().then((response) => {
+  response.forwardingList.forEach((entry) => {
+    const fwd = entry.forwardingListItem;
+    if (fwd.forwardStatus) {
+      console.log(`active ${fwd.forwardingType} to number ${fwd.forwardDN}`);
+    }
+  });
+});
+
 // handler is called if application-session could not be started
 agent.on("applicationsessionterminated", (event) => {
   if (event.reason == "invalidApplicationInfo") {
