@@ -2808,6 +2808,31 @@ async function submitLogin() {
           resultTerminals?.terminals?.length > 0 &&
           resultDeviceid?.addresses?.length > 0
         ) {
+          const userDevices = JSON.parse(localStorage.getItem("userDevices"));
+          const userTerminals = JSON.parse(
+            localStorage.getItem("userTerminals")
+          );
+
+          agent.on("applicationsessionstarted", () => {
+            webphone = agent.getDevice(
+              `${userDevices && userDevices[0]?.sip}${
+                userTerminals && userTerminals[0]?.term
+              }`
+            );
+
+            // tell server that we want to use WebRTC (error handling omitted)
+            webphone.monitorStart({
+              monitorObject: {
+                deviceObject: `${userDevices && userDevices[0]?.sip}${
+                  userTerminals && userTerminals[0]?.term
+                }`,
+              },
+              rtc: true,
+            });
+          });
+
+          await checkDeviceExisted(userLogin, passLogin, userTerminals[0]?.id);
+
           openUI("mainContent");
           $("#mainCourse").css("display", "block");
           $("#headCourse").css("display", "block");
@@ -3093,12 +3118,15 @@ function showFormLogout() {
 
 function submitLogout() {
   client.interface.trigger("show", { id: "softphone" }).then(function () {
+    resetText();
+    agent.stopApplicationSession();
     localStorage.clear();
     openUI("mainLogin");
     isMainShow = "mainLogin";
     $("#pbx_username").val("");
     $("#pbx_code").val("");
     isClickToCallInitialized = false;
+    isLogger = false;
   });
 }
 
@@ -3385,3 +3413,35 @@ pbxInput.addEventListener("mouseleave", function () {
   pbxInput.setAttribute("type", "password");
   togglePasswordButton.textContent = "👁"; // Reset the icon to eye
 });
+
+async function checkDeviceExisted(param_email_as7, param_code_as7, param_term) {
+  const encodedAuth = btoa(
+    `${param_email_as7}`.concat(":").concat(`${param_code_as7}`)
+  );
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  };
+  const url = `https://pbx-stg.oncallcx.vn/rest/locations?where=terminalId.eq(${param_term})`;
+  try {
+    const response = await fetch(url, requestOptions);
+    if (response.status === 200) {
+      const data = await response.json();
+      if (data?.lolocations !== null || data?.lolocations !== undefined) {
+        if (data.locations[0].expires > 0) {
+          showNotify("danger", "Being logged in on another device");
+          return submitLogout();
+        }
+      }
+    } else {
+      showNotify("danger", response.statusText);
+      return submitLogout();
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return submitLogout();
+  }
+}

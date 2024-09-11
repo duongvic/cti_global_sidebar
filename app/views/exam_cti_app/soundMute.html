@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Audio Mute Example</title>
+</head>
+
+<body>
+    <h1>WebRTC Audio Mute Example</h1>
+    <button id="startCallButton">Start Call</button>
+    <button id="muteButton" disabled>Mute</button>
+
+    <script>
+        let localStream;
+
+        // Hàm khởi tạo cuộc gọi và chỉ lấy luồng âm thanh
+        async function startCall() {
+            try {
+                // Chỉ yêu cầu âm thanh, không có video
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                localStream = stream;
+
+                // Kích hoạt nút mute sau khi có luồng âm thanh
+                document.getElementById('muteButton').disabled = false;
+            } catch (error) {
+                console.error('Error accessing audio devices.', error);
+            }
+        }
+
+        // Hàm để tắt hoặc bật âm thanh
+        function toggleMute() {
+            const audioTracks = localStream.getAudioTracks();
+            audioTracks.forEach(track => {
+                track.enabled = !track.enabled; // Đảo ngược trạng thái enabled
+            });
+
+            // Cập nhật trạng thái nút mute
+            const muteButton = document.getElementById('muteButton');
+            muteButton.textContent = audioTracks[0].enabled ? "Mute" : "Unmute";
+        }
+
+        // Gán sự kiện click cho nút mute
+        document.getElementById('muteButton').addEventListener('click', toggleMute);
+
+        // Khởi động cuộc gọi khi nhấn nút start
+        document.getElementById('startCallButton').addEventListener('click', startCall);
+    </script>
+</body>
+
+</html>

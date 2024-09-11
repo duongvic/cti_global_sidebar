@@ -14,6 +14,8 @@
 
 <body>
 
+    <audio id="localAudio" style="display: none"></audio>
+
     <button style="float: right;" id="call" onclick="clickGetValue()" type="button">GetValue</button>
 
     <div class="calling">
@@ -258,6 +260,8 @@
         <video id="remoteView" playsInline autoPlay muted></video>
 
         <script>
+            window.localAudio = document.getElementById('localAudio');
+
             // tabs ctiapp
             function openCity(cityName) {
                 var i;
@@ -359,21 +363,52 @@
             //       audio: true
             //   });
             // }
+
+            function getLocalStream() {
+                return navigator.mediaDevices
+                    .getUserMedia({ video: false, audio: true })
+                    .then((stream) => {
+                        window.localStream = stream; // A
+                        window.localAudio.srcObject = stream; // B
+                        window.localAudio.autoplay = true; // C
+                    })
+                    .catch((err) => {
+                        console.log("err", err);
+                    });
+            }
+
             var input = document.test.savereport;
-            function mic(x) {
+            async function mic(x) {
                 x.classList.toggle("mic");
-                if (input.value === String(false)) {
-                    input.value = true;
-                    let call = webphone.calls[0];
-                    call.updateCall({
-                        audio: 'false',
-                    });
+
+                // Ensure that the local stream is available
+                if (!window.localStream) {
+                    await getLocalStream();
+                }
+
+                if (window.localStream) {
+                    if (input.value === String(false)) {
+                        input.value = true;
+                        // let call = webphone.calls[0];
+                        // call.updateCall({
+                        //     audio: 'false',
+                        // });
+
+                        // Mute the audio
+                        window.localStream.getAudioTracks()[0].enabled = false;
+
+                    } else {
+                        input.value = false;
+                        // let call = webphone.calls[0];
+                        // call.updateCall({
+                        //     audio: 'true',
+                        // });
+                        // Unmute the audio
+                        window.localStream.getAudioTracks()[0].enabled = true;
+
+                    }
                 } else {
-                    input.value = false;
-                    let call = webphone.calls[0];
-                    call.updateCall({
-                        audio: 'true',
-                    });
+                    console.error("Local stream is not available.");
                 }
             }
             var input = document.test.savereport;
