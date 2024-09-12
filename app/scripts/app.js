@@ -2764,12 +2764,6 @@ async function submitLogin() {
       const initialUserAs7 = userInfAs7 && userInfAs7[0];
       localStorage.setItem("initialUserAs7", JSON.stringify(initialUserAs7));
 
-      // Bắt đầu phiên ứng dụng
-      agent.startApplicationSession({
-        username: userLogin,
-        password: passLogin,
-      });
-
       try {
         const [resultTerminals, resultDeviceid] = await Promise.all([
           getTerminalsByUserId(initialUserAs7),
@@ -2812,6 +2806,12 @@ async function submitLogin() {
           const userTerminals = JSON.parse(
             localStorage.getItem("userTerminals")
           );
+
+          // Bắt đầu phiên ứng dụng
+          agent.startApplicationSession({
+            username: userLogin,
+            password: passLogin,
+          });
 
           agent.on("applicationsessionstarted", () => {
             webphone = agent.getDevice(
@@ -3074,7 +3074,7 @@ $("#toggleEndCallBusy").click(function () {
       $("#headCourse").css("display", "block");
       $("#menuApp").css("display", "block");
       // renderNameSipExtension("#appTxtService");
-
+      showMainDialpad();
       resetText();
       /**as7 backend **/
       let call = webphone?.calls[0];
@@ -3436,6 +3436,7 @@ async function checkDeviceExisted(param_email_as7, param_code_as7, param_term) {
           return submitLogout();
         }
       }
+      location.reload(true);
     } else {
       showNotify("danger", response.statusText);
       return submitLogout();
