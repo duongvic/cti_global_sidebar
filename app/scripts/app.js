@@ -2151,7 +2151,7 @@ async function createContact() {
   } catch (error) {
     console.error(`Error: Failed to create a contact ${phoneNumberReceiver}`);
     console.error(error);
-    showNotify("danger", "Failed to create a contact.");
+    showNotify("danger", error);
   }
 }
 
@@ -3446,3 +3446,29 @@ async function checkDeviceExisted(param_email_as7, param_code_as7, param_term) {
     return submitLogout();
   }
 }
+
+let inactivityTime = 5 * 60 * 1000; // 5 phút
+let timer;
+
+// Hàm reset lại bộ đếm thời gian
+function resetTimer() {
+  clearTimeout(timer); // Xóa bộ đếm hiện tại
+  timer = setTimeout(logout, inactivityTime); // Thiết lập lại bộ đếm
+}
+
+// Hàm logout
+function logout() {
+  if (isMainShow !== "mainLogin") {
+    alert("You have been automatically logged out due to inactivity.");
+    // Gọi API logout hoặc điều hướng sang trang đăng nhập
+    submitLogout();
+  }
+}
+
+// Theo dõi các hoạt động của người dùng
+window.onload = function () {
+  document.addEventListener("mousemove", resetTimer); // Di chuột
+  document.addEventListener("keydown", resetTimer); // Nhấn phím
+  document.addEventListener("click", resetTimer); // Nhấp chuột
+  resetTimer(); // Thiết lập bộ đếm ngay khi trang được tải
+};
