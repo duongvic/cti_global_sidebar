@@ -93,30 +93,42 @@ async function setUpdateCallAs7(value) {
 }
 
 // click start stop action button
-var input = document.testMic.savereportMic;
+var inputMic = document.test.savereport;
 async function mic(x) {
   isTimeStarted = true;
   x.classList.toggle("mic");
-  if (input.value === String(false)) {
-    input.value = "true";
+  if (inputMic.value === String(false)) {
+    inputMic.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "false",
     });
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-ac#checkHold");
+    // Duyệt qua các button và set thuộc tính disabled
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "0.2";
+    });
   } else {
-    input.value = "false";
+    inputMic.value = "false";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "true",
     });
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-ac#checkHold");
+    // Duyệt qua các button và set thuộc tính disabled
+    buttons.forEach(function (button) {
+      button.disabled = false;
+      button.style.opacity = "0.1";
+    });
   }
 }
 
-var input = document.testHold_Unhold.savereportHold_Unhold;
+var input = document.test.savereport;
 async function change(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
@@ -124,110 +136,156 @@ async function change(x) {
     input.value = "true";
     let call = webphone.calls[0];
     call.holdCall();
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-mic#checkMic");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "0.2";
+    });
   } else {
     input.value = "false";
     let call = webphone.calls[0];
     call.retrieveCall();
-
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-mic#checkMic");
+    buttons.forEach(function (button) {
+      button.disabled = false;
+      button.style.opacity = "1";
+    });
   }
 }
 
-var input = document.testMicInbound.savereportMicInbound;
+var inputMicInbound = document.testInbound.savereportInbound;
 async function micInbound(x) {
   isTimeStarted = true;
   x.classList.toggle("mic");
-  if (input.value === String(false)) {
-    input.value = "true";
+  if (inputMicInbound.value === String(false)) {
+    inputMicInbound.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "false",
     });
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+    var buttons = document.querySelectorAll("button.btn-ac#checkHoldInbound");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "0.2";
+    });
   } else {
-    input.value = "false";
+    inputMicInbound.value = "false";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "true",
     });
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-ac#checkHoldInbound");
+    buttons.forEach(function (button) {
+      button.disabled = false;
+      button.style.opacity = "1";
+    });
   }
 }
-var input = document.testInboundHold_Unhold.savereportInbound_Hold_Unhold;
+var inputHoldInbound = document.testInbound.savereportInbound;
 async function changeInbound(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
-  if (input.value === String(false)) {
-    input.value = "true";
+  if (inputHoldInbound.value === String(false)) {
+    inputHoldInbound.value = "true";
     let call = webphone.calls[0];
     call.holdCall();
-
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-mic#checkMicInbound");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "0.2";
+    });
   } else {
-    input.value = "false";
+    inputHoldInbound.value = "false";
     let call = webphone.calls[0];
     call.retrieveCall();
-
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-mic#checkMicInbound");
+    buttons.forEach(function (button) {
+      button.disabled = false;
+      button.style.opacity = "1";
+    });
   }
 }
 
-var input = document.testMicMainBusy.savereportMicMainBusy;
+var inputBusy = document.testMainBusy.savereportMainBusy;
 async function micMainBusy(x) {
   isTimeStarted = true;
   x.classList.toggle("mic");
   if (input.value === String(false)) {
-    input.value = "true";
+    inputBusy.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "false",
     });
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-ac#checkHoldMainBusy");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "0.2";
+    });
   } else {
-    input.value = "false";
+    inputBusy.value = "false";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "true",
     });
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-ac#checkHoldMainBusy");
+    buttons.forEach(function (button) {
+      button.disabled = false;
+      button.style.opacity = "1";
+    });
   }
 }
-var input = document.testMainBusyHold_Unhold.savereportMainBusy_Hold_Unhold;
+var inputHoldBusy = document.testMainBusy.savereportMainBusy;
 async function changeHoldMainBusy(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
-  if (input.value === String(false)) {
-    input.value = "true";
+  if (inputHoldBusy.value === String(false)) {
+    inputHoldBusy.value = "true";
     let call = webphone.calls[0];
     call.holdCall();
 
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-mic#checkMicMainBusy");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "0.2";
+    });
   } else {
-    input.value = "false";
+    inputHoldBusy.value = "false";
     let call = webphone.calls[0];
     call.retrieveCall();
 
-    // clearAllIntervals();
     await setUpdateCallAs7(true);
+
+    var buttons = document.querySelectorAll("button.btn-mic#checkMicMainBusy");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.style.opacity = "1";
+    });
   }
 }
 
-var input = document.testMicBlindTransfer.savereportMicBlindTransfer;
+var inputTransfer = document.testBlindTransfer.savereportBlindTransfer;
 async function micBlindTransfer(x) {
   isTimeStarted = true;
   x.classList.toggle("mic");
-  if (input.value === String(false)) {
-    input.value = "true";
+  if (inputTransfer.value === String(false)) {
+    inputTransfer.value = "true";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "false",
@@ -235,7 +293,7 @@ async function micBlindTransfer(x) {
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
-    input.value = "false";
+    inputTransfer.value = "false";
     let call = webphone.calls[0];
     call.updateCall({
       audio: "true",
@@ -244,20 +302,19 @@ async function micBlindTransfer(x) {
     await setUpdateCallAs7(true);
   }
 }
-var input =
-  document.testBlindTransferHold_Unhold.savereportBlindTransferHold_Unhold;
+var inputHoldTransfer = document.testBlindTransfer.savereportBlindTransfer;
 async function changeHoldBlindTransfer(x) {
   isTimeStarted = true;
   x.classList.toggle("change");
-  if (input.value === String(false)) {
-    input.value = "true";
+  if (inputHoldTransfer.value === String(false)) {
+    inputHoldTransfer.value = "true";
     let call = webphone.calls[0];
     call.holdCall();
 
     // clearAllIntervals();
     await setUpdateCallAs7(true);
   } else {
-    input.value = "false";
+    inputHoldTransfer.value = "false";
     let call = webphone.calls[0];
     call.retrieveCall();
 
@@ -445,7 +502,15 @@ async function handleConnectedCall(call) {
     clearInterval(intervalInbound);
   }
 
-  $(".ac__calling button").prop("disabled", false);
+  // $(".ac__calling button").prop("disabled", false);
+  $("#checkMic").prop("disabled", false).css("opacity", "1");
+  $("#checkHold").prop("disabled", false).css("opacity", "1");
+  if (inputMic.value === String(true)) {
+    $("#checkHold").prop("disabled", true).css("opacity", "0.2");
+  }
+  if (inputMicInbound.value === String(true)) {
+    $("#checkHoldInbound").prop("disabled", true).css("opacity", "0.2");
+  }
 }
 
 // Handle call ended
@@ -885,6 +950,7 @@ async function filterContactDataInbound(phone) {
 
 //---- refactor filteredContactSearch---//
 async function filteredContactSearch(term) {
+  debugger;
   try {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
       context: { term },
@@ -1950,6 +2016,11 @@ function acceptCall() {
   renderNameSipExtension("#appTxtService");
 
   isMainActive = true;
+
+  debugger;
+  $("#checkMicInbound").prop("disabled", false).css("opacity", "1");
+  $("#checkHoldInbound").prop("disabled", false).css("opacity", "1");
+
   listenCall();
 }
 
@@ -3447,7 +3518,7 @@ async function checkDeviceExisted(param_email_as7, param_code_as7, param_term) {
   }
 }
 
-let inactivityTime = 5 * 60 * 1000; // 5 phút
+let inactivityTime = 30 * 60 * 1000; // 5 phút
 let timer;
 
 // Hàm reset lại bộ đếm thời gian

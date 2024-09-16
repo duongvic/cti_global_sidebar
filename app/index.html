@@ -400,10 +400,10 @@
                   <img class="icon__calling" src="./images/DialPad-InCall.svg" />
                 </button>
                 <!-- Mic - UnMic -->
-                <form name="testMic" method="post" style="display: none">
-                  <input type="text" name="savereportMic" value="false" />
+                <form name="test" method="post" style="display: none">
+                  <input type="text" name="savereport" value="false" />
                 </form>
-                <button class="btn-mic" value="false" id="checkMic" disabled onclick="mic(this)">
+                <button class="btn-mic" value="false" id="checkMic" style="opacity: 0.2;" disabled onclick="mic(this)">
                   <!-- <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" /> -->
                   <i class="material-icons mic-un">&#xe02b;</i>
@@ -412,10 +412,11 @@
                 <!-- Mic - UnMic -->
 
                 <!-- Hold - UnHold -->
-                <form name="testHold_Unhold" method="post" style="display: none">
+                <!-- <form name="testHold_Unhold" method="post" style="display: none">
                   <input type="text" name="savereportHold_Unhold" value="false" />
-                </form>
-                <button class="btn-ac" value="false" id="checkHold" disabled onclick="change(this)">
+                </form> -->
+                <button class="btn-ac" value="false" id="checkHold" style="opacity: 0.2;" disabled
+                  onclick="change(this)">
                   <div class="bar1"></div>
                   <div class="bar2"></div>
                 </button>
@@ -461,30 +462,16 @@
           <p id="appTextPhoneBusyCall"></p>
           <p>Người dùng bận</p>
           <div><img class="avatar__busy" id="avatarContact" src="./images/avatar_none.png"></div>
-          <!-- <div class="ac__calling__busy">
-            <button class="btn-ac__busy" onclick="openCity('calls')"><img class="icon__calling tablinks"
-                src="./images/DialPad-InCall.svg"></button>
-            <button class="btn-ac__busy" onclick="recordaudio()"><img class="icon__calling tablinks"
-                src="./images/Mic-InCall.svg"></button>
-            <button class="btn-ac__busy change" onclick="myFunction(this)">
-              <div class="bar1"></div>
-              <div class="bar2"></div>
-            </button>
-            <button class="btn-ac__busy" onclick="openCity('maincall')"><img class="icon__calling tablinks"
-                src="./images/Blind_Transfer.svg"></button>
-            <button class="btn-ac__busy" onclick="openCity('busycall')"><img class="icon__calling tablinks"
-                src="./images/Attend_Transfer.svg"></button>
-          </div> -->
-
           <div class="ac__calling">
             <button class="btn-ac" id="dialPadOutbound" disabled>
               <img class="icon__calling" src="./images/DialPad-InCall.svg" />
             </button>
             <!-- Mic - UnMic -->
-            <form name="testMicMainBusy" method="post" style="display: none;">
-              <input type="text" name="savereportMicMainBusy" value="false" />
+            <form name="testMainBusy" method="post" style="display: none;">
+              <input type="text" name="savereportMainBusy" value="false" />
             </form>
-            <button class="btn-mic" value="false" id="checkMicMainBusy" disabled onclick="micMainBusy(this)">
+            <button class="btn-mic" value="false" id="checkMicMainBusy" style="opacity: 0.2;" disabled
+              onclick="micMainBusy(this)">
               <img class="mic-un" src="./images/icon_mic_top.svg" />
               <img class="mic-top" src="./images/icon_mic_un.svg" />
               <!-- <i class="material-icons mic-un">&#xe02b;</i>
@@ -493,10 +480,11 @@
             <!-- Mic - UnMic -->
 
             <!-- Hold - UnHold -->
-            <form name="testMainBusyHold_Unhold" method="post" style="display: none;">
+            <!-- <form name="testMainBusyHold_Unhold" method="post" style="display: none;">
               <input type="text" name="savereportMainBusy_Hold_Unhold" value="false" />
-            </form>
-            <button class="btn-ac" value="false" id="checkHoldMainBusy" disabled onclick="changeHoldMainBusy(this)">
+            </form> -->
+            <button class="btn-ac" value="false" id="checkHoldMainBusy" style="opacity: 0.2;" disabled
+              onclick="changeHoldMainBusy(this)">
               <div class="bar1"></div>
               <div class="bar2"></div>
             </button>
@@ -634,10 +622,11 @@
                 <button class="btn-ac"><img class="icon__calling" src="./images/DialPad-InCall.svg" />
                 </button>
                 <!-- Mic - UnMic -->
-                <form name="testMicInbound" method="post" style="display: none;">
-                  <input type="text" name="savereportMicInbound" value="false" />
+                <form name="testInbound" method="post" style="display: none;">
+                  <input type="text" name="savereportInbound" value="false" />
                 </form>
-                <button class="btn-mic" value="false" id="checkMicInbound" onclick="micInbound(this)">
+                <button class="btn-mic" value="false" id="checkMicInbound" style="opacity: 0.2;" disabled
+                  onclick="micInbound(this)">
                   <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" />
                   <!-- <i class="material-icons mic-un">&#xe02b;</i>
@@ -646,10 +635,11 @@
                 <!-- Mic - UnMic -->
 
                 <!-- Hold - UnHold -->
-                <form name="testInboundHold_Unhold" method="post" style="display: none;">
+                <!-- <form name="testInboundHold_Unhold" method="post" style="display: none;">
                   <input type="text" name="savereportInbound_Hold_Unhold" value="false" />
-                </form>
-                <button class="btn-ac" value="false" id="checkHoldInbound" onclick="changeInbound(this)">
+                </form> -->
+                <button class="btn-ac" value="false" id="checkHoldInbound" style="opacity: 0.2;" disabled
+                  onclick="changeInbound(this)">
                   <div class="bar1"></div>
                   <div class="bar2"></div>
                 </button>
@@ -814,10 +804,10 @@
                   <img class="icon__calling" src="./images/DialPad-InCall.svg" />
                 </button>
                 <!-- Mic - UnMic -->
-                <form name="testMicBlindTransfer" method="post" style="display: none">
-                  <input type="text" name="savereportMicBlindTransfer" value="false" />
+                <form name="testBlindTransfer" method="post" style="display: none">
+                  <input type="text" name="savereportBlindTransfer" value="false" />
                 </form>
-                <button class="btn-mic" value="false" id="checkMicBlindTransfer" disabled
+                <button class="btn-mic" value="false" id="checkMicBlindTransfer" style="opacity: 0.2;" disabled
                   onclick="micBlindTransfer(this)">
                   <img class="mic-un" src="./images/icon_mic_top.svg" />
                   <img class="mic-top" src="./images/icon_mic_un.svg" />
@@ -827,10 +817,10 @@
                 <!-- Mic - UnMic -->
 
                 <!-- Hold - UnHold -->
-                <form name="testBlindTransferHold_Unhold" method="post" style="display: none">
+                <!-- <form name="testBlindTransferHold_Unhold" method="post" style="display: none">
                   <input type="text" name="savereportBlindTransferHold_Unhold" value="false" />
-                </form>
-                <button class="btn-ac" value="false" id="checkHoldBlindTransfer" disabled
+                </form> -->
+                <button class="btn-ac" value="false" id="checkHoldBlindTransfer" style="opacity: 0.2;" disabled
                   onclick="changeHoldBlindTransfer(this)">
                   <div class="bar1"></div>
                   <div class="bar2"></div>
