@@ -978,6 +978,8 @@ async function filteredContactSearch(term) {
   } catch (error) {
     existContact = false;
     console.log(error);
+    showNotify("danger", error); // Thông báo cho người dùng
+    enableCallButton();
   }
 }
 
@@ -1072,6 +1074,7 @@ async function getContactById(id_contact) {
       return detail;
     } catch (error) {
       console.log(error);
+      showNotify("danger", error?.message);
     }
   } else {
     existContact = false;
@@ -1880,7 +1883,7 @@ async function showMissCall() {
   // });
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 30;
 let currentPage = 1;
 
 // Hàm lấy phần tử cho trang hiện tại
@@ -1903,33 +1906,158 @@ async function loadMoreItems() {
   currentPage++;
   const newItems = getItemsForCurrentPage();
 
-  // Hiển thị các phần tử mới này trên giao diện
-  // displayItems(newItems);
-  const response = await Promise.all(
-    newItems.map(async function (itm) {
-      const { calling } = itm;
-      const profiles = await getDetailContact(calling);
-      return { ...itm, profiles };
+  // 1. Lấy danh sách số điện thoại duy nhất từ cả hai trường
+  const uniquePhones = getUniquePhones(newItems, ["calling"]);
+
+  // In số lượng số điện thoại duy nhất
+  console.log(`Số lần gọi API cần thiết: ${uniquePhones.length}`);
+
+  // 2. Hàng đợi để lưu các số điện thoại cần gọi API
+  let requestQueue = uniquePhones.slice(); // Sao chép mảng để xử lý
+
+  // 3. Tạo hàm xử lý hàng đợi với debounce
+  const processQueue = _.debounce(async () => {
+    const maxRequestsPerMinute = 50;
+    const delay = 60000 / maxRequestsPerMinute; // Khoảng thời gian giữa các yêu cầu
+
+    while (requestQueue.length > 0) {
+      // Thực hiện các yêu cầu API
+      const batch = requestQueue.splice(0, maxRequestsPerMinute); // Lấy tối đa 50 yêu cầu
+      const results = await Promise.all(
+        batch.map((phone) => getDetailContact(phone))
+      );
+      console.log("Batch results:", results);
+
+      // Cập nhật dữ liệu gốc sau khi nhận kết quả
+      newItems.forEach((item) => {
+        const phone = item.calling || item.called;
+        const profile = results.find(
+          (result) =>
+            result && (result.mobile === phone || result.phone === phone)
+        );
+        if (profile) {
+          item.profiles = profile;
+        }
+      });
+      // Đợi một khoảng thời gian trước khi tiếp tục với phần còn lại
+      if (requestQueue.length > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    // Sau khi tất cả các yêu cầu được xử lý, gọi hàm để render dữ liệu
+    let itemsOld = JSON.parse(localStorage.getItem("cacheDataMissCall"));
+    let arrayOfArrays = [...(itemsOld && itemsOld), newItems && newItems];
+    const flattenedArray = [].concat(...arrayOfArrays);
+    localStorage.setItem("cacheDataMissCall", JSON.stringify(flattenedArray));
+    renderListMissCall(flattenedArray);
+  }, 200); // Thay đổi thời gian debounce nếu cần
+
+  // Đảm bảo rằng processQueue trả về một Promise
+  function runProcessQueue() {
+    return new Promise((resolve) => {
+      processQueue(); // Gọi debounce
+      setTimeout(resolve, 1000); // Chờ một thời gian hợp lý để đảm bảo debounce đã hoàn tất
+    });
+  }
+
+  // Bắt đầu xử lý hàng đợi và xử lý kết quả
+  runProcessQueue()
+    .then(() => {
+      console.log("All requests processed.");
+      console.log("Updated call data:", newItems);
     })
-  );
-  let itemsOld = JSON.parse(localStorage.getItem("cacheDataMissCall"));
-  let arrayOfArrays = [...(itemsOld && itemsOld), response && response];
-  const flattenedArray = [].concat(...arrayOfArrays);
-  localStorage.setItem("cacheDataMissCall", JSON.stringify(flattenedArray));
-  renderListMissCall(flattenedArray);
+    .catch((error) => {
+      console.error("Error processing requests:", error);
+    });
+
+  // const response = await Promise.all(
+  //   newItems.map(async function (itm) {
+  //     const { calling } = itm;
+  //     const profiles = await getDetailContact(calling);
+  //     return { ...itm, profiles };
+  //   })
+  // );
+  // let itemsOld = JSON.parse(localStorage.getItem("cacheDataMissCall"));
+  // let arrayOfArrays = [...(itemsOld && itemsOld), response && response];
+  // const flattenedArray = [].concat(...arrayOfArrays);
+  // localStorage.setItem("cacheDataMissCall", JSON.stringify(flattenedArray));
+  // renderListMissCall(flattenedArray);
 }
 
 // Hàm để hiển thị các phần tử lên giao diện
 async function displayItems(items) {
-  const response = await Promise.all(
-    items.map(async function (itm) {
-      const { calling } = itm;
-      const profiles = await getDetailContact(calling);
-      return { ...itm, profiles };
+  // 1. Lấy danh sách số điện thoại duy nhất từ cả hai trường
+  const uniquePhones = getUniquePhones(items, ["calling"]);
+
+  // In số lượng số điện thoại duy nhất
+  console.log(`Số lần gọi API cần thiết: ${uniquePhones.length}`);
+
+  // 2. Hàng đợi để lưu các số điện thoại cần gọi API
+  let requestQueue = uniquePhones.slice(); // Sao chép mảng để xử lý
+
+  // 3. Tạo hàm xử lý hàng đợi với debounce
+  const processQueue = _.debounce(async () => {
+    const maxRequestsPerMinute = 50;
+    const delay = 60000 / maxRequestsPerMinute; // Khoảng thời gian giữa các yêu cầu
+
+    while (requestQueue.length > 0) {
+      // Thực hiện các yêu cầu API
+      const batch = requestQueue.splice(0, maxRequestsPerMinute); // Lấy tối đa 50 yêu cầu
+      const results = await Promise.all(
+        batch.map((phone) => getDetailContact(phone))
+      );
+      console.log("Batch results:", results);
+
+      // Cập nhật dữ liệu gốc sau khi nhận kết quả
+      items.forEach((item) => {
+        const phone = item.calling || item.called;
+        const profile = results.find(
+          (result) =>
+            result && (result.mobile === phone || result.phone === phone)
+        );
+        if (profile) {
+          item.profiles = profile;
+        }
+      });
+      // Đợi một khoảng thời gian trước khi tiếp tục với phần còn lại
+      if (requestQueue.length > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    // Sau khi tất cả các yêu cầu được xử lý, gọi hàm để render dữ liệu
+    localStorage.setItem("cacheDataMissCall", JSON.stringify(items));
+    renderListMissCall(items);
+  }, 200); // Thay đổi thời gian debounce nếu cần
+
+  // Đảm bảo rằng processQueue trả về một Promise
+  function runProcessQueue() {
+    return new Promise((resolve) => {
+      processQueue(); // Gọi debounce
+      setTimeout(resolve, 1000); // Chờ một thời gian hợp lý để đảm bảo debounce đã hoàn tất
+    });
+  }
+
+  // Bắt đầu xử lý hàng đợi và xử lý kết quả
+  runProcessQueue()
+    .then(() => {
+      console.log("All requests processed.");
+      console.log("Updated call data:", items);
     })
-  );
-  localStorage.setItem("cacheDataMissCall", JSON.stringify(response));
-  renderListMissCall(response);
+    .catch((error) => {
+      console.error("Error processing requests:", error);
+    });
+
+  // const response = await Promise.all(
+  //   items.map(async function (itm) {
+  //     const { calling } = itm;
+  //     const profiles = await getDetailContact(calling);
+  //     return { ...itm, profiles };
+  //   })
+  // );
+  // localStorage.setItem("cacheDataMissCall", JSON.stringify(response));
+  // renderListMissCall(response);
 }
 
 function searchContact() {
@@ -2569,7 +2697,7 @@ async function getDetailContact(term) {
   } catch (error) {}
 }
 
-const ITEMS_PER_PAGE_HIS_CALL = 10;
+const ITEMS_PER_PAGE_HIS_CALL = 30;
 let currentPageHisCall = 1;
 
 // Hàm lấy phần tử cho trang hiện tại
@@ -2583,33 +2711,161 @@ function getItemsForCurrentPageHisCall() {
 async function loadMoreItemsHisCall() {
   currentPageHisCall++;
   const newItems = getItemsForCurrentPageHisCall();
-  // Hiển thị các phần tử mới này trên giao diện
-  // displayItemsHisCall(newItems);
-  const response = await Promise.all(
-    newItems.map(async function (itm) {
-      const { calling, called } = itm;
-      const profiles = await getDetailContact(calling ? calling : called);
-      return { ...itm, profiles };
+
+  // 1. Lấy danh sách số điện thoại duy nhất từ cả hai trường
+  const uniquePhones = getUniquePhones(newItems, ["calling", "called"]);
+
+  // In số lượng số điện thoại duy nhất
+  console.log(`Số lần gọi API cần thiết: ${uniquePhones.length}`);
+
+  // 2. Hàng đợi để lưu các số điện thoại cần gọi API
+  let requestQueue = uniquePhones.slice(); // Sao chép mảng để xử lý
+
+  // 3. Tạo hàm xử lý hàng đợi với debounce
+  const processQueue = _.debounce(async () => {
+    const maxRequestsPerMinute = 50;
+    const delay = 60000 / maxRequestsPerMinute; // Khoảng thời gian giữa các yêu cầu
+
+    while (requestQueue.length > 0) {
+      // Thực hiện các yêu cầu API
+      const batch = requestQueue.splice(0, maxRequestsPerMinute); // Lấy tối đa 50 yêu cầu
+      const results = await Promise.all(
+        batch.map((phone) => getDetailContact(phone))
+      );
+      console.log("Batch results:", results);
+
+      // Cập nhật dữ liệu gốc sau khi nhận kết quả
+      newItems.forEach((item) => {
+        const phone = item.calling || item.called;
+        const profile = results.find(
+          (result) =>
+            result && (result.mobile === phone || result.phone === phone)
+        );
+        if (profile) {
+          item.profiles = profile;
+        }
+      });
+      // Đợi một khoảng thời gian trước khi tiếp tục với phần còn lại
+      if (requestQueue.length > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    // Sau khi tất cả các yêu cầu được xử lý, gọi hàm để render dữ liệu
+    let itemsOld = JSON.parse(localStorage.getItem("cacheDataHisCall"));
+    let arrayOfArrays = [...itemsOld, newItems];
+    const flattenedArray = [].concat(...arrayOfArrays);
+    localStorage.setItem("cacheDataHisCall", JSON.stringify(flattenedArray));
+    renderListHistoryCall(flattenedArray);
+  }, 200); // Thay đổi thời gian debounce nếu cần
+
+  // Đảm bảo rằng processQueue trả về một Promise
+  function runProcessQueue() {
+    return new Promise((resolve) => {
+      processQueue(); // Gọi debounce
+      setTimeout(resolve, 1000); // Chờ một thời gian hợp lý để đảm bảo debounce đã hoàn tất
+    });
+  }
+
+  // Bắt đầu xử lý hàng đợi và xử lý kết quả
+  runProcessQueue()
+    .then(() => {
+      console.log("All requests processed.");
+      console.log("Updated call data:", newItems);
     })
-  );
-  let itemsOld = JSON.parse(localStorage.getItem("cacheDataHisCall"));
-  let arrayOfArrays = [...itemsOld, response];
-  const flattenedArray = [].concat(...arrayOfArrays);
-  localStorage.setItem("cacheDataHisCall", JSON.stringify(flattenedArray));
-  renderListHistoryCall(flattenedArray);
+    .catch((error) => {
+      console.error("Error processing requests:", error);
+    });
+
+  // const response = await Promise.all(
+  //   items.map(async function (itm) {
+  //     const { calling, called } = itm;
+  //     const profiles = await getDetailContact(calling ? calling : called);
+  //     return { ...itm, profiles };
+  //   })
+  // );
+
+  // let itemsOld = JSON.parse(localStorage.getItem("cacheDataHisCall"));
+  // let arrayOfArrays = [...itemsOld, response];
+  // const flattenedArray = [].concat(...arrayOfArrays);
+  // localStorage.setItem("cacheDataHisCall", JSON.stringify(flattenedArray));
+  // renderListHistoryCall(flattenedArray);
 }
 
 // Hàm để hiển thị các phần tử lên giao diện
 async function displayItemsHisCall(items) {
-  const response = await Promise.all(
-    items.map(async function (itm) {
-      const { calling, called } = itm;
-      const profiles = await getDetailContact(calling ? calling : called);
-      return { ...itm, profiles };
+  // 1. Lấy danh sách số điện thoại duy nhất từ cả hai trường
+  const uniquePhones = getUniquePhones(items, ["calling", "called"]);
+
+  // In số lượng số điện thoại duy nhất
+  console.log(`Số lần gọi API cần thiết: ${uniquePhones.length}`);
+
+  // 2. Hàng đợi để lưu các số điện thoại cần gọi API
+  let requestQueue = uniquePhones.slice(); // Sao chép mảng để xử lý
+
+  // 4. Tạo hàm xử lý hàng đợi với debounce
+  const processQueue = _.debounce(async () => {
+    const maxRequestsPerMinute = 50;
+    const delay = 60000 / maxRequestsPerMinute; // Khoảng thời gian giữa các yêu cầu
+
+    while (requestQueue.length > 0) {
+      // Thực hiện các yêu cầu API
+      const batch = requestQueue.splice(0, maxRequestsPerMinute); // Lấy tối đa 50 yêu cầu
+      const results = await Promise.all(
+        batch.map((phone) => getDetailContact(phone))
+      );
+      console.log("Batch results:", results);
+
+      // Cập nhật dữ liệu gốc sau khi nhận kết quả
+      items.forEach((item) => {
+        const phone = item.calling || item.called;
+        const profile = results.find(
+          (result) =>
+            result && (result.mobile === phone || result.phone === phone)
+        );
+        if (profile) {
+          item.profiles = profile;
+        }
+      });
+      // Đợi một khoảng thời gian trước khi tiếp tục với phần còn lại
+      if (requestQueue.length > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    // Sau khi tất cả các yêu cầu được xử lý, gọi hàm để render dữ liệu
+    localStorage.setItem("cacheDataHisCall", JSON.stringify(items));
+    renderListHistoryCall(items);
+  }, 200); // Thay đổi thời gian debounce nếu cần
+
+  // Đảm bảo rằng processQueue trả về một Promise
+  function runProcessQueue() {
+    return new Promise((resolve) => {
+      processQueue(); // Gọi debounce
+      setTimeout(resolve, 1000); // Chờ một thời gian hợp lý để đảm bảo debounce đã hoàn tất
+    });
+  }
+
+  // Bắt đầu xử lý hàng đợi và xử lý kết quả
+  runProcessQueue()
+    .then(() => {
+      console.log("All requests processed.");
+      console.log("Updated call data:", items);
     })
-  );
-  localStorage.setItem("cacheDataHisCall", JSON.stringify(response));
-  renderListHistoryCall(response);
+    .catch((error) => {
+      console.error("Error processing requests:", error);
+    });
+
+  // const response = await Promise.all(
+  //   items.map(async function (itm) {
+  //     const { calling, called } = itm;
+  //     const profiles = await getDetailContact(calling ? calling : called);
+  //     return { ...itm, profiles };
+  //   })
+  // );
+
+  // localStorage.setItem("cacheDataHisCall", JSON.stringify(response));
+  // renderListHistoryCall(response);
 }
 
 function openUI(nameMainView) {
@@ -3543,3 +3799,14 @@ window.onload = function () {
   document.addEventListener("click", resetTimer); // Nhấp chuột
   resetTimer(); // Thiết lập bộ đếm ngay khi trang được tải
 };
+
+// Hàm lấy số điện thoại duy nhất từ các trường được chỉ định
+function getUniquePhones(items, fields) {
+  return [
+    ...new Set(
+      items
+        .flatMap((item) => fields.map((field) => item[field])) // Lấy tất cả số điện thoại từ các trường
+        .filter((phone) => phone) // Loại bỏ giá trị undefined hoặc null
+    ),
+  ];
+}
