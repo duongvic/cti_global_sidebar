@@ -371,7 +371,7 @@ html {
 .background-login {
   background-image: url("../images/background-login.png");
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size: cover;
 }
 
 .content-login {

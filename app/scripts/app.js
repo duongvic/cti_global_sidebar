@@ -687,9 +687,9 @@ function resetText() {
   // Reset call history and missed call lists
   listMissCall = [];
   listHisCall = [];
-
   // Clear local storage cache
   localStorage.removeItem("cacheDataHisCall");
+  //debugger
   localStorage.removeItem("cacheDataMissCall");
   localStorage.removeItem("cacheDataContact");
 }
@@ -790,17 +790,17 @@ async function getContactData(page) {
         // names must be equal
         return 0;
       });
-      // listContacts = [...arr];
+      listContacts = [...arr];
 
-      const response = await Promise.all(
-        arr.map(async function (itm) {
-          const { id } = itm;
-          const profiles = await getContactById(id);
-          return { ...itm, profiles };
-        })
-      );
+      // const response = await Promise.all(
+      //   arr.map(async function (itm) {
+      //     const { id } = itm;
+      //     const profiles = await getContactById(id);
+      //     return { ...itm, profiles };
+      //   })
+      // );
 
-      listContacts = [...response];
+      // listContacts = [...response];
       const transformedItems = transformerItems(listContacts);
       localStorage.setItem("cacheDataContact", JSON.stringify(listContacts));
 
@@ -818,8 +818,24 @@ async function getContactData(page) {
     $("#loadingImg").css("display", "none");
     $("#loadMoreTxt").css("display", "block");
   } catch (error) {
-    console.log(error);
-    showNotify("danger", error?.message);
+    if (error.status === 429) {
+      // Nếu gặp lỗi 429, chờ thêm thời gian
+      const retryAfter = error.headers["Retry-After"] || 60; // Thời gian chờ lấy từ header hoặc mặc định 60 giây
+      const timeUntilNextRequest = retryAfter * 1000; // Đổi ra miliseconds
+      // Hiển thị thông báo chờ
+      showNotify(
+        "info",
+        `Too many requests. Waiting ${retryAfter} seconds before sending next request...`
+      );
+      // Chờ trước khi thử lại
+      await new Promise((resolve) => setTimeout(resolve, timeUntilNextRequest));
+    } else {
+      console.error("Error in processing request:", error);
+    }
+    isLoading = false;
+    $("#loadingImg").css("display", "none");
+    $("#loadMoreTxt").css("display", "block");
+    // showNotify("danger", error?.message);
   }
 }
 
@@ -853,16 +869,17 @@ async function fetchContactData(page) {
         // names must be equal
         return 0;
       });
-      // var newData = [...arr];
-      const response = await Promise.all(
-        arr.map(async function (itm) {
-          const { id } = itm;
-          const profiles = await getContactById(id);
-          return { ...itm, profiles };
-        })
-      );
+      var newData = [...arr];
 
-      var newData = [...response];
+      // const response = await Promise.all(
+      //   arr.map(async function (itm) {
+      //     const { id } = itm;
+      //     const profiles = await getContactById(id);
+      //     return { ...itm, profiles };
+      //   })
+      // );
+
+      // var newData = [...response];
 
       console.log("newData", newData);
 
@@ -896,7 +913,20 @@ async function fetchContactData(page) {
       // renderListContact(listContacts);
     }
   } catch (error) {
-    console.log(error);
+    if (error.status === 429) {
+      // Nếu gặp lỗi 429, chờ thêm thời gian
+      const retryAfter = error.headers["Retry-After"] || 60; // Thời gian chờ lấy từ header hoặc mặc định 60 giây
+      const timeUntilNextRequest = retryAfter * 1000; // Đổi ra miliseconds
+      // Hiển thị thông báo chờ
+      showNotify(
+        "info",
+        `Too many requests. Waiting ${retryAfter} seconds before sending next request...`
+      );
+      // Chờ trước khi thử lại
+      await new Promise((resolve) => setTimeout(resolve, timeUntilNextRequest));
+    } else {
+      console.error("Error in processing request:", error);
+    }
     isLoading = false;
     $("#loadingImg").css("display", "none");
     $("#loadMoreTxt").css("display", "block");
@@ -950,7 +980,7 @@ async function filterContactDataInbound(phone) {
 
 //---- refactor filteredContactSearch---//
 async function filteredContactSearch(term) {
-  debugger;
+  //debugger;
   try {
     const data = await client.request.invokeTemplate("filteredContactSearch", {
       context: { term },
@@ -1073,8 +1103,27 @@ async function getContactById(id_contact) {
       }
       return detail;
     } catch (error) {
-      console.log(error);
-      showNotify("danger", error?.message);
+      if (error.status === 429) {
+        // Nếu gặp lỗi 429, chờ thêm thời gian
+        const retryAfter = error.headers["Retry-After"] || 60; // Thời gian chờ lấy từ header hoặc mặc định 60 giây
+        const timeUntilNextRequest = retryAfter * 1000; // Đổi ra miliseconds
+
+        // Hiển thị thông báo chờ
+        showNotify(
+          "info",
+          `Too many requests. Waiting ${retryAfter} seconds before sending next request...`
+        );
+        // Chờ trước khi thử lại
+        await new Promise((resolve) =>
+          setTimeout(resolve, timeUntilNextRequest)
+        );
+      } else {
+        console.error("Error in processing request:", error);
+      }
+      // showNotify("danger", error?.message);
+      isLoading = false;
+      $("#loadingImg").css("display", "none");
+      $("#loadMoreTxt").css("display", "block");
     }
   } else {
     existContact = false;
@@ -1801,8 +1850,8 @@ async function showHistoryCall() {
 
   listMissCall = [];
   listHisCall = [];
-
   const dataCached = JSON.parse(localStorage.getItem("cacheDataHisCall"));
+  //debugger
   // lấy data historycall
   let readCall = await webphone?.readCallDetails(options);
   listHisCall = readCall?.reverse();
@@ -1854,7 +1903,6 @@ async function showMissCall() {
 
   listMissCall = [];
   listHisCall = [];
-
   const dataCached = JSON.parse(localStorage.getItem("cacheDataMissCall"));
   let readCall = await webphone?.readCallDetails(options);
   const arr = readCall?.reverse();
@@ -2145,7 +2193,7 @@ function acceptCall() {
 
   isMainActive = true;
 
-  debugger;
+  //debugger;
   $("#checkMicInbound").prop("disabled", false).css("opacity", "1");
   $("#checkHoldInbound").prop("disabled", false).css("opacity", "1");
 
@@ -2627,20 +2675,25 @@ async function clickToMissCall(elem) {
   const idProfile = $(elem).attr("attr-id");
   // await filteredContactSearch(sdt);
 
-  // idContact = $(elem).attr("attr-id");
-  await getContactById(idProfile);
-  if (existContact) {
-    goToContact(idProfile);
-    $("#appTxtNameContact").val(nameContact);
-    $("#appTxtNameContact").text(nameContact);
-  } else {
-    $("#appTxtNameContact").val(
-      `Unknown Contact`.concat(" - ").concat(`${sdt}`)
-    );
+  if (idProfile === "undefined") {
+    //hien thi text cho the span
     $("#appTxtNameContact").text(
       `Unknown Contact`.concat(" - ").concat(`${sdt}`)
     );
+    filteredContactSearch(sdt);
+  } else {
+    await getContactById(idProfile);
+    if (existContact) {
+      goToContact(idProfile);
+
+      $("#appTxtNameContact").text(nameContact);
+    } else {
+      $("#appTxtNameContact").text(
+        `Unknown Contact`.concat(" - ").concat(`${sdt}`)
+      );
+    }
   }
+
   // filteredContactSearch(sdt);
   resizeAppDefault();
   openUI("mainOutbound");
@@ -2756,6 +2809,7 @@ async function loadMoreItemsHisCall() {
     let arrayOfArrays = [...itemsOld, newItems];
     const flattenedArray = [].concat(...arrayOfArrays);
     localStorage.setItem("cacheDataHisCall", JSON.stringify(flattenedArray));
+    //debugger
     renderListHistoryCall(flattenedArray);
   }, 200); // Thay đổi thời gian debounce nếu cần
 
@@ -2835,6 +2889,7 @@ async function displayItemsHisCall(items) {
 
     // Sau khi tất cả các yêu cầu được xử lý, gọi hàm để render dữ liệu
     localStorage.setItem("cacheDataHisCall", JSON.stringify(items));
+    //debugger
     renderListHistoryCall(items);
   }, 200); // Thay đổi thời gian debounce nếu cần
 
@@ -2875,6 +2930,7 @@ function openUI(nameMainView) {
     x[i].style.display = "none";
   }
   document.getElementById(nameMainView).style.display = "block";
+  isMainShow = nameMainView;
 }
 
 function preCall() {
@@ -3122,9 +3178,7 @@ async function submitLogin() {
         }
 
         isClickToCallInitialized = false;
-        // debugger;
 
-        // Kiểm tra và mở giao diện UI tương ứng
         if (
           resultTerminals?.terminals?.length > 0 &&
           resultDeviceid?.addresses?.length > 0
@@ -3133,6 +3187,15 @@ async function submitLogin() {
           const userTerminals = JSON.parse(
             localStorage.getItem("userTerminals")
           );
+
+          const browserInfo = getBrowserInfo();
+          getIPInfo().then((ipInfo) => {
+            console.log(
+              "Browser ",
+              browserInfo.browserName + "." + browserInfo.fullVersion
+            );
+            console.log("IP Address:", ipInfo.ip);
+          });
 
           // Bắt đầu phiên ứng dụng
           agent.startApplicationSession({
@@ -3432,14 +3495,31 @@ function mainCollapseClickToCall() {
 
 function showFormLogout() {
   client.interface.trigger("show", { id: "softphone" }).then(function () {
-    openUI("mainLogout");
-    isMainShow = "mainLogout";
-    isTimeStarted = false;
-    // terminate call and stop session
-    resetText();
-    agent.stopApplicationSession();
-    localStorage.clear();
-    isLogger = false;
+    // openUI("mainLogout");
+    // isMainShow = "mainLogout";
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to log out now!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        isTimeStarted = false;
+        resetText();
+        // terminate call and stop session
+        agent.stopApplicationSession();
+        localStorage.clear();
+        openUI("mainLogin");
+        isMainShow = "mainLogin";
+        $("#pbx_username").val("");
+        $("#pbx_code").val("");
+        isClickToCallInitialized = false;
+        isLogger = false;
+      }
+    });
   });
 }
 
@@ -3759,8 +3839,8 @@ async function checkDeviceExisted(param_email_as7, param_code_as7, param_term) {
       const data = await response.json();
       if (data?.lolocations !== null || data?.lolocations !== undefined) {
         if (data.locations[0].expires > 0) {
-          showNotify("danger", "Being logged in on another device");
-          return submitLogout();
+          // showNotify("info", "Being logged in on another device");
+          // return submitLogout();
         }
       }
       location.reload(true);
@@ -3786,7 +3866,11 @@ function resetTimer() {
 // Hàm logout
 function logout() {
   if (isMainShow !== "mainLogin") {
-    alert("You have been automatically logged out due to inactivity.");
+    // alert("You have been automatically logged out due to inactivity.");
+    showNotify(
+      "info",
+      "You have been automatically logged out due to inactivity."
+    );
     // Gọi API logout hoặc điều hướng sang trang đăng nhập
     submitLogout();
   }
@@ -3810,3 +3894,49 @@ function getUniquePhones(items, fields) {
     ),
   ];
 }
+
+function getBrowserInfo() {
+  const ua = navigator.userAgent;
+  let browserName, fullVersion;
+
+  if (ua.indexOf("Chrome") > -1) {
+    browserName = "Chrome";
+    fullVersion = ua.substring(ua.indexOf("Chrome") + 7);
+  } else if (ua.indexOf("Firefox") > -1) {
+    browserName = "Firefox";
+    fullVersion = ua.substring(ua.indexOf("Firefox") + 8);
+  } else if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) {
+    browserName = "Internet Explorer";
+    fullVersion = ua.substring(ua.indexOf("MSIE") + 5);
+  } else if (ua.indexOf("Safari") > -1 && ua.indexOf("Chrome") === -1) {
+    browserName = "Safari";
+    fullVersion = ua.substring(ua.indexOf("Safari") + 7);
+  }
+
+  return { browserName, fullVersion };
+}
+
+function getIPInfo() {
+  return fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => {
+      return { ip: data.ip };
+    })
+    .catch((error) => {
+      console.error("Error fetching IP:", error);
+      return { ip: "Unable to fetch IP" };
+    });
+}
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    const loginButton = document.getElementById("btn_sub_login");
+    const callButton = document.getElementById("callEnter");
+
+    if (loginButton && isMainShow === "mainLogin") {
+      submitLogin();
+    } else if (!callButton.disabled && isMainShow === "mainContent") {
+      toggleCall();
+    }
+  }
+});
